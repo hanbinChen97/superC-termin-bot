@@ -1,0 +1,5 @@
+现在我要添加自动填写表单的功能。
+因为RWTH - Außenstelle Super C的 termin 目前没有。
+但是可以在Infostelle测试，他们是两个不同的 termin，但是 info 是可以预约的。
+
+我想在 infostell 的情况下开发自动填写表单，并预约 temrin 的功能，成功后迁移到 Super C。

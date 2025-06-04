@@ -1,0 +1,58 @@
+[
+    {
+      "beschreibung": "Vorname",
+      "fuellen_in_name": "vorname",
+      "fuellen_in_id": "vorname",
+      "typ": "text",
+      "wert_zum_fuellen": "Hanbin"
+    },
+    {
+      "beschreibung": "Nachname",
+      "fuellen_in_name": "nachname",
+      "fuellen_in_id": "nachname",
+      "typ": "text",
+      "wert_zum_fuellen": "Chen"
+    },
+    {
+      "beschreibung": "E-Mail",
+      "fuellen_in_name": "email",
+      "fuellen_in_id": "email",
+      "typ": "email",
+      "wert_zum_fuellen": "hanbin.9797@gmail.com"
+    },
+    {
+      "beschreibung": "E-Mail - Wiederholung",
+      "fuellen_in_name": "emailCheck",
+      "fuellen_in_id": "emailwhlg",
+      "typ": "email",
+      "wert_zum_fuellen": "hanbin.9797@gmail.com"
+    },
+    {
+      "beschreibung": "Telefonnummer",
+      "fuellen_in_name": "phone",
+      "fuellen_in_id": "tel",
+      "typ": "number",
+      "wert_zum_fuellen": "015732636211"
+    },
+    {
+      "beschreibung": "Geburtsdatum Tag",
+      "fuellen_in_name": "geburtsdatumDay",
+      "fuellen_in_id": "geburtsdatumDay",
+      "typ": "number",
+      "wert_zum_fuellen": "06" 
+    },
+    {
+      "beschreibung": "Geburtsdatum Monat",
+      "fuellen_in_name": "geburtsdatumMonth",
+      "fuellen_in_id": "geburtsdatumMonth",
+      "typ": "number",
+      "wert_zum_fuellen": "09" 
+    },
+    {
+      "beschreibung": "Geburtsdatum Jahr",
+      "fuellen_in_name": "geburtsdatumYear",
+      "fuellen_in_id": "geburtsdatumYear",
+      "typ": "number",
+      "wert_zum_fuellen": "1997" 
+    }
+  ]

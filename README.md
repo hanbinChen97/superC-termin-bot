@@ -1,17 +1,30 @@
-# 项目介绍
+# Aachen Termin Bot
+
+这是一个用于自动检查亚琛外管局（Ausländeramt）预约时间的机器人。
+
+## 预约流程详情
+
+### 初始请求
 request
 https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1
-起始网站
-页面上有html 代码：
+
+### 页面流程
+1. 起始网站页面上有html 代码：
+```
 <h1> Schritt 2<span class="visuallyhidden"> von 6</span>: Aufenthaltsangelegenheiten - Auswahl des Anliegens </h1>
+```
 选择 RWTH Studenten，然后点击 weiter。
 
-下个步骤页面上有html 代码：
+2. 下个步骤页面上有html 代码：
+```
 <h1> Schritt 3<span class="visuallyhidden"> von 6</span>: Terminvorschläge - Standortauswahl </h1>
+```
 继续点 weiter。
 
-刷新后的页面上有html 代码：
+3. 刷新后的页面上有html 代码：
+```
 <h1> Schritt 4<span class="visuallyhidden"> von 6</span>: Terminvorschläge - Keine Zeiten verfügbar </h1>
+```
 一般就显示 Kein freier Termin verfügbar 了。
 
 ### 预约检查序列图
@@ -37,10 +50,6 @@ sequenceDiagram
     SC-->>A: 返回预约结果
     A-->>S: 返回最终结果
 ```
-
-# Aachen Termin Bot
-
-这是一个用于自动检查亚琛外管局（Ausländeramt）预约时间的机器人。
 
 ## 功能特点
 
