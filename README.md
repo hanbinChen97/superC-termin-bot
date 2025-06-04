@@ -72,8 +72,6 @@ cd aachen-termin-bot
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# 或
-.venv\Scripts\activate  # Windows
 ```
 
 3. 安装依赖：
@@ -84,10 +82,10 @@ pip install -r requirements.txt
 ## 运行
 
 ```bash
-python app.py
+source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 ```
 
-应用将在 8080 端口启动（可通过环境变量 PORT 修改）。
+应用将在 8318 端口启动（可通过环境变量 PORT 修改）。
 
 ## API 接口
 
