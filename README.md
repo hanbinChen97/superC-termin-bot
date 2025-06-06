@@ -51,23 +51,6 @@ sequenceDiagram
     A-->>S: 返回最终结果
 ```
 
-## 功能特点
-
-- 自动检查亚琛外管局预约系统
-- 每3分钟自动检查一次
-- 详细的日志记录
-- 支持健康检查接口
-
-## 项目结构
-
-```
-.
-├── app.py              # Flask应用主文件
-├── superc.py           # 预约检查核心逻辑
-├── requirements.txt    # 项目依赖
-├── logs/              # 日志目录
-└── pages/             # 页面内容存储目录
-```
 
 ## 安装
 
@@ -94,19 +77,8 @@ pip install -r requirements.txt
 source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 ```
 
+```bash
+python3 infostelle.py
+```
+
 应用将在 8318 端口启动（可通过环境变量 PORT 修改）。
-
-## API 接口
-
-- `GET /` - 检查服务是否运行
-- `GET /status` - 健康检查接口
-
-## 日志
-
-日志文件存储在 `logs` 目录下，按日期命名。同时也会在控制台输出。
-
-## 注意事项
-
-- 请确保网络连接稳定
-- 建议使用代理服务器以避免IP被封
-- 定期检查日志文件大小
