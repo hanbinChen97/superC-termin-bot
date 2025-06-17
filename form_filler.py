@@ -61,9 +61,13 @@ def fill_form(session, soup, captcha_image_path):
 
     # 准备表单数据
     form_data = personal_info.copy()
+    # comment= ''
+    form_data['comment'] = ''
     form_data['captcha_code'] = captcha_text
     form_data['agreementChecked'] = 'on'
     form_data['hunangskrukka'] = ''
+    # submit=Reservieren
+    form_data['submit'] = 'Reservieren'
     print(f"\n准备提交的表单数据: {form_data}")
 
     # 获取表单提交URL
@@ -96,7 +100,7 @@ def fill_form(session, soup, captcha_image_path):
         print(f"\n表单提交响应状态码: {res.status_code}")
         
         # 检查是否提交成功
-        if "Ihre Anmeldung war erfolgreich" in res.text:
+        if "Schritt 6" in res.text:
             print("预约成功！")
             return True, res
         else:

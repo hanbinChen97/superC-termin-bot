@@ -37,6 +37,13 @@ def get_initial_page(session):
     """
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1'
     res = session.get(url)
+
+    # Schritt 2von 6: Aufenthaltsangelegenheiten
+    if "Schritt 2" in res.text:
+        print("成功进入 Schritt 2 von 6")
+    else:
+        print("未进入 Schritt 2 von 6")
+
     save_page_content(res.text, '1_initial')
     return True, res
 
@@ -72,6 +79,10 @@ def get_location_info(session, url):
     :return: (是否成功, (位置ID, 响应对象))
     """
     res = session.get(url)
+
+    if "Schritt 3" in res.text:
+        print("成功进入 Schritt 3 von 6")
+
     save_page_content(res.text, '2_location')
     
     soup = bs4.BeautifulSoup(res.content, 'html.parser')
@@ -96,6 +107,10 @@ def submit_location(session, url, loc):
         'select_location': 'Ausländeramt Aachen - Infostelle auswählen'
     }
     res = session.post(url, data=payload)
+
+    if "Schritt 4" in res.text:
+        print("成功进入 Schritt 4 von 6")
+
     save_page_content(res.text, '3_location_submitted')
     return True, res
 
@@ -157,6 +172,11 @@ def check_availability(session):
     """
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
     res = session.get(url)
+
+    # Schritt 5von 6: Eingabe der persönlichen Daten
+    if "Schritt 5" in res.text:
+        print("成功进入 Schritt 5 von 6")
+
     save_page_content(res.text, '4_availability')
     
     if "Kein freier Termin verfügbar" not in res.text:
