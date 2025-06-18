@@ -115,7 +115,6 @@ def submit_location(session, url, loc):
     if "Schritt 4" in res.text:
         print("成功进入 Schritt 4 von 6")
 
-    save_page_content(res.text, '3_location_submitted')
     return True, res
 
 def download_captcha(session, soup):
@@ -177,28 +176,42 @@ def check_availability(session):
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
     res = session.get(url)
 
-    # Schritt 5von 6: Eingabe der persönlichen Daten
-    if "Schritt 5" in res.text:
-        print("成功进入 Schritt 5 von 6")
 
     save_page_content(res.text, '4_availability')
     
     if "Kein freier Termin verfügbar" not in res.text:
         soup = bs4.BeautifulSoup(res.text, 'html.parser')
+
         div = soup.find("div", {"id": "sugg_accordion"})
+
         if div:
             first_available_form = div.find("form", {"class": "suggestion_form"})
+
             if first_available_form:
                 form_data = {}
+
                 for input_field in first_available_form.find_all("input", {"type": "hidden"}):
                     form_data[input_field.get('name')] = input_field.get('value')
-                time_button = first_available_form.find("button", {"class": "suggest_btn"})
+
+                time_button = first_available_form.find("button", {"type": "submit"})
                 time_info = time_button.get('title') if time_button else "未知时间"
+
                 submit_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
+
                 submit_res = session.post(submit_url, data=form_data)
+                # Schritt 5 Terminvorschläge zeit
+                if "Schritt 5" in submit_res.text:
+                    print("成功进入 Schritt 5 von 6")
+                    print("有时间：" + time_info)
+                else:
+                    print("没选中时间。")
+
                 save_page_content(submit_res.text, '5_term_selected')
+
+                # 下载验证码了
                 submit_soup = bs4.BeautifulSoup(submit_res.text, 'html.parser')
                 success, result = download_captcha(session, submit_soup)
+
                 if success:
                     return True, (submit_res.text, result)
                 else:
@@ -207,6 +220,7 @@ def check_availability(session):
             appointments = "\n".join([h.text for h in h3_tags])
             return True, f"发现可用预约时间：\n{appointments}"
         return True, "发现可用预约时间，但无法解析具体时间"
+
     return False, "当前没有可用预约时间"
 
 def check_appointment():
@@ -240,6 +254,7 @@ def check_appointment():
 
     # 第五步：检查是否有可用时间
     success, result = check_availability(session)
+
     if not success:
         return False, result
 
@@ -256,4 +271,3 @@ def check_appointment():
 
 if __name__ == "__main__":
     has_appointment, message = check_appointment()
-    print(message) 

@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import datetime
 from urllib.parse import urljoin
+
 from llmCall import recognize_captcha
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
@@ -74,13 +75,11 @@ def fill_form(session, soup, captcha_image_path):
     form = soup.find('form')
     if not form:
         return False, "无法找到表单"
-    print(f"\n找到表单: {form.get('action')}")
 
     # 获取所有隐藏字段
     hidden_fields = {}
     for hidden_input in form.find_all('input', type='hidden'):
         hidden_fields[hidden_input.get('name')] = hidden_input.get('value')
-    print(f"找到隐藏字段: {hidden_fields}")
     form_data.update(hidden_fields)
 
     # 拼接 action url
@@ -95,9 +94,9 @@ def fill_form(session, soup, captcha_image_path):
             'Referer': 'https://termine.staedteregion-aachen.de/auslaenderamt/'
         }
         print(f"\n准备提交请求，headers: {headers}")
-        res = session.post(submit_url, data=form_data, headers=headers)
-        save_page_content(res.text, '6_form_submitted')
-        print(f"\n表单提交响应状态码: {res.status_code}")
+        # res = session.post(submit_url, data=form_data, headers=headers)
+        # save_page_content(res.text, '6_form_submitted')
+        # print(f"\n表单提交响应状态码: {res.status_code}")
         
         # 检查是否提交成功
         if "Schritt 6" in res.text:
@@ -105,10 +104,6 @@ def fill_form(session, soup, captcha_image_path):
             return True, res
         else:
             error_message = "表单提交失败"
-            if "captcha" in res.text.lower():
-                error_message += "，验证码可能不正确"
-            if "agreement" in res.text.lower():
-                error_message += "，请确认已勾选同意条款"
             print(f"\n错误信息: {error_message}")
             print(f"响应内容: {res.text[:500]}...")
             return False, error_message

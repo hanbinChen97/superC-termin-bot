@@ -1,5 +1,6 @@
 '''
 python3 superc.py
+nohup python3 superc.py > superc.log 2>&1 &
 '''
 
 import requests
@@ -9,6 +10,7 @@ import os
 from datetime import datetime
 from urllib.parse import urljoin
 from form_filler import fill_form
+import time
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
@@ -41,6 +43,13 @@ def get_initial_page(session):
     """
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/select2?md=1'
     res = session.get(url)
+
+    # Schritt 2von 6: Aufenthaltsangelegenheiten
+    # if "Schritt 2" in res.text:
+    #     print("成功进入 Schritt 2 von 6")
+    # else:
+    #     print("未进入 Schritt 2 von 6")
+
     # save_page_content(res.text, '1_initial')
     return True, res
 
@@ -76,6 +85,10 @@ def get_location_info(session, url):
     :return: (是否成功, (位置ID, 响应对象))
     """
     res = session.get(url)
+
+    # if "Schritt 3" in res.text:
+    #     print("成功进入 Schritt 3 von 6")
+
     # save_page_content(res.text, '2_location')
     
     soup = bs4.BeautifulSoup(res.content, 'html.parser')
@@ -161,21 +174,40 @@ def check_availability(session):
     """
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
     res = session.get(url)
-    save_page_content(res.text, '4_availability')
+    # save_page_content(res.text, '4_availability')
     
     if "Kein freier Termin verfügbar" not in res.text:
         soup = bs4.BeautifulSoup(res.text, 'html.parser')
-        div = soup.find("div", {"id": "sugg_accordion"})
-        if div:
-            first_available_form = div.find("form", {"class": "suggestion_form"})
+
+        details_container = soup.find("details", {"id": "details_suggest_times"})
+
+        # 后续逻辑几乎不用变，只需将变量 div 替换为 details_container
+        if details_container:
+            # 查找表单的逻辑不变，因为它依然在容器内部
+            first_available_form = details_container.find("form", {"class": "suggestion_form"})
+            
             if first_available_form:
                 form_data = {}
+                # 提取隐藏字段的逻辑不变
                 for input_field in first_available_form.find_all("input", {"type": "hidden"}):
                     form_data[input_field.get('name')] = input_field.get('value')
-                time_button = first_available_form.find("button", {"class": "suggest_btn"})
+                
+                # 提取时间的逻辑不变
+                time_button = first_available_form.find("button", {"type": "submit"})
                 time_info = time_button.get('title') if time_button else "未知时间"
+                
+                # 提交请求的逻辑不变
+                print(f"找到可用时间: {time_info}, 正在提交...")
+                print(f"提交的表单数据: {form_data}")
+                
                 submit_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
                 submit_res = session.post(submit_url, data=form_data)
+                # Schritt 5 Terminvorschläge zeit
+                if "Schritt 5" in submit_res.text:
+                    print("成功进入 Schritt 5 von 6")
+                    print("有时间：" + time_info)
+                else:
+                    print("没选中时间。")
                 save_page_content(submit_res.text, '5_term_selected')
                 submit_soup = bs4.BeautifulSoup(submit_res.text, 'html.parser')
                 success, result = download_captcha(session, submit_soup)
@@ -235,5 +267,13 @@ def check_appointment():
     return success, result
 
 if __name__ == "__main__":
-    has_appointment, message = check_appointment()
-    print(message) 
+    while True:
+        has_appointment, message = check_appointment()
+        print(message)
+        logging.info(f'{message}')
+
+        if has_appointment:
+            break
+        logging.info("等待1分钟后重新检查...")
+        time.sleep(60)  # 等待60秒
+    

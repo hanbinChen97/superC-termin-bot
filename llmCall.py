@@ -13,11 +13,11 @@ deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
 api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 
 # 打印环境变量（不打印敏感信息）
-print("环境变量检查：")
-print(f"AZURE_OPENAI_ENDPOINT: {'已设置' if endpoint else '未设置'}")
-print(f"AZURE_OPENAI_DEPLOYMENT_NAME: {'已设置' if deployment else '未设置'}")
-print(f"AZURE_OPENAI_KEY: {'已设置' if subscription_key else '未设置'}")
-print(f"AZURE_OPENAI_API_VERSION: {api_version}")
+# print("环境变量检查：")
+# print(f"AZURE_OPENAI_ENDPOINT: {'已设置' if endpoint else '未设置'}")
+# print(f"AZURE_OPENAI_DEPLOYMENT_NAME: {'已设置' if deployment else '未设置'}")
+# print(f"AZURE_OPENAI_KEY: {'已设置' if subscription_key else '未设置'}")
+# print(f"AZURE_OPENAI_API_VERSION: {api_version}")
 
 client = AzureOpenAI(
     api_version=api_version,
