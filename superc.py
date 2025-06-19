@@ -175,51 +175,66 @@ def check_availability(session):
     url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
     res = session.get(url)
     # save_page_content(res.text, '4_availability')
+    soup = bs4.BeautifulSoup(res.text, 'html.parser')
+
+    details_container = soup.find("details", {"id": "details_suggest_times"})
     
-    if "Kein freier Termin verfügbar" not in res.text:
-        soup = bs4.BeautifulSoup(res.text, 'html.parser')
+    if "Kein freier Termin verfügbar" in res.text:
+        return False, "查询完成，当前没有可用预约时间"
 
-        details_container = soup.find("details", {"id": "details_suggest_times"})
+    if details_container is None:
+        return False, "Error, we are not in processing."
 
-        # 后续逻辑几乎不用变，只需将变量 div 替换为 details_container
-        if details_container:
-            # 查找表单的逻辑不变，因为它依然在容器内部
-            first_available_form = details_container.find("form", {"class": "suggestion_form"})
+    if details_container is not None:
+        print("发现可用预约时间")
+
+        first_available_form = details_container.find("form", {"class": "suggestion_form"})
+        
+        if first_available_form is None:
+            return False, "没找到表格" 
+
+        if first_available_form:
+            form_data = {}
+            # 提取隐藏字段的逻辑不变
+            for input_field in first_available_form.find_all("input", {"type": "hidden"}):
+                form_data[input_field.get('name')] = input_field.get('value')
             
-            if first_available_form:
-                form_data = {}
-                # 提取隐藏字段的逻辑不变
-                for input_field in first_available_form.find_all("input", {"type": "hidden"}):
-                    form_data[input_field.get('name')] = input_field.get('value')
-                
-                # 提取时间的逻辑不变
-                time_button = first_available_form.find("button", {"type": "submit"})
-                time_info = time_button.get('title') if time_button else "未知时间"
-                
-                # 提交请求的逻辑不变
-                print(f"找到可用时间: {time_info}, 正在提交...")
-                print(f"提交的表单数据: {form_data}")
-                
-                submit_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
-                submit_res = session.post(submit_url, data=form_data)
-                # Schritt 5 Terminvorschläge zeit
-                if "Schritt 5" in submit_res.text:
-                    print("成功进入 Schritt 5 von 6")
-                    print("有时间：" + time_info)
-                else:
-                    print("没选中时间。")
-                save_page_content(submit_res.text, '5_term_selected')
-                submit_soup = bs4.BeautifulSoup(submit_res.text, 'html.parser')
-                success, result = download_captcha(session, submit_soup)
-                if success:
-                    return True, (submit_res.text, result)
-                else:
-                    return True, (submit_res.text, result)
+            # 提取时间的逻辑不变
+            time_button = first_available_form.find("button", {"type": "submit"})
+            
+            if time_button is None:
+                return False, "没找到button" 
+
+            time_info = time_button.get('title') if time_button else "未知时间"
+            
+            # 提交请求的逻辑不变
+            print(f"找到可用时间: {time_info}, 正在提交...")
+            print(f"提交的表单数据: {form_data}")
+            
+            submit_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
+            submit_res = session.post(submit_url, data=form_data)
+            # Schritt 5 Terminvorschläge zeit
+            if "Schritt 5" in submit_res.text:
+                print("成功进入 Schritt 5 von 6")
+                print("有时间：" + time_info)
+            else:
+                print("没选中时间。")
+
+            save_page_content(submit_res.text, '5_term_selected')
+
+            submit_soup = bs4.BeautifulSoup(submit_res.text, 'html.parser')
+            success, result = download_captcha(session, submit_soup)
+
+            if success:
+                return True, (submit_res.text, result)
+            else:
+                return True, (submit_res.text, result)
             h3_tags = div.find_all("h3")
             appointments = "\n".join([h.text for h in h3_tags])
             return True, f"发现可用预约时间：\n{appointments}"
+
         return True, "发现可用预约时间，但无法解析具体时间"
-    return False, "当前没有可用预约时间"
+    
 
 def check_appointment():
     """
@@ -269,11 +284,11 @@ def check_appointment():
 if __name__ == "__main__":
     while True:
         has_appointment, message = check_appointment()
-        print(message)
         logging.info(f'{message}')
 
         if has_appointment:
             break
+
         logging.info("等待1分钟后重新检查...")
         time.sleep(60)  # 等待60秒
     
