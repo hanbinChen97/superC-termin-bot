@@ -3,48 +3,48 @@
       "beschreibung": "Vorname",
       "fuellen_in_name": "vorname",
       "typ": "text",
-      "wert_zum_fuellen": "Rongzheng"
+      "wert_zum_fuellen": "Xinhui"
     },
     {
       "beschreibung": "Nachname",
       "fuellen_in_name": "nachname",
       "typ": "text",
-      "wert_zum_fuellen": "Hao"
+      "wert_zum_fuellen": "Feng"
     },
     {
       "beschreibung": "E-Mail",
       "fuellen_in_name": "email",
       "typ": "email",
-      "wert_zum_fuellen": "Rongzheng7@outlook.com"
+      "wert_zum_fuellen": "Fengxinhui1217@outlook.com"
     },
     {
       "beschreibung": "E-Mail - Wiederholung",
       "fuellen_in_name": "emailCheck",
       "typ": "email",
-      "wert_zum_fuellen": "Rongzheng7@outlook.com"
+      "wert_zum_fuellen": "Fengxinhui1217@outlook.com"
     },
     {
       "beschreibung": "Telefonnummer",
       "fuellen_in_name": "phone",
       "typ": "number",
-      "wert_zum_fuellen": "017664168727"
+      "wert_zum_fuellen": "015756157460"
     },
     {
       "beschreibung": "Geburtsdatum Tag",
       "fuellen_in_name": "geburtsdatumDay",
       "typ": "number",
-      "wert_zum_fuellen": "07" 
+      "wert_zum_fuellen": "17" 
     },
     {
       "beschreibung": "Geburtsdatum Monat",
       "fuellen_in_name": "geburtsdatumMonth",
       "typ": "number",
-      "wert_zum_fuellen": "07" 
+      "wert_zum_fuellen": "12" 
     },
     {
       "beschreibung": "Geburtsdatum Jahr",
       "fuellen_in_name": "geburtsdatumYear",
       "typ": "number",
-      "wert_zum_fuellen": "2000" 
+      "wert_zum_fuellen": "1998" 
     }
   ]

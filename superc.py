@@ -186,7 +186,7 @@ def check_availability(session):
         return False, "Error, we are not in processing."
 
     if details_container is not None:
-        print("发现可用预约时间")
+        logging.info("发现可用预约时间")
 
         first_available_form = details_container.find("form", {"class": "suggestion_form"})
         
@@ -208,17 +208,17 @@ def check_availability(session):
             time_info = time_button.get('title') if time_button else "未知时间"
             
             # 提交请求的逻辑不变
-            print(f"找到可用时间: {time_info}, 正在提交...")
-            print(f"提交的表单数据: {form_data}")
+            logging.info(f"找到可用时间: {time_info}, 正在提交...")
+            logging.info(f"提交的表单数据: {form_data}")
             
             submit_url = 'https://termine.staedteregion-aachen.de/auslaenderamt/suggest'
             submit_res = session.post(submit_url, data=form_data)
             # Schritt 5 Terminvorschläge zeit
             if "Schritt 5" in submit_res.text:
-                print("成功进入 Schritt 5 von 6")
-                print("有时间：" + time_info)
+                logging.info("成功进入 Schritt 5 von 6")
+                logging.info("有时间：" + time_info)
             else:
-                print("没选中时间。")
+                logging.info("没选中时间。")
 
             save_page_content(submit_res.text, '5_term_selected')
 
@@ -282,13 +282,15 @@ def check_appointment():
     return success, result
 
 if __name__ == "__main__":
+    logging.info(f"当前进程PID: {os.getpid()}")
+
     while True:
         has_appointment, message = check_appointment()
-        logging.info(f'{message}')
-
+     
         if has_appointment:
             break
 
+        logging.info(f'{message}')
         logging.info("等待1分钟后重新检查...")
         time.sleep(60)  # 等待60秒
     

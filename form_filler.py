@@ -4,9 +4,11 @@ import os
 from datetime import datetime
 from urllib.parse import urljoin
 
+
 from llmCall import recognize_captcha
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 def save_page_content(content, step_name):
     """
@@ -45,18 +47,18 @@ def fill_form(session, soup, captcha_image_path):
     :param captcha_image_path: 验证码图片路径
     :return: (是否成功, 响应对象或错误信息)
     """
-    print("\n开始填写表单...")
+    logging.info("\n开始填写表单...")
     
     # 加载个人信息
     personal_info = load_personal_info()
     if not personal_info:
         return False, "无法加载个人信息"
-    print(f"已加载个人信息: {personal_info}")
+    logging.info(f"已加载个人信息: {personal_info}")
 
     # 识别验证码
-    print(f"\n开始识别验证码: {captcha_image_path}")
+    logging.info(f"\n开始识别验证码: {captcha_image_path}")
     captcha_text = recognize_captcha(captcha_image_path)
-    print(f"验证码识别结果: {captcha_text}")
+    logging.info(f"验证码识别结果: {captcha_text}")
     if not captcha_text:
         return False, "验证码识别失败"
 
@@ -69,7 +71,7 @@ def fill_form(session, soup, captcha_image_path):
     form_data['hunangskrukka'] = ''
     # submit=Reservieren
     form_data['submit'] = 'Reservieren'
-    print(f"\n准备提交的表单数据: {form_data}")
+    logging.info(f"\n准备提交的表单数据: {form_data}")
 
     # 获取表单提交URL
     form = soup.find('form')
@@ -84,7 +86,7 @@ def fill_form(session, soup, captcha_image_path):
 
     # 拼接 action url
     submit_url = urljoin('https://termine.staedteregion-aachen.de/auslaenderamt/', form.get('action'))
-    print(f"\n提交URL: {submit_url}")
+    logging.info(f"\n提交URL: {submit_url}")
 
     # 提交表单
     try:
@@ -93,14 +95,14 @@ def fill_form(session, soup, captcha_image_path):
             'Content-Type': 'application/x-www-form-urlencoded',
             'Referer': 'https://termine.staedteregion-aachen.de/auslaenderamt/'
         }
-        print(f"\n准备提交请求，headers: {headers}")
-        # res = session.post(submit_url, data=form_data, headers=headers)
-        # save_page_content(res.text, '6_form_submitted')
-        # print(f"\n表单提交响应状态码: {res.status_code}")
+        logging.info(f"\n准备提交请求，headers: {headers}")
+        res = session.post(submit_url, data=form_data, headers=headers)
+        save_page_content(res.text, '6_form_submitted')
+        logging.info(f"\n表单提交响应状态码: {res.status_code}")
         
         # 检查是否提交成功
         if "Schritt 6" in res.text:
-            print("预约成功！")
+            logging.info("预约成功！")
             return True, res
         else:
             error_message = "表单提交失败"
@@ -110,5 +112,5 @@ def fill_form(session, soup, captcha_image_path):
             
     except Exception as e:
         error_msg = f"提交表单时发生错误: {str(e)}"
-        print(f"\n错误: {error_msg}")
+        logging.info(f"\n错误: {error_msg}")
         return False, error_msg 

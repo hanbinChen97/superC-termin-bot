@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <!--###NOINDEX###-->
+        <meta charset="UTF-8">
+        <title>Termine Städteregion Aachen - Ausländerbehörde -</title>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="styles/web/basis/css/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/web/basis/css/fontawesome/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="styles/web/basis/css/leaflet.css"/>
+        <script src="app/js/leaflet.js"></script>
+        <script src="app/js/osm2geojson-lite.js"></script>
+        <script src="app/js/svg-icon.js"></script>
+        
+        <script type="text/javascript" src="app/js/jquery-3.6.0.min.js"></script>
+        
+        <link rel="stylesheet" href="styles/web/basis/css/jquery-ui_1.13.2.css">
+        <script src="app/js/jquery-ui_1.13.2.min.js"></script>
+
+        <link rel="stylesheet" href="styles/web/basis/css/combobox.css"/>
+        <script src="app/js/combobox.js"></script>
+
+        <link rel="stylesheet" href="styles/web/basis/css/Font.css">
+        <link rel="stylesheet" href="styles/web/basis/css/tvo.css?cache_buster=1742404504" type="text/css" />
+        <link rel="stylesheet" href="styles/web/tevis011/css/custom.css?cache_buster=1742382381" type="text/css" />
+        <!--###KONTRASTSTYLE###-->
+
+        <script type="text/javascript" src="styles/web/basis/css/bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="app/js/tvweb.js?cache_buster=1742404503"></script>
+        <script type="text/javascript" src="scripts/web/basis/javascript/basis.js"></script>
+        <script type="text/javascript" src="scripts/web/basis/javascript/calendar.js"></script>
+        <script type="text/javascript" src="app/js/js.cookie.min.js"></script>
+
+        <link rel="icon" href="data:,">
+
+        <script src="app/js/customA11ySelect.js"></script>
+
+        <!--##CONWORD_ONLOAD##-->
+    </head>
+
+    <body class="TEVISWEB">
+
+        <div id="cookie_msg">
+            <span tabindex="1" style="">Diese Website verwendet Cookies - nähere Informationen dazu und zu Ihren Rechten als Benutzer finden Sie in unserer Datenschutzerklärung.</span>
+            <input type="button" id="cookie_msg_btn_yes" class="btn" value="Akzeptieren" aria-label="Cookie-Verwendung akzeptieren" />
+            <input type="button" id="cookie_msg_btn_no" class="btn" value="Ablehnen" aria-label="Cookie-Verwendung ablehnen" />
+            <a href="#" onclick="showFooterModals('privacy', $(this).text())">Datenschutzerklärung</a>
+        </div>
+        
+         <nav id="einstellungen-nav" class="mainheader" aria-labelledby="Einstellungen-Label">
+                <div style="margin-top:-17px;">
+                    <a class="unsichtbar" href="#inhalt" style="margin-top:-10px;">Hauptregion der Seite anspringen</a><p id="Einstellungen-Label" class="menuEinstellung" >Einstellungen</p><ul id="exTest" role="menu" class="disclosure-nav"><li><button class="NavigationButton nomenu set_contrast_btn" title="Kontrast an" data-languageAN="Kontrast an" data-languageAUS="Kontrast aus" style="height: 100% !important;"><img  alt="Icon Kontrast" aria-hidden="true" src="styles/web/basis/images/contrast_low_black.svg" width="29" role="image"><img  alt="Icon Kontrast" aria-hidden="true" src="styles/web/basis/images/contrast_low_white.svg" width="29" role="image"></button > </li > <li><a href="https://termine.staedteregion-aachen.de/auslaenderamt/&lang=de_VS" tabindex="-1"><button class="NavigationButton nomenu"  aria-label="Sprachwahl einfache Sprache" title="Sprachwahl einfache Sprache"><img alt="Icon einfache Sprache" aria-hidden="true" focusable="false" src="styles/web/basis/images/leichte_Sprache_252525.svg" width="29px"><img alt="Icon einfache Sprache" aria-hidden="true" focusable="false" src="styles/web/basis/images/leichte_Sprache_FFFFFF.svg" width="29px"></button></a></li></ul>
+                </div>
+                </nav>
+	<div id="banner"></div>
+            <!--##LANGUAGE_MENU##-->
+        <!--##CORONA_LOGOUT##-->
+
+        <main class="container wrapper">
+
+            <script type="application/javascript">function removeAllClassesAndErrorText(eingabefeld){
+    eingabefeld.classList.remove("required");
+    eingabefeld.classList.remove("goodvalidate");
+    eingabefeld.classList.remove("wrongvalidate");
+    findErrorText(eingabefeld, "");
+    if(eingabefeld.id.includes("geburtsdatum")){
+        let eingabeYear = $("#geburtsdatumYear");
+        if(eingabeYear.parent().next().prop("tagName")=="IMG"){
+            eingabeYear.parent().next().remove();
+        }
+    }else{
+        if($(eingabefeld).next().prop("tagName")=="IMG"){
+            $(eingabefeld).next().remove();
+        }
+    }
+}
+
+function validate(eingabefeld){
+        if(!eingabefeld){
+            //alles validieren -> input, checkbox(falls required), select(falls required)
+            $("input").each(function(){
+                validate(this);
+            })
+            $("select[required]").each(function(){
+                validate(this);
+            })
+            $("textarea").each(function(){
+                validate(this);
+            })
+        }else{
+            //validate eingabefeld
+            if(eingabefeld.type=="checkbox"){
+                if(eingabefeld.getAttribute("name") == "agreementChecked" ){
+                    if(eingabefeld.checked){
+                        $("#agreementChecked").css("width", "0px");
+                        eingabefeld.classList.remove("required");
+                    }else{
+                        eingabefeld.classList.add("required");
+                        $("#agreementChecked").css("width", "17px");
+                    }
+                }
+
+                if( eingabefeld.classList.contains("ctf_checkbox") ){
+                    var target_cf_checkbox = eingabefeld.parentElement.parentElement.querySelectorAll("[id ^= cf-]");
+                    if( target_cf_checkbox.length === 1 ){
+                        if( eingabefeld.checked ){
+                            $( target_cf_checkbox ).css("width", "0px");
+                            eingabefeld.classList.remove("required");
+                        } else {
+                            $( target_cf_checkbox ).css("width", "17px");
+                            eingabefeld.classList.add("required");
+                        }
+                    }
+                }
+            }else{
+                if( eingabefeld.type == "text" ){
+                    removeAllClassesAndErrorText(eingabefeld);
+                    let eingabefeldvalue = $(eingabefeld).val().trim();
+                    if( eingabefeldvalue == "" ){
+                        if( eingabefeld.hasAttribute("required") ){
+                            eingabefeld.classList.add("required");
+                        }
+                    }else{
+                        var error = eingabefeldvalue.length < 1; //zu kurz
+                        var errortext = "";
+                        switch( eingabefeld.id ){
+                            case "nachname":
+                                error = eingabefeldvalue.match(/([0-9!"§\$%&\/\(\)=\?\{\[\]\}\*~#_\|<>^$])/)!=null || error;
+                                errortext = "Bitte geben Sie einen zulässigen Nachnamen ein.";
+                                break;
+                            case "vorname":
+                                error = eingabefeldvalue.match(/([0-9!"§\$%&\/\(\)=\?\{\[\]\}\*~#_\|<>^$])/)!=null || error; 
+                                errortext = "Bitte geben Sie einen zulässigen Vornamen ein.";
+                                break;
+                            case "nationality":
+                                error = eingabefeldvalue.match(/\d/)!=null || error;
+                                errortext= "Bitte geben Sie eine zulässige Nationalität ein.";
+                                break;
+                            case "firma":
+                                errortext= "Bitte geben Sie einen zulässigen Firmennamen ein.";
+                                break;
+                            case "docnr":
+                                errortext= "Bitte geben Sie eine zulässige Dokumentennummer ein.";
+                                break;
+                            case "str":
+                                error = eingabefeldvalue.length<5;
+                                errortext= "Bitte geben Sie eine zulässige Adresse ein.";
+                                break;
+                            case "wohnort":
+                                error = eingabefeldvalue.match(/([0-9!"§\$%&\/\(\)=\?\{\[\]\}\*~#_\|<>^$])/)!=null ||  error || eingabefeldvalue.length <3;
+                                errortext= "Bitte geben Sie einen zulässigen Wohnort ein.";
+                                break;
+                            case "aktenzeichen":
+                                errortext= "Bitte geben Sie ein zulässiges Aktenzeichen ein.";
+                                break;
+                            default:
+                                error = eingabefeldvalue.length <1;
+                                errortext= "Bitte machen Sie eine zulässige Eingabe!";
+                        }//ende switch
+
+                        if( error ){
+                            if( eingabefeld.id!="captcha_result" ){
+                                wrongvalidate(eingabefeld, errortext);
+                            }
+                        } else {
+                            if( eingabefeld.id != "captcha_result" && eingabefeld.id.match(/cf\-\d+/i) == null ){
+                                goodvalidate(eingabefeld);
+                            }
+                        }
+                    }
+                }else{
+                    if(eingabefeld.type=="number"){
+                        if(eingabefeld.id.includes("geburtsdatum")){
+                           checkGeburtsdatum();
+                        }else{
+                            removeAllClassesAndErrorText(eingabefeld);
+                            var eingabefeldvalue = $(eingabefeld).val();
+                            if( eingabefeldvalue != "" ){
+                                switch(eingabefeld.name){
+                                        case "phone" :{
+                                            if( eingabefeldvalue.match(/\d{3,}/) == null || parseInt(eingabefeldvalue) > eingabefeld.max ){
+                                                wrongvalidate(eingabefeld, "Bitte geben Sie eine zulässige Telefonnummer ein.");
+                                            }else{
+                                                goodvalidate(eingabefeld);
+                                            }
+                                            break;
+                                            }
+                                        case "phone_mobile":{
+                                            if( eingabefeldvalue.match(/\d{10,}/) == null || parseInt(eingabefeldvalue) > eingabefeld.max ){
+                                                wrongvalidate(eingabefeld, "Bitte geben Sie eine zulässige Mobilnummer ein.");
+                                            }else{
+                                                goodvalidate(eingabefeld);
+                                            }
+                                            break;
+                                        }
+                                        case "postleitzahl":{
+                                            if(eingabefeldvalue.match(/\d{4,}/)==null || eingabefeldvalue.length <4 || eingabefeldvalue.length >5){
+                                                wrongvalidate(eingabefeld, "Bitte geben Sie eine zulässige Postleitzahl ein.");
+                                            }else{
+                                                const plz_whitelist = $( "#plz_whitelist" ).val().split( "," );
+                                                if( plz_whitelist.length && plz_whitelist[0].length ){
+                                                    plz_whitelist.every(function (plz_whitelist_item) {
+                                                        let plz_range_end;
+                                                        let plz_range_start;
+                                                        let plz_range = plz_whitelist_item.split('-');
+                                                        if (plz_range.length > 1) {
+                                                            plz_range_start = plz_range[0];
+                                                            plz_range_end = plz_range[1];
+                                                        }else{
+                                                            plz_range_start = plz_range[0];
+                                                            plz_range_end = plz_range[0];
+                                                        }
+
+                                                        if (((eingabefeldvalue >= plz_range_start) && (eingabefeldvalue <= plz_range_end)) || plz_whitelist.includes(eingabefeldvalue)) {
+                                                            eingabefeld.classList.remove("wrongvalidate");
+                                                            goodvalidate(eingabefeld);
+                                                            findErrorText(eingabefeld, "");
+                                                            return false;
+                                                        } else {
+                                                            eingabefeld.classList.remove("goodvalidate");
+                                                            wrongvalidate(eingabefeld, "Die eingegebene Postleitzahl ist ungültig oder nicht Teil des Zuständigkeitsbereiches der Behörde.");
+                                                            return true;
+                                                        }
+                                                    });
+                                                }else{
+                                                    goodvalidate(eingabefeld);
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                            }else{
+                                if(eingabefeld.hasAttribute("required") && eingabefeldvalue ==""){
+                                    //required!
+                                    eingabefeld.classList.add("required");
+                                }
+                            }
+                        }
+                     
+                    }else{
+                        if(eingabefeld.tagName =="SELECT"){
+                            //nur required-Felder!
+                            $(eingabefeld).on("change", function(){
+                                validate(eingabefeld);
+                            });
+
+                            var selectMenu = findSelectMenu(eingabefeld);
+                            if( eingabefeld.hasAttribute("required") ){
+                                if( eingabefeld.value != "" ){
+                                    selectMenu.removeClass("required");
+                                    selectMenu.removeClass("validatewrongselect");
+                                    selectMenu.removeClass("validatewrong");
+                                    selectMenu.addClass("validateokselect");
+                                    selectMenu.addClass("validateok");
+                                    findErrorText(eingabefeld, "");
+                                }else{
+                                    selectMenu.addClass("required");
+                                    selectMenu.addClass("validatewrong");
+                                    selectMenu.addClass("validatewrongselect");
+                                    selectMenu.removeClass("validateok");
+                                    selectMenu.removeClass("validateokselect");
+                                    findErrorText(eingabefeld, "");
+                                }
+                            }
+                        }else{
+                            if(eingabefeld.type=="email"){
+                                checkMail();
+                            }else{
+                                if(eingabefeld.type=="textarea"){
+                                    removeAllClassesAndErrorText(eingabefeld);
+                                    eingabefeldvalue = $(eingabefeld).val().trim();
+                                    if( eingabefeld.hasAttribute("required") && eingabefeldvalue.length < 3 ){
+                                        wrongvalidate(eingabefeld, "Bitte machen Sie eine zulässige Eingabe");
+                                    }else{
+                                        if( eingabefeldvalue != "" ){
+                                            goodvalidate(eingabefeld);
+                                            eingabefeld.classList.remove("error");
+                                        }
+                                    }
+                                }
+                                //console.error("unbekanntes eingabefeld!");
+                                //console.log(eingabefeld);
+                            }
+                        }//ende if select
+                    }
+                }//ende else if number
+            }
+        }
+}
+
+function checkWeiter(){
+    var existrequired = $(".required").length > 0;
+    var existerror = $(".wrongvalidate").length > 0;
+
+    $(".goodvalidate").each(function (){
+        if( $(this).hasClass("gebJahr") ){
+            if( $(this).parent().next().prop("tagName") != "IMG" ){
+                $("<img aria-hidden=\"true\" class=\"validateimg geburtsdatumimg\"></img>").insertAfter($(this).parent());
+            }
+        } else{
+            if( $(this).next().prop("tagName") != "IMG" ){
+                if ($(this).prop("tagName") == "TEXTAREA") {
+                    if( $(this).prop('required') === true )
+                        $("<img aria-hidden=\"true\" class=\"validateimg textareaimg\"></img>").insertAfter($(this));
+                }else{
+                    $("<img aria-hidden=\"true\" class=\"validateimg\"></img>").insertAfter($(this));
+                }
+            }
+        }
+    });
+
+    $(".wrongvalidate, .wrongvalidate_continue").each( function(){
+        if ($(this).hasClass("gebJahr")) {
+            if( $(this).parent().next().prop("tagName") != "IMG" ){
+                $("<img aria-hidden=\"true\" class=\"wrongvalidateimg geburtsdatumimg\"></img>").insertAfter($(this).parent());
+            }
+        } else {
+            if ($(this).next().prop("tagName") != "IMG") {
+                if ($(this).prop("tagName") == "TEXTAREA") {
+                    $("<img aria-hidden=\"true\" class=\"wrongvalidateimg textareaimg\"></img>").insertAfter($(this));
+                }else{
+                    $("<img aria-hidden=\"true\" class=\"wrongvalidateimg\"></img>").insertAfter($(this));
+                }
+            }
+        }
+    });
+
+    var buttontext = "";
+    if( existrequired ){
+        buttontext = "Alle Pflichtfelder müssen ausgefüllt werden";
+    } else {
+        if( existerror ){
+            buttontext = "Es gibt noch fehlerhafte Eingaben.";
+        } else {
+            buttontext = "Reservieren";
+        }
+    }
+    
+    if( existrequired || existerror ){
+        $(".pull-right").addClass("disabledButton");
+        $(".pull-right").attr("aria-disabled", "true");
+        $(".pull-right").attr("title", buttontext);
+        $("#srhinweis").html(buttontext);
+        $(".pull-right").on("click", function(event){
+            event.preventDefault();
+        });
+    } else {
+        $("#srhinweis").html("Sie können nun zum nächsten Schritt der Terminreservierung gehen.")
+        $(".pull-right").removeClass("disabledButton");
+        $(".pull-right").attr("aria-disabled", "false");
+        $(".pull-right").attr("title", buttontext);
+        $(".pull-right").unbind();
+    }
+}
+
+
+function checkMail(){
+    var mail = $("#email");
+    var mailwhlg = $("#emailwhlg");
+    removeAllClassesAndErrorText( mail[0] );
+    removeAllClassesAndErrorText( mailwhlg[0] );
+   
+    if( mail.val().trim() == "" && mailwhlg.val().trim() == "" ){
+        if( mail.prop("required") ){
+            //pflichtfeld
+            mail.addClass("required");
+            mailwhlg.addClass("required");
+        }
+    } else {
+        var mailident = mail.val().trim() == mailwhlg.val().trim();
+        var mailok = mail.val().trim() != "" && mail.val().trim().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) != null;
+        var mailwhlgok = mailwhlg.val().trim() != "" && mailwhlg.val().trim().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) != null;
+        if( mailok && mailwhlgok && mailident ){
+            goodvalidate(mail);
+            goodvalidate(mailwhlg);
+            findErrorText(mail, "");
+        }
+        if( mailok && mailwhlgok && !mailident ){
+            goodvalidate(mail);
+            wrongvalidate(mailwhlg, "Die Mailadressen stimmen nicht überein.");
+        } else {
+            var errortext ="Bitte geben Sie eine zulässige Mailadresse ein.";
+            if( !mailok ){
+                wrongvalidate(mail, errortext);
+            }else{
+                goodvalidate(mail);
+            }
+            if( !mailwhlgok ){
+                wrongvalidate(mailwhlg, errortext);
+            }else{
+                goodvalidate(mailwhlg);
+            }
+        }
+    }
+}
+
+function checkGeburtsdatum(){
+    var required = $("#geb").hasClass("pflicht");
+    var day = $("#geburtsdatumDay");
+    var month= $("#geburtsdatumMonth");
+    var year = $("#geburtsdatumYear");
+    removeAllClassesAndErrorText(day[0]);
+    removeAllClassesAndErrorText(month[0]);
+    removeAllClassesAndErrorText(year[0]);
+
+    if( day.val() != "" && parseInt( day.val() ) > 99 )
+        day.val( day.val().substring( 0, 2 ) );
+
+    if( month.val() != "" && parseInt( month.val() ) > 99 )
+        month.val( month.val().substring( 0, 2 ) );
+
+    if( year.val() != "" && parseInt( year.val() ) > 9999 )
+        year.val( year.val().substring( 0, 4 ) );
+
+    //bereits eine eingabe gemacht
+    tagemonat = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    max = ( parseInt(month.val()) >= 1 && parseInt(month.val()) <= 12 ) ? tagemonat[ parseInt(month.val())-1 ] : 31;
+    today = new Date();
+    daycorrect = day.val() != "" && parseInt(day.val()) <= max && parseInt(day.val()) >= 0;
+    monthcorrect= month.val() != "" && parseInt(month.val())>=0 && parseInt(month.val()) <= 12;
+    yearcheck = year.val() != "" ? parseInt(year.val()) : today.getFullYear();
+    monthcheck= month.val() != "" && parseInt(month.val()) > 0 ? parseInt(month.val()) - 1 : today.getMonth();
+    daycheck = day.val() != "" && parseInt(day.val()) > 0 ? parseInt(day.val()) : today.getDate();
+    checkdate = new Date( yearcheck, monthcheck, daycheck );
+    //jahr ist korrekt, wenn nicht leer und Angabe Jahr ist nicht über 130 Jahre in Vergangenheit und Jahr ist kleiner oder gleich dem aktuellen Jahr und datum ist kleiner als heute 
+    yearcorrect = year.val() != "" && parseInt(year.val()) >= (today.getFullYear()-130) && parseInt(year.val()) <= today.getFullYear() && checkdate < today;
+    errortext = "";
+    
+    //Fehler, wenn 
+    //a) Pflichtfeld und keine Jahresangabe
+    //b) Jahr gesetzt, aber nicht korrekt  
+    //c) Jahr gesetzt, monat gesetzt, aber jahr oder monat nicht korrekt
+    //d) Jahr gesetzt, monat gesetzt, tag gesetzt, aber nicht korrekt
+    if( daycorrect && monthcorrect && yearcorrect || //tag, monat, jahr gesetzt und alle eingaben korrekt
+        day.val() == "" && monthcorrect && yearcorrect || // monat und jahr gesetzt, korrekt
+        day.val() == "" && month.val() == "" && yearcorrect || //jahr gesetzt und korrekt
+        day.val() == "00" && month.val() == "00" && year.val() == "0"
+    ){
+        goodvalidate(year);
+    }else{
+        if( !(day.val()=="" && year.val()=="" && month.val()=="" && !required) ){
+            //error
+            //Fehlermeldung ausser, wenn nichts gesetzt wurde und pflichtfeld
+            if( !(day.val() == "" && year.val() == "" && month.val() == "" && required) ){
+                year.addClass("wrongvalidate");
+                findErrorText(year[0], "Bitte geben Sie ein zulässiges Geburtsdatum ein");
+                $("#geburtsdatumerror").removeAttr("cnw-original-text-0 cnw-current-language-0");
+            }else{
+                //required
+                year.addClass("required");
+            }
+        }
+    }
+    if( day.val().length == 1 )
+        day.val( "0" + day.val() );
+
+    if( month.val().length == 1 )
+        month.val( "0" + month.val() );
+}
+
+function findSelectMenu(element){
+    while(!element.classList.contains("custom-select")){
+        element = element.parentElement;
+    }
+    return $(element).find(".custom-a11yselect-btn");
+    
+}
+function findErrorText(element, errortext){
+    //get label of element
+    if(element.tagName =="SELECT"){
+        element = element.parentElement.previousElementSibling;
+    }
+    if(element.name=="geburtsdatumDay" || element.name =="geburtsdatumMonth" || element.name =="geburtsdatumYear"){
+        element = document.getElementById("geburtsdatumerror");
+    }
+    if(element.id =="captcha_result"){
+        element = document.getElementById("error_captcha");
+    }
+    if(element.id =="hunangskrukka"){
+        return true;
+    }       
+    for(let i=0; i<10; i++){
+        if($(element).hasClass("error-text")){
+           i=11; 
+        }else{
+            element = $(element).next();
+        }
+    }
+    $(element).html(errortext);
+}
+
+function check_execution_type( elem ){
+    var selected_execution_type = $(elem).val();
+    
+    if( $("#aufrufart").length ){
+        if( selected_execution_type == 2 ){
+            $("#aufrufart-label").addClass("disabled_select");
+            
+            $("#aufrufart-button").prop("disabled", true);
+            $("#aufrufart-button").addClass("disabled_select");
+            $("#aufrufart-button").attr("aria-disabled", true);
+
+            $("#aufrufart-tooltip").parent().css("display", "none");
+        }else if( selected_execution_type == 1 ){
+            $("#aufrufart-label").removeClass("disabled_select");
+            $("#aufrufart-button").prop("disabled", false);
+            $("#aufrufart-button").removeClass("disabled_select");
+            $("#aufrufart-tooltip").parent().css("display", "block");
+        }
+    }
+    
+}
+
+function goodvalidate( elem ) {
+    $(elem).addClass( "goodvalidate" );
+    $(elem).next(".error-text").removeAttr("cnw-original-text-0 cnw-current-language-0");
+}
+
+function wrongvalidate( elem, errortext) {
+    $(elem).addClass( "wrongvalidate" );
+    findErrorText( elem, errortext );
+    $(elem).next(".error-text").removeAttr("cnw-original-text-0 cnw-current-language-0");
+}
+
+$(document).ready(function() {
+    
+    document.addEventListener("keydown", function () {
+        if (document.activeElement.id == "privacy_dialog" && document.activeElement.className == "modal fade in") {
+            document.getElementById("close_btn_X_2").children[0].focus();
+        }
+    });
+    
+    //event-Listener für alle select-boxen, alle input-felder und checkboxen
+    document.addEventListener("change", function(event){
+        var eingabefeld= event.target;
+        validate(eingabefeld);
+        checkWeiter();
+    });
+    
+    $("select").on("change", function(event){
+        validate( event.target );
+        checkWeiter();
+    });
+    
+    $("select#execution_type").on("change", function(){
+        check_execution_type( this );
+    });
+    check_execution_type( $("select#execution_type") );
+
+    $("#geburtsdatumDay, #geburtsdatumMonth, #geburtsdatumYear").on("focusin", function(){
+        removeAllClassesAndErrorText($("#geburtsdatumYear")[0]);
+    });
+
+    $("#geburtsdatumDay, #geburtsdatumMonth, #geburtsdatumYear").on("focusout", function(){
+        validate( this );
+        checkWeiter();
+    });
+
+    validate();
+    checkWeiter();
+})</script>
+<div class="content content--personaldata" id='inhalt'><div>
+            <div role="banner" class="wizard">
+                <div class="wizard-inner">
+                
+                    <ul class="nav nav-tabs" role="presentation" aria-hidden="true">
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">1</span>
+                        </li>
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">2</span>
+                        </li>
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">3</span>
+                        </li>
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">4</span>
+                        </li>
+                        <li role="presentation" class="active">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Eingabe der persönlichen Daten" data-trigger="hover">5</span>
+                        </li>
+                        <li role="presentation" class="disabled">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">6</span>
+                        </li>
+                    </ul>
+                
+                    <div>
+                        <h1> Schritt 5<span class='visuallyhidden'> von 6</span>: Eingabe der persönlichen Daten </h1>
+                    </div><!--ende div inhalt-->
+                </div><!-- ende div wizard-inner-->
+            </div><!--ende div wizard-->
+            <details id="details_infobox" class="ui-accordion ui-widget ui-helper-reset" isOpen>
+                            <summary id="infobox_summary" class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons">
+                                <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>Übersicht zu Ihrem Termin</summary>
+                            <div id="infobox_content" class="ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+                                <dl class="grid" style="margin-bottom: 0px;"><dt><span class='infobox_text'>Funktionseinheit</span></dt><dd class=''>Aufenthaltsangelegenheiten</dd><dt><span class='infobox_text'>Anliegen</span></dt><dd class=''><ul id="info_box_cnc_list"><li>1 <span class="visuallyhidden">Mal</span><span aria-hidden="true">x</span> RWTH Studenten</li></ul></dd><dt><span class='infobox_text'>Standort</span></dt><dd class=''><span class='cnw_skip_translation'>Ausländeramt Aachen - Außenstelle RWTH, Templergraben 57, 52062 Aachen</span></dd><dt><span class='infobox_text'>Termin</span></dt><dd class=''>03.09.2025, 12:00 Uhr</dd><dt><span class='infobox_text'>Persönliche Daten</span></dt><dd><span class='visuallyhidden cnw_skip_translation'>noch nicht gesetzt</span></dd></dl>
+                            </div>
+                        </details>
+            <script>
+                $(document).ready(function(){
+                    var title = document.title.split("Schritt");
+                    var titleNeu = title[0] + " - " + $("h1:not(#Einstellungen-Label)").html();
+                    titleNeu = titleNeu.replace('<span class="visuallyhidden">', '');
+                    titleNeu = titleNeu.replace('</span>', '').trim();
+                    document.title= titleNeu;
+                    var lang = "de"
+                    lang = lang.split('_')[0];
+                    if( lang != "vs" ){ //nicht vereinfachte Sprache -> lang-Attribut setzen
+                        $('html').attr('lang', lang);
+                    } else { //vereinfachte Sprache -> de nehmen
+                        $('html').attr('lang', 'de');
+                    }
+                });
+            </script>
+
+                    <div class="content__error" tabindex="0">
+                        <b>Fehler!</b><br/>
+                        Bitte überprüfen Sie Ihre Eingaben!<br>
+                        Folgende Eingaben müssen korrigiert werden:
+                        <div style="height: 10px;"></div>
+                        <ul>
+                            <li>Sicherheitsfrage</li>
+                        </ul>
+                        <div style="height: 10px;"></div>
+                    </div>
+                    <script type="text/javascript">
+                        $(document).ready(function(){
+                            $('.content').css('margin-top', $('.content__error').height() + 20);
+                            $('.content__error').css('top', (- 10 - $('.content__error').height()));
+                            $('.content__error').focus();
+                            
+                            
+                            
+                            
+                        });
+                    </script>              
+</div>
+<br><div class="header"><h2 class="h1like">Aufenthaltsangelegenheiten - Eingabe der persönlichen Daten für den Termin</h2>
+<p class="h4" style="margin-top:5px;">Ihr Termin: 
+03.09.2025, 12:00 Uhr
+</p>
+</div>
+<form class="row" name="cal_request" id="cal-reservation" method="post" action="personaldata?cal=169&cnc=344|344&mdt=95" autocomplete="off">
+    <div class="col-sm-12" style="padding-left: 0px; padding-right: 0px;">
+<div class="requiredDiv">
+    <div>
+        <p><small>Pflichtfelder sind mit <b> <span class="visuallyhidden">Pflichtfeld</span><span aria-hidden="true">*</span></b> gekennzeichnet</small></p>
+    </div>
+</div>
+<label for="vorname" class="tvweb_label pflicht">Vorname <span class="visuallyhidden">Pflichtfeld</span><span aria-hidden="true">*</span></label>
+        <input 
+            autocomplete="given-name"
+            id="vorname" 
+            type="text" 
+            class="personaldataInput textInput" 
+            title= "Vorname" 
+            name="vorname" 
+            size="54" 
+            maxlength="200" required="required"
+            value="Liaochong"  />
+        <p class="error-text" aria-live="polite"></p>
+<label for="nachname" class="tvweb_label pflicht">Nachname 
+                        <span aria-hidden="true"> * </span><span class="visuallyhidden">Pflichtfeld</span>
+                    </label>
+                    <input  id="nachname"
+                            autocomplete="family-name"
+                            type="text" class="personaldataInput textInput" 
+                            title="Nachname" 
+                            name="nachname" 
+                            size="54" 
+                            maxlength="200" required="required"
+                            value="Du"  />
+                    <p class="error-text" aria-live="polite"></p>
+<label for="email" class="tvweb_label  pflicht withTooltip"> E-Mail  <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></label>
+<a class="tooltipPersonaldata" role="tooltip" aria-describedby="tooltip-email" tabindex="0" data-toggle="popover">
+   <div id="tooltip-email" class="visuallyhidden">Tooltip Ihre E-Mail-Adresse wird zur Bestätigung benötigt.Sie erhalten nach Absenden des Formulars einen Link per E-Mail. Diesen müssen Sie bestätigen. Erst dann gilt der Termin als gebucht.</div>
+   <span aria-hidden="true" class="info-circle" style="margin-bottom: -5px"></span>
+</a>
+<div style="display: none;" class="tvo_popover_content">Ihre E-Mail-Adresse wird zur Bestätigung benötigt.Sie erhalten nach Absenden des Formulars einen Link per E-Mail. Diesen müssen Sie bestätigen. Erst dann gilt der Termin als gebucht.</div>
+<input 
+    autocomplete="email"
+    id="email" 
+    type="email" 
+    class="personaldataInput textInput " 
+    title="E-Mail" 
+    name="email" 
+    size="54" 
+    maxlength="100" 
+    value="liaochong.du@gmail.com" required="required" />
+<p class="error-text" aria-live="polite"></p>
+<label for="emailwhlg" class="tvweb_label  pflicht">E-Mail - Wiederholung  <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></label>
+<input 
+    autocomplete="email"
+    id="emailwhlg" 
+    type="email" 
+    title="E-Mail - Wiederholung" 
+    class="personaldataInput textInput" 
+    name="emailCheck" 
+    size="54" 
+    maxlength="100" 
+    value="liaochong.du@gmail.com" required="required"/>
+<p id="errormail" class="error-text" aria-live="polite"></p>
+
+
+
+
+
+<label for="tel" class="tvweb_label pflicht">Telefonnummer <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></label>
+<input 
+    autocomplete="tel"
+    id="tel" 
+    type="number" 
+    class="personaldataInput textInput" 
+    title="Telefonnummer" 
+    name="phone" 
+    max="99999999999999999999" 
+    value="017662306584" required="required" 
+    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+<p class="error-text" aria-live="polite"></p>
+<div class="wrap_geburtsdatum">
+<label class="geburtstag_head  pflicht" style="font-size: 1em;">Geburtsdatum  <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></label>
+<br>
+<br>
+<div id="geb" class="wrap_geburtsdatum_daten  pflicht">
+    <label class="tvweb_label pflicht" style="font-size: 0.857em !important;width: 50px; margin-top:-5px;">Tag
+    <input autocomplete="bday-day" id="geburtsdatumDay" class="textInput birthdates " title="Geburtsdatum Tag" type="number" min="0" max="31" name="geburtsdatumDay"  value="12"  /></label> 
+    <label class="tvweb_label pflicht" style="font-size: 0.857em !important;width: 50px;margin-top:-5px; white-space: nowrap; display: inline-block;">Monat
+    <input autocomplete="bday-month" id="geburtsdatumMonth" class="textInput birthdates " title="Geburtsdatum Monat" type="number" min="0" max="12" name="geburtsdatumMonth"  value="04"  /></label> 
+    <label class="tvweb_label pflicht" style="font-size: 0.857em !important;width: 90px;margin-top:-5px;">Jahr
+    <input autocomplete="bday-year" id="geburtsdatumYear" class="textInput birthdates  gebJahr" required="required" type="number"  min="0" max="2025" title="Geburtsdatum Jahr" name="geburtsdatumYear"  value="1997"  /></label>   
+</div>
+
+</div>
+<a class="tooltipPersonaldata gebDatumTooltip" role="tooltip" aria-describedby="tooltip-geburtsdaten" tabindex="0" data-toggle="popover">
+   <div id="tooltip-geburtsdaten" class="visuallyhidden">Tooltip Bitte tragen Sie mindestens das 4-stellige Geburtsjahr ein. Dieses muss im Format jjjj sein und darf nicht in der Zukunft liegen. Optional können Sie auch Tag und Monat oder nur einen Monat eingeben.</div>
+   <span aria-hidden="true" class="info-circle" style="margin-bottom: -5px"></span>
+</a>
+<div style="display: none;" class="tvo_popover_content">Bitte tragen Sie mindestens das 4-stellige Geburtsjahr ein. Dieses muss im Format jjjj sein und darf nicht in der Zukunft liegen. Optional können Sie auch Tag und Monat oder nur einen Monat eingeben.</div>
+<p id="geburtsdatumerror" class="error-text" aria-live="polite"></p>
+<label for="comment" class="tvweb_label  withTooltip">Bemerkungen </label>
+<a class="tooltipPersonaldata" role="tooltip" aria-describedby="tooltip-bemerkung" tabindex="0" data-toggle="popover">
+    <div id="tooltip-bemerkung" class="visuallyhidden">Tooltip Hier können Sie sonstige Informationen eingeben, die Ihrer Meinung nach wichtig sind. Die maximale Zeichenlänge ist auf 2000 begrenzt.</div>
+    <span aria-hidden="true" class="info-circle" style="margin-bottom: -5px"></span>
+</a>
+<div style="display: none;" class="tvo_popover_content">Hier können Sie sonstige Informationen eingeben, die Ihrer Meinung nach wichtig sind. Die maximale Zeichenlänge ist auf 2000 begrenzt.</div>
+<textarea  id="comment" name="comment" title="Bemerkungen" class="textInput personaldataInput" cols="54" rows="5" maxlength="2000" ></textarea>
+<p class="error-text" aria-live="polite"></p>
+
+<input type="text" name="hunangskrukka" id="hunangskrukka" value="" />
+
+<label class="pflicht withTooltip"  for="captcha_result" title="Sicherheitsfrage"><span>Sicherheitsfrage  <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></span></label>
+<a  class="tooltipPersonaldata" role="tooltip"   aria-describedby="tooltip-captcha" tabindex="0" data-container="body" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true" data-content="Bitte geben Sie die im Bild dargestellte Zeichenfolge ein.<br>Sie müssen diese Sicherheitsabfrage richtig beantworten, um zur nächsten Seite zu gelangen.<br>Sie haben die Möglichkeit, sich die Sicherheitsabfrage vorlesen oder neu laden zu lassen." >
+   <div id="tooltip-captcha" class="visuallyhidden">Tooltip Bitte geben Sie die im Bild dargestellte Zeichenfolge ein.<br>Sie müssen diese Sicherheitsabfrage richtig beantworten, um zur nächsten Seite zu gelangen.<br>Sie haben die Möglichkeit, sich die Sicherheitsabfrage vorlesen oder neu laden zu lassen.</div>
+   <span aria-hidden="true" class="info-circle" style="margin-top: -10px"></span>
+</a>
+<br>
+<div class="row">
+<div id="captcha_control">
+    <div id="captcha_image_audio_div">
+        <audio id="captcha_image_audio" preload="none">
+            <source id="captcha_image_source_wav" src="app/securimage/securimage_play.php?id=d408f43fcea693557df9d1bd5a5a0664" type="audio/wav">
+        </audio>
+    </div>
+    <div id="captcha_image_audio_controls">
+        <a tabindex="0" class="captcha_play_button" href="app/securimage/securimage_play.php?id=d408f43fcea693557df9d1bd5a5a0664" onclick="return false">
+            <img id="captcha_play" class="captcha_play_image" src="app/images/speaker_32x32.png" alt="Sicherheitsabfrage vorlesen">
+            <img id="captcha_loading" class="captcha_loading_image rotating" src="app/images/loading.gif" alt="Audio wird geladen" style="display: none;">
+        </a>
+        <noscript>Für die Audiowiedergabe muss Javascript aktiviert sein.</noscript>
+    </div>
+
+    <a tabindex="0" href="#" title="Sicherheitsabfrage neu laden" onclick="document.getElementById('captcha_image').src = 'app/securimage/securimage_show.php?type=2&source=personaldata&' + Math.random(); captcha_image_audioObj.refresh(); this.blur(); return false">
+        <img id="captcha_reload" src="app/images/reload_32x32.png" alt="Sicherheitsabfrage neu laden" onclick="this.blur()" />
+    </a>
+    <br>
+
+    <script type="text/javascript" src="app/securimage/securimage.js"></script>
+    <script type="text/javascript">
+        captcha_image_audioObj = new SecurimageAudio({ audioElement: 'captcha_image_audio', controlsElement: 'captcha_image_audio_controls' });
+    </script>
+    <div style="clear: both"></div>
+</div>
+
+<div id="captcha_output">
+    <img id="captcha_image" class="captcha_image_personaldata" data-captchaType="2" src="app/securimage/securimage_show.php?type=2&source=personaldata&58daf1cb35349a10aa6689b1900df533" alt="[[Bitte geben Sie die im Bild angezeigte Zeichenfolge ein]] [[Die Sicherheitsabfrage können Sie sich über Drücken des entsprechenden Bedienelements vorlesen lassen.]]" />
+</div>
+
+<div id="captcha_input">
+    <label class="" for="captcha_result"><span class="redBoldText" aria-hidden="true">Zeichenfolge:</span><span class="visuallyhidden">Ergebnis der Sicherheitsabfrage:</span></label>
+    <input type="text" name="captcha_code" size="10" maxlength="21" class="required textInput  error captcha_result_personaldata personaldataInput" autocomplete="off" id="captcha_result" required="required"/>
+</div>
+</div>
+<p id="error_captcha" class="error-text" aria-live="polite"> </p>
+<script>
+    //console.log("app/securimage/securimage_play.php?id=d408f43fcea693557df9d1bd5a5a0664");
+//    var audio = new Audio("app/securimage/securimage_play.php?id=d408f43fcea693557df9d1bd5a5a0664");
+//    audio.play();
+</script>
+
+        <div id="privacy_dialog" class="modal fade" tabindex="-1" role="dialog" aria-label="Hinweisfenster">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" id="close_btn_X_2" class="close" data-dismiss="modal" aria-label="Hinweisfenster schließen" title="Hinweisfenster schließen"><span aria-hidden="true">&times;</span></button>
+                        <h1 class="modal-title">Titel</h1>
+                    </div>
+                    <div class="modal-body">
+                        <div id="agreementText_privacy_notes">
+                            <h2>Informationen zur Datenerhebung bei OnlineTerminbuchungen für Beratungen und Dienstleistungen</h2>
+<h3>Informationen gemäß Artikel 13 Datenschutzgrundverordnung (DS-GVO)</h3>
+<p>
+  <b>Verantwortlich für die Verarbeitung Ihrer personenbezogenen Daten ist:</b><br>
+  StädteRegion Aachen<br>
+  - Der Städteregionsrat -<br>
+  Tel: 0241/5198-0<br>
+  E-Mail: <a href="mailto:info@staedteregion-aachen.de">info@staedteregion-aachen.de</a><br>
+  De-Mail: <a href="mailto:info@staedteregion-aachen.de-mail.de">info@staedteregion-aachen.de-mail.de</a><br>
+</p>
+<p>
+  <b>Die behördlichen Datenschutzbeauftragten können Sie wie folgt erreichen:</b><br>
+  StädteRegion Aachen<br>
+  Die Datenschutzbeauftragte<br>
+  Tel: 0241/5198-1410<br>
+  E-Mail: <a href="mailto:datenschutz@staedteregion-aachen.de">datenschutz@staedteregion-aachen.de</a><br>
+</p>
+<p><b>Postanschrift:</b> Zollernstraße 10; 52070 Aachen</p>
+
+<h4><u>Zweck und Rechtsgrundlagen der Verarbeitung Ihrer personenbezogenen Daten</u></h4>
+<p>
+  Personenbezogene Daten sind gem. Art. 4 Nr. 1 DS-GVO alle Informationen zu einer natürlichen Person, die eine Identifizierung dieser 
+  Person direkt oder indirekt ermöglichen. Verarbeitung ist gem. Art. 4 Nr. 2 DS-GVO u.a. das Erheben, Speichern, Übermitteln und Nutzen 
+  der personenbezogenen Daten zur Erledigung des beschriebenen Vorgangs und zur Erfüllung des damit einhergehenden Zwecks.
+</p>
+<p>
+  Ihre personenbezogenen Daten werden verarbeitet, zur Buchung eines Online-Termins zur Wahrnehmung einer Beratung und Dienstleistung.
+</p>
+<p>
+  Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 Buchst. a) DS-GVO Ihrer Einwilligung in die Datenverarbeitung. Die Einwilligung erfolgt
+  durch Ihre aktive und freiwillige Buchung des Online-Termins.
+</p>
+<p>
+  Sie haben das Recht, die Einwilligung jederzeit zu widerrufen, indem Sie den Termin vor Beginn stornieren, ohne dass die Rechtmäßigkeit der aufgrund 
+  der Einwilligung bis zum Widerruf erfolgten Verarbeitung berührt wird.
+</p>
+<p>
+  Die von Ihnen erhobenen Daten sind folgenden Kategorien zuzuordnen:
+  <dl>
+    <dt>Persönliche Daten:</dt>
+      <dd>&ndash; Name</dd>
+      <dd>&ndash; Vorname</dd>
+      <dd>&ndash; Geburtsdatum</dd>
+    <dt>Kontaktdaten:</dt>
+      <dd>&ndash; Mail-Adresse</dd>
+      <dd>&ndash; Telefonnummer</dd>
+      <dd>&ndash; Mobilfunknummer</dd>
+    <dt>Protokolldaten:</dt>
+      <dd>&ndash; z.B. IP-Adresse</dd>
+  </dl>
+</p>
+<p>Eine Weitergabe Ihrer Daten erfolgt nur soweit dies notwendig und gesetzlich zulässig ist.</p>
+<p>
+  Die StädteRegion Aachen behält sich zudem vor, Informationen über Sie offen zu legen, wenn die Herausgabe von rechtmäßig handelnden 
+  Behörden oder Strafverfolgungsorganen verlangt wird und eine gesetzliche Verpflichtung besteht.
+</p>
+<p>
+  Die elektronische Datenverarbeitung bei der StädteRegion Aachen erfolgt mit Unterstützung des IT-Dienstleisters regio iT aus Aachen. 
+  Die Einhaltung aller datenschutzrechtlichen Vorschriften ist durch einen Vertrag zur Auftragsverarbeitung nach Art. 28 DS-GVO und durch
+  ständige Kontrollen gewährleistet.
+</p>
+<p>
+  Wir speichern Ihre personenbezogenen Daten nur so lange, wie dies zur Erfüllung unserer gesetzlichen Aufgaben erforderlich ist. Zusätzliche
+  und abweichende Aufbewahrungsfristen können sich gesetzlich ergeben.
+</p>
+
+<h4>Welche Datenschutzrechte habe ich?</h4>
+<p>
+  Findet die Datenverarbeitung auf Grund einer persönlichen Einwilligung statt, dann haben Sie 
+  nach Art. 7 (3) DS-GVO das Recht, diese Einwilligung ohne Angabe von Gründen zu 
+  widerrufen. Dies gilt nicht für die bereits vorgenommene Verwendung Ihrer Daten in der 
+  Vergangenheit, sondern nur für die Zukunft.
+</p> 
+<p>
+  Ihnen stehen bezogen auf die Verarbeitung Ihrer personenbezogenen Daten gemäß Art. 15 ff. 
+  DS-GVO die nachfolgend genannten Rechte zu.
+</p>
+<p>
+  Sie können
+  <ul>
+    <li>
+      eine <b>Auskunft</b> beantragen, ob und welche personenbezogenen Daten von Ihnen 
+      verarbeitet werden (Art. 15 DS-GVO). Bitte beachten Sie, dass dieses Auskunftsrecht 
+      unter bestimmten Umständen eingeschränkt oder ausgeschlossen ist
+    </li>
+    <li>
+      eine <b>Berichtigung</b> oder eine Vervollständigung Ihrer personenbezogenen Daten 
+      beantragen (Art. 16 DS-GVO).
+    </li>
+    <li>
+      die <b>Löschung</b> (Art. 17 DS-GVO) oder die Einschränkung der Verarbeitung (Art. 18 
+      DS-GVO) Ihrer personenbezogenen Daten beantragen. Bitte beachten Sie, dass diese 
+      Rechte unter bestimmten Umständen eingeschränkt oder ausgeschlossen sind.
+      </li>
+      <li>
+      in begründeten Einzelfällen der Verarbeitung Ihrer personenbezogenen Daten jederzeit
+      <b>widersprechen</b> (Art. 21 DS-GVO). Sofern die gesetzlichen Voraussetzungen 
+      vorliegen, werden Ihre Daten zukünftig nicht mehr verarbeitet.
+      </li>
+      <li>
+      beantragen, Ihre persönlichen Daten in einem gängigen Format zu erhalten (Art. 20 
+      DS-GVO). Bitte beachten Sie, dass sich dieses Recht auf <b>Datenübertragbarkeit</b> nur 
+      auf die Sie betreffenden und von Ihnen eingereichten Daten beschränkt.
+    </li>
+  </ul>
+</p>
+<p>
+  Sie haben das Recht, sich bei der Aufsichtsbehörde über die Verarbeitung Ihrer 
+  personenbezogenen Daten zu <b>beschweren</b> (Art. 77 DS-GVO). Die zuständige 
+  Aufsichtsbehörde ist die Landesbeauftragte für Datenschutz und Informationsfreiheit 
+  Nordrhein-Westfalen (Postfach 20 04 44, 40102 Düsseldorf).
+</p>
+                    
+                        </div>
+                        
+                        <div id="agreementText_privacy">
+                            <h3>Link zu der Datenschutzerklärung der StädteRegion Aachen:<br>
+<a href="https://www.staedteregion-aachen.de/de/datenschutz-1" target="_blank">
+Datenschutzerklärung der StädteRegion Aachen</a></h3>
+                    
+                        </div>
+                        
+                        <div id="agreementText_terms_of_service">
+                            <p>
+Die Online-Terminreservierung steht jeder Bürgerin und jedem Bürger, sowie jeder 
+anderen Person die Ihr Anliegen in einer der zuständigen Behörden berechtigt 
+wahrnehmen möchte, unentgeltlich zur Verfügung.
+</p>
+<p>
+Die Nutzung der Online-Terminreservierung ist personengebunden. Termine 
+können nur zur persönlichen Wahrnehmung reserviert werden. Termine können nur 
+für die bei der Reservierung namentlich genannten Person wahrgenommen werden.
+</p>
+<p>
+Der Name der reservierenden Person kann nachträglich nicht mehr geändert werden. 
+Sollten Sie einen Termin nicht wahrnehmen können, sagen Sie diesen bitte frühzeitig 
+ab, um anderen zu ermöglichen diesen Zeitraum zu nutzen.
+</p>
+<p>
+Die Weitergabe eines Termins an eine dritte Person ist nicht gestattet. Wird der 
+Termin durch eine dritte Person wahrgenommen, führt dies zu dem Verfall des 
+Termins. Die zuständigen Behörden sind in diesem Fall dazu berechtigt diesen 
+Termin vor Ort zu widerrufen.
+</p>
+<p>
+Das automatische Reservieren von Terminen durch EDV-gestützte Verfahren 
+(Skripte, Bots, etc.) ist untersagt. Sollte hiervon Kenntnis erlangt werden, wird dieses 
+strafrechtlich verfolgt. Dies gilt ebenso für die entgeltliche oder/und kommerzielle 
+Weitergabe von Terminen
+</p>
+                    
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="sel_button btn btn-primary fifty btn-ok" data-dismiss="modal">Schliessen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+                function showAgreementDialog( type, title ) {
+                    $('#agreementText_privacy_notes, #agreementText_privacy, #agreementText_terms_of_service').hide();
+
+                    $('#privacy_dialog .modal-title').html( title );
+                    $('#privacy_dialog').attr('aria-label',  'Infofenster: ' + title);
+
+                    switch( type ){
+                        case 'privacy_notes':
+                            $('#agreementText_privacy_notes').show();
+                            break;
+                        case 'privacy':
+                            $('#agreementText_privacy').show();
+                            break;
+                        case 'terms_of_service':
+                            $('#agreementText_terms_of_service').show();
+                            break;
+                    }
+
+                    $("#privacy_dialog").modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
+                    
+                    $("#privacy_dialog").on("shown.bs.modal", function(){
+                        $("#privacy_dialog").focus();
+                    });
+                      $("#privacy_dialog").on("hidden.bs.modal", function(){
+                        switch(type){
+                            case 'privacy_notes':
+                                $('#link_privacy_notes').focus();
+                                break;
+                            case 'privacy':
+                                $('#link_privacy').focus();
+                                break;
+                            case 'terms_of_service':
+                                $('#link_terms_of_service').focus();
+                                break;
+                        }
+                    })
+                }
+        </script>
+        <div class="privacy_check" style="clear: left;padding-top:20px;">
+        <span id="agreementChecked" class="requiredBadge" aria-hidden="true"></span>
+            <label>
+                <input class="required" type="checkbox" required="required" title="Checkbox für Datenerhebung und -verarbeitung" name="agreementChecked" checked/>
+                <span title="Checkbox für Datenerhebung und -verarbeitung" class=""></span>
+                <span  id="privacy_check_agreement" class="privacy_check_span">Ich willige in die Verarbeitung meiner Daten zur Online-Terminbuchung für die Wahrnehmung einer Dienstleistung ein. (Rechtsgrundlage Art. 6 Abs. 1 Buchst. a) Datenschutzgrundverordnung (DS-GVO)) <span aria-hidden="true">*</span> <span class="visuallyhidden">Pflichtfeld</span></span>
+            </label>
+        </div>
+<nav aria-label="Sprunglink" tabindex="-1" style="margin-top:-10px"><p><a class="unsichtbar" href="#chooseTerminButton"><br>Links zu den Datenschutzhinweisen, der Datenschutzerklärung und den AGB überspringen.</a></p></nav>
+            
+        <div class="privacy_check_info" style="clear: left;">
+                    <ul style="padding-top:8px; padding-left:45px;">
+                        <li style="display: inline"><a id="link_privacy_notes" href="#" aria-describedby="link-target-text2" title="Link Datenschutzhinweise zur Einwilligungserklärung" onclick="showAgreementDialog('privacy_notes', $(this).text())">Datenschutzhinweise zur Einwilligungserklärung</a> &</li> 
+                        <li style="display: inline"><a id="link_privacy" href="#" aria-describedby="link-target-text2" title="Link Datenschutzerklärung" onclick="showAgreementDialog('privacy', $(this).text())">Datenschutzerklärung</a></li>
+                        <li style="display: inline"> & <a id="link_terms_of_service" href="#" aria-describedby="link-target-text2" title="Link AGB" onclick="showAgreementDialog('terms_of_service', $(this).text())">AGB</a></li>
+                    </ul>
+                    <p id="link-target-text2" class="visuallyhidden"> Öffnet im Dialogfenster.</p>
+        </div>
+<div style="margin-top: 20px; clear: left;">
+<input class="sel_button btn btn-primary pull-left fifty " type="button"  onClick="historyGoBack('suggest?mdt=95&cnc-344=1');" title="Zurück zu den Terminvorschlägen" id="zurueck" aria-label="Zurück zu den Terminvorschlägen" value="Zurück zu den Terminvorschlägen">
+
+<input class="sel_button btn btn-primary pull-right fifty disabledButton" id="chooseTerminButton" type="submit" name="submit" aria-label="Reservieren" title="Reservieren" value="Reservieren" />
+<p id="srhinweis" class="visuallyhidden" aria-live="polite"></p>
+</div>
+</div>
+</form>
+
+</div>
+
+            <footer id="footer" class="tvweb_form">
+                <nav id="footer-nav" class="nav navHelp" aria-labelledby="footernavlabel">
+                    <p id="footernavlabel" class="visuallyhidden">Links zur Hilfe, Impressum, Datenschutzerklärung, Erklärung zur Barrierefreiheit</p>
+                    <div id="footer_dialog" class="modal fade" tabindex="-1" role="dialog" aria-label="Hinweisfenster"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" id="close_btn_X" data-dismiss="modal" aria-label="Hinweisfenster schließen" title="Hinweisfenster schließen" autofocus><span aria-hidden="true">&times;</span></button><h1 class="modal-title">Titel</h1></div><div class="modal-body"><div id="modal_help"><ol style="padding-left: 15px;">
+    <li><h2 class="h3like">Auswahl der Behörde</h2>
+        <p>Zunächst wählen Sie bitte die gewünschte Behörde aus den angebotenen Behörden aus.</p></li>
+    <li><h2 class="h3like">Auswahl des Anliegens</h2>
+        <p>Anschließend erhalten Sie die zur Behörde angebotenen Anliegen angezeigt, wählen Sie entsprechend aus.</p>
+    </li>
+    <li><h2 class="h3like">Terminauswahl</h2>
+        <p>Anschließend wird ein Kalender eingeblendet, aus dem die freien Zeiten hervorgehen. Rot gekennzeichnete
+            Bereiche bedeuten, dass zu diesen Zeiten keine Termin vergeben werden können. Markieren Sie dann bitte ihren
+            Terminwunsch mit einem Mausklick im Kalender. Der Bereich wird dann grün dargestellt. Die Angaben zum
+            Terminwunsch werden unterhalb der Überschrift textlich angezeigt.<br> Je nach Konfiguration kann es auch
+            sein, dass anstatt des Kalenders, eine Seite mit Terminvorschlägen angezeigt wird. Die Vorschläge lassen
+            sich nach Datum und Wochentag filtern. Bei Auswahl eines Termins werden Sie direkt auf die nächste Seite
+            weitergeleitet.</p></li>
+    <li><h2 class="h3like">Persönliche Daten</h2>
+        <p>Es erscheint die Eingabemaske für ihre persönlichen Daten. Alle mit einem Sternchen (*) gekennzeichneten
+            Felder sind Pflichtfelder und müssen ausgefüllt werden. Es besteht die Möglichkeit für spätere Anfragen die
+            persönlichen Daten auf Ihrem PC zu speichern, eine erneute Angabe dieser Daten bei zukünftigen Anfragen ist
+            dann nicht mehr erforderlich, abgesehen von evtl. Änderungen die dann erfolgen können wenn die neue Anfrage
+            erzeugt wird. Setzen Sie dazu bitte einen Haken in das Feld Persönliche Daten für zukünftige Anfragen
+            speichern. Bestätigen Sie die Anfrage, sofern nötig, nach der Eingabe des Sicherheitscodes, mit einem Klick
+            auf 'Weiter'.</p></li>
+    <li><h2 class="h3like">Terminübersicht</h2>
+        <p>Abschließend erhalten Sie eine Übersicht über ihren ausgewählten Termin und können einen weiteren Termin
+            reservieren.</p></li>
+    <li><h2 class="h3like">Bestätigungsmail</h2>
+        <p>Sie erhalten anschließend eine E-Mail in der Sie einen Bestätigungslink anklicken müssen. Erst nach der
+            Bestätigung wird Ihr Termin an die Behörde übertragen.</p></li>
+    <li><h2 class="h3like">Rückmeldung Sachbearbeiter</h2>
+        <p>Ihre Anfrage wird dann in der Behörde geprüft und Sie erhalten eine weitere E-Mail, diesmal direkt vom
+            Sachbearbeiter. Diese Mail enhält dann auch die Angaben zu ggf. beizubringenden Unterlagen.</p></li>
+</ol></div><div id="modal_imprint"><h3>Link zu dem Impressum der StädteRegion Aachen:<br>
+<a href="https://www.staedteregion-aachen.de/de/navigation/aemter/auslaenderamt-a-33/vois-tevis-impressum" target="_blank">
+Impressum der StädteRegion Aachen</a></h3>
+</div><div id="modal_privacy"><h3>Link zu der Datenschutzerklärung der StädteRegion Aachen:<br>
+<a href="https://www.staedteregion-aachen.de/de/datenschutz-1" target="_blank">
+Datenschutzerklärung der StädteRegion Aachen</a></h3>
+</div><div id="modal_accessibility"><a href="https://report.bitvtest.de/691ac4fa-85b1-4391-9eef-20f2b0550aa2.html" title="Zum BITV-Test Prüfbericht. Link öffnet in neuem Fenster." target="_blank">
+    <img src="https://www.bitvtest.de/fileadmin/user_upload/bik-bitv-konform-h44px.svg" alt="BIK - BITV-konform (geprüfte Seiten), zum Prüfbericht" width="135" height="44" />
+</a>
+</div><div id="modal_licenses">Diese Software enthält kopierte und modifizierte Inhalte von <a href='https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/' target="_blank">Editable Combobox With Both List and Inline Autocomplete Example</a>.<br/>
+<br/>
+Copyright C 2024 World Wide Web Consortium. <a href='https://www.w3.org/copyright/software-license-2023/' target="_blank">https://www.w3.org/copyright/software-license-2023/</a></div><div id="modal_session"><p>Ihre Sitzung läuft in einer Minute ab.</p><p>Für eine Verlängerung schließen Sie bitte dieses Fenster in den nächsten 60 Sekunden.</p></div></div><div class="modal-footer"><button type="button" id="close_btn" class="sel_button btn btn-primary fifty btn-ok" data-dismiss="modal">Schliessen</button></div></div></div></div>
+                    <ul id="footer_links">
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_help" title="Hilfe" onclick="showFooterModals('help', $(this).text())">Hilfe</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_imprint" title="Impressum" onclick="showFooterModals('imprint', $(this).text())">Impressum</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_privacy" title="Datenschutzerklärung" onclick="showFooterModals('privacy', $(this).text())">Datenschutzerklärung</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_accessibility" title="Erklärung zur Barrierefreiheit" onclick="showFooterModals('accessibility', $(this).text())">Erklärung zur Barrierefreiheit</a></li>
+                        <!--##USAGE_FEEDBACK_URL##-->
+                        <!--##NEW_RESERVATION_URL##-->
+                        <!--##CONWORD_TRANSLATE_INFO##-->
+                        <!--##CUSTOM_FOOTER_LINKS##-->
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_licenses" title="Lizenzen" onclick="showFooterModals('licenses', $(this).text())">Lizenzen</a></li>
+                    </ul>
+                    <p id="link-target-text" class="visuallyhidden"> Öffnet im Dialogfenster.</p>
+                </nav>
+
+                <br/><input type="hidden" id="session_reset_lifetime" value="1440" /><input type="hidden" id="session_warning_str" value="Warnung" /><input type="hidden" id="infofenster_str" value="Infofenster: " /><div id="session_reset_wrap_wrap" tabindex="0"><p id="session_reset_wrap">Ihre Sitzung läuft aus in <span id="session_reset_input">0</span> Minuten</p></div><nav id="inhalt-nav" aria-label="Sprunglink" tabindex="-1" style="margin-top:-10px"><p><a class="unsichtbar" href="#inhalt">Hauptregion der Seite anspringen</a></p></nav>
+            </footer>
+        </main>
+
+    </body>
+</html>
