@@ -1,30 +1,10 @@
 import json
 import logging
-import os
-from datetime import datetime
 from urllib.parse import urljoin
 
-
 from llmCall import recognize_captcha
-
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-def save_page_content(content, step_name):
-    """
-    保存页面内容到文件
-    :param content: 页面内容
-    :param step_name: 步骤名称
-    """
-    if not os.path.exists('pages/infostelle'):
-        os.makedirs('pages/infostelle')
-    
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f'pages/infostelle/step_{step_name}_{timestamp}.html'
-    
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(content)
-    logging.info(f'页面内容已保存到: {filename}')
+from utils import save_page_content
+from config import USER_AGENT, PERSONAL_INFO_FILE, BASE_URL
 
 def load_personal_info():
     """
@@ -32,19 +12,20 @@ def load_personal_info():
     :return: 个人信息字典
     """
     try:
-        with open('table', 'r', encoding='utf-8') as f:
+        with open(PERSONAL_INFO_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
             return {item['fuellen_in_name']: item['wert_zum_fuellen'] for item in data}
     except Exception as e:
         logging.error(f"加载个人信息失败: {str(e)}")
         return None
 
-def fill_form(session, soup, captcha_image_path):
+def fill_form(session, soup, captcha_image_path, location_name):
     """
     填写表单并提交
     :param session: requests.Session 对象
     :param soup: BeautifulSoup 对象
     :param captcha_image_path: 验证码图片路径
+    :param location_name: 地点名称，用于保存文件
     :return: (是否成功, 响应对象或错误信息)
     """
     logging.info("\n开始填写表单...")
@@ -97,7 +78,7 @@ def fill_form(session, soup, captcha_image_path):
         }
         logging.info(f"\n准备提交请求，headers: {headers}")
         res = session.post(submit_url, data=form_data, headers=headers)
-        save_page_content(res.text, '6_form_submitted')
+        save_page_content(res.text, '6_form_submitted', location_name)
         logging.info(f"\n表单提交响应状态码: {res.status_code}")
         
         # 检查是否提交成功
