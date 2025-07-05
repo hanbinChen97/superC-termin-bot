@@ -87,17 +87,53 @@ def find_and_select_appointment(session, location_name):
         return False, "在预约页面找不到时间容器", None
 
     logging.info("发现可用预约时间")
+    
     first_available_form = details_container.find("form", {"class": "suggestion_form"})
 
     if not first_available_form:
         return False, "有可用时间但无法找到具体的预约表单", None
 
+    # 从表单的隐藏字段中提取所有需要提交的数据
     form_data = {inp.get('name'): inp.get('value') for inp in first_available_form.find_all("input", {"type": "hidden"})}
+    
+    # 为了日志记录，提取可读的日期和时间
+    # 日期来自 <summary>
+    date_display = ""
+    summary_tag = details_container.find("summary")
+    if summary_tag:
+        date_display = summary_tag.text.strip()
+
+    # 根据日期决定使用哪个个人信息文件
+    import config # 导入 config 模块以修改其变量
+    try:
+        # 从 "Mittwoch, 27.08.2025" 中提取 "dd.mm.yyyy" 部分
+        date_part = date_display.split(', ')[1] 
+        day, month, year = date_part.split('.')
+        month_int = int(month)
+        
+        if month_int < 9:
+            config.PERSONAL_INFO_FILE = "hanbin"
+            logging.info(f"预约日期为 {date_display}，月份早于9月，将使用 'hanbin' 文件中的个人信息。")
+        else:
+            config.PERSONAL_INFO_FILE = "table"
+            logging.info(f"预约日期为 {date_display}，月份为9月或更晚，将使用 'table' 文件中的个人信息。")
+
+    except (IndexError, ValueError) as e:
+        logging.warning(f"无法从 '{date_display}' 解析日期，将使用默认的 'table' 文件。错误: {e}")
+        config.PERSONAL_INFO_FILE = "table"
+    
+    # 时间来自 <button>
     time_button = first_available_form.find("button", {"type": "submit"})
     time_info = time_button.get('title') if time_button else "未知时间"
 
-    logging.info(f"找到可用时间: {time_info}, 正在提交...")
-    submit_res = session.post(url, data=form_data)
+    # 如果 summary 中没有日期，可以尝试从 form_data 中获取
+    if not date_display:
+        date_display = form_data.get("date", "未知日期")
+
+    logging.info(f"找到可用时间: {date_display} {time_info}, 正在提交...")
+    
+    submit_url = urljoin(BASE_URL, 'suggest')
+    submit_res = session.post(submit_url, data=form_data)
     save_page_content(submit_res.text, '5_term_selected', location_name)
 
     if "Schritt 5" not in submit_res.text:
