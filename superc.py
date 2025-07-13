@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# nohup python3 superc.py 2>&1 | tee superc.log
 
 import logging
 import time
@@ -18,6 +18,9 @@ if __name__ == "__main__":
             has_appointment, message = run_check(superc_config)
             if has_appointment:
                 logging.info(f"成功！ {message}")
+                break  # 成功预约后退出循环
+            elif message == "表单提交失败, zu vieler Terminanfragen":
+                logging.info(message)
                 break  # 成功预约后退出循环
             elif message == "查询完成，当前没有可用预约时间":
                 logging.info(message)

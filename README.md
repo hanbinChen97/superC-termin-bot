@@ -82,3 +82,6 @@ python3 infostelle.py
 ```
 
 应用将在 8318 端口启动（可通过环境变量 PORT 修改）。
+
+
+nohup python3 superc.py 2>&1 | tee superc.log

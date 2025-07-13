@@ -85,6 +85,9 @@ def fill_form(session, soup, captcha_image_path, location_name):
         if "Schritt 6" in res.text:
             logging.info("预约成功！")
             return True, res
+        elif "zu vieler Terminanfragen" in res.text:
+            error_message = "表单提交失败, zu vieler Terminanfragen"
+            return False, error_message
         else:
             error_message = "表单提交失败"
             print(f"\n错误信息: {error_message}")

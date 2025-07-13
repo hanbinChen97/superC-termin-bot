@@ -3,48 +3,48 @@
       "beschreibung": "Vorname",
       "fuellen_in_name": "vorname",
       "typ": "text",
-      "wert_zum_fuellen": "Hanzhi"
+      "wert_zum_fuellen": "Jiacheng"
     },
     {
       "beschreibung": "Nachname",
       "fuellen_in_name": "nachname",
       "typ": "text",
-      "wert_zum_fuellen": "Zhang"
+      "wert_zum_fuellen": "Liu"
     },
     {
       "beschreibung": "E-Mail",
       "fuellen_in_name": "email",
       "typ": "email",
-      "wert_zum_fuellen": "doris.hanzhi@gmail.com"
+      "wert_zum_fuellen": "jiacheng.liu@rwth-aachen.de"
     },
     {
       "beschreibung": "E-Mail - Wiederholung",
       "fuellen_in_name": "emailCheck",
       "typ": "email",
-      "wert_zum_fuellen": "doris.hanzhi@gmail.com"
+      "wert_zum_fuellen": "jiacheng.liu@rwth-aachen.de"
     },
     {
       "beschreibung": "Telefonnummer",
       "fuellen_in_name": "phone",
       "typ": "number",
-      "wert_zum_fuellen": "01727085781"
+      "wert_zum_fuellen": "017632926572"
     },
     {
       "beschreibung": "Geburtsdatum Tag",
       "fuellen_in_name": "geburtsdatumDay",
       "typ": "number",
-      "wert_zum_fuellen": "26" 
+      "wert_zum_fuellen": "30" 
     },
     {
       "beschreibung": "Geburtsdatum Monat",
       "fuellen_in_name": "geburtsdatumMonth",
       "typ": "number",
-      "wert_zum_fuellen": "01" 
+      "wert_zum_fuellen": "05" 
     },
     {
       "beschreibung": "Geburtsdatum Jahr",
       "fuellen_in_name": "geburtsdatumYear",
       "typ": "number",
-      "wert_zum_fuellen": "1996" 
+      "wert_zum_fuellen": "2001" 
     }
   ]
