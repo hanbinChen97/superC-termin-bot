@@ -9,7 +9,7 @@ import os
 # Add parent directory to path to import from main project
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from streamlit_app.appointment_workflow import AppointmentWorkflow
+from streamlit_app.appointment_workflow import run_workflow
 from config import LOCATIONS
 
 # 配置页面
@@ -155,9 +155,6 @@ def main():
             progress_bar = st.progress(0)
             status_text = st.empty()
             
-            # 初始化工作流
-            workflow = AppointmentWorkflow(selected_location)
-            
             status_text.text("正在初始化...")
             progress_bar.progress(10)
             time.sleep(0.5)
@@ -167,8 +164,8 @@ def main():
             progress_bar.progress(30)
             
             try:
-                success, message = workflow.run_workflow()
-                st.session_state.workflow_steps = workflow.get_steps()
+                success, message, steps = run_workflow(selected_location)
+                st.session_state.workflow_steps = steps
                 st.session_state.workflow_result = success
                 st.session_state.workflow_message = message
                 
