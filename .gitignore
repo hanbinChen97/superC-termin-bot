@@ -163,3 +163,7 @@ cython_debug/
 
 pages/
 
+# Test files for development only
+test_dom_utils.py
+test_integration.py
+

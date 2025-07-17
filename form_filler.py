@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 from llmCall import recognize_captcha
 from utils import save_page_content
 from config import USER_AGENT, PERSONAL_INFO_FILE, BASE_URL
+from dom_utils import check_step_completion, check_rate_limit_error
 
 def load_personal_info():
     """
@@ -81,11 +82,11 @@ def fill_form(session, soup, captcha_image_path, location_name):
         save_page_content(res.text, '6_form_submitted', location_name)
         logging.info(f"\n表单提交响应状态码: {res.status_code}")
         
-        # 检查是否提交成功
-        if "Schritt 6" in res.text:
+        # 使用DOM解析检查是否提交成功，而不是简单的字符串搜索
+        if check_step_completion(res.text, 6):
             logging.info("预约成功！")
             return True, res
-        elif "zu vieler Terminanfragen" in res.text:
+        elif check_rate_limit_error(res.text):
             error_message = "表单提交失败, zu vieler Terminanfragen"
             return False, error_message
         else:

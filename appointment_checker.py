@@ -8,6 +8,7 @@ from urllib.parse import urljoin
 from form_filler import fill_form
 from utils import save_page_content, download_captcha
 from config import BASE_URL, USER_AGENT
+from dom_utils import check_no_appointments_available
 
 def get_initial_page(session):
     """
@@ -75,7 +76,8 @@ def find_and_select_appointment(session, location_name):
     res = session.get(url)
     # save_page_content(res.text, '4_availability', location_name)
 
-    if "Kein freier Termin verfügbar" in res.text:
+    # 使用DOM解析检查是否没有可用预约时间，而不是简单的字符串搜索
+    if check_no_appointments_available(res.text):
         return False, "查询完成，当前没有可用预约时间", None
 
     soup = bs4.BeautifulSoup(res.text, 'html.parser')
