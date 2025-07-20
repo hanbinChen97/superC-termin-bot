@@ -115,8 +115,8 @@ def find_and_select_appointment(session, location_name):
             config.PERSONAL_INFO_FILE = "hanbin"
             logging.info(f"预约日期为 {date_display}，月份早于9月，将使用 'hanbin' 文件中的个人信息。")
         else:
-            config.PERSONAL_INFO_FILE = "table"
-            logging.info(f"预约日期为 {date_display}，月份为9月或更晚，将使用 'table' 文件中的个人信息。")
+            logging.info(f"预约日期为 {date_display}，月份为9月或更晚，跳过此预约。")
+            return False, f"预约时间 {date_display} 不符合要求（仅处理9月前的预约）", None
 
     except (IndexError, ValueError) as e:
         logging.warning(f"无法从 '{date_display}' 解析日期，将使用默认的 'table' 文件。错误: {e}")
