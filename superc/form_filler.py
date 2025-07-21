@@ -2,9 +2,9 @@ import json
 import logging
 from urllib.parse import urljoin
 
-from llmCall import recognize_captcha
-from utils import save_page_content
-from config import USER_AGENT, PERSONAL_INFO_FILE, BASE_URL
+from .llmCall import recognize_captcha
+from .utils import save_page_content
+from .config import USER_AGENT, PERSONAL_INFO_FILE, BASE_URL
 
 def load_personal_info():
     """

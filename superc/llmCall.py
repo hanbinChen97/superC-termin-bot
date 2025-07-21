@@ -19,11 +19,19 @@ api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
 # print(f"AZURE_OPENAI_KEY: {'已设置' if subscription_key else '未设置'}")
 # print(f"AZURE_OPENAI_API_VERSION: {api_version}")
 
-client = AzureOpenAI(
-    api_version=api_version,
-    azure_endpoint=endpoint,
-    api_key=subscription_key,
-)
+# Initialize client only when needed to avoid import-time errors
+client = None
+
+def _get_client():
+    """Get or initialize the Azure OpenAI client."""
+    global client
+    if client is None:
+        client = AzureOpenAI(
+            api_version=api_version,
+            azure_endpoint=endpoint,
+            api_key=subscription_key,
+        )
+    return client
 
 def encode_image(image_path):
     """
@@ -41,7 +49,7 @@ def recognize_captcha(image_path):
     # 将图片转换为base64
     base64_image = encode_image(image_path)
     
-    response = client.chat.completions.create(
+    response = _get_client().chat.completions.create(
         messages=[
             {
                 "role": "system",
@@ -77,7 +85,7 @@ def recognize_captcha(image_path):
 
 if __name__ == "__main__":
     # 测试验证码识别
-    image_path = "test_pic.png"
+    image_path = "data/test_pic.png"
     if os.path.exists(image_path):
         result = recognize_captcha(image_path)
         print(f"验证码识别结果: {result}")

@@ -8,13 +8,13 @@ from urllib.parse import urljoin
 
 import bs4
 
-from config import USER_AGENT
+from .config import USER_AGENT
 
 def save_page_content(content, step_name, location_name):
     """
     保存页面内容到文件
     """
-    dir_path = f'pages/{location_name}'
+    dir_path = f'data/pages/{location_name}'
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     

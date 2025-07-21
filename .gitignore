@@ -163,3 +163,12 @@ cython_debug/
 
 pages/
 
+# Project specific - generated pages and files
+data/pages/
+*.png
+captcha_*.png
+
+# Personal info files (contains sensitive data)
+data/table
+data/hanbin
+

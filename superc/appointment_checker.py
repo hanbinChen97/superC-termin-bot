@@ -5,9 +5,9 @@ import bs4
 import logging
 from urllib.parse import urljoin
 
-from form_filler import fill_form
-from utils import save_page_content, download_captcha
-from config import BASE_URL, USER_AGENT
+from .form_filler import fill_form
+from .utils import save_page_content, download_captcha
+from .config import BASE_URL, USER_AGENT
 
 def get_initial_page(session):
     """

@@ -4,8 +4,8 @@ import logging
 import time
 import os
 
-from appointment_checker import run_check
-from config import LOCATIONS, LOG_FORMAT
+from superc.appointment_checker import run_check
+from superc.config import LOCATIONS, LOG_FORMAT
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
 
