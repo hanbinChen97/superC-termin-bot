@@ -1,3 +1,4 @@
+# source .venv/bin/activate && python3 superc.py 2>&1
 # nohup python3 superc.py 2>&1 | tee superc.log
 
 import logging
@@ -29,7 +30,7 @@ if __name__ == "__main__":
             elif message == "表单提交失败, zu vieler Terminanfragen":
                 logging.info(message)
                 break  # 成功预约后退出循环
-            elif message == "查询完成，当前没有可用预约时间":
+            elif "当前没有可用预约时间" in message:
                 logging.info(message)
             else:
                 # 记录其他错误信息，以备调试

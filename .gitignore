@@ -168,7 +168,4 @@ data/pages/
 *.png
 captcha_*.png
 
-# Personal info files (contains sensitive data)
-data/table
-data/hanbin
 

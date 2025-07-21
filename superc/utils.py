@@ -4,13 +4,45 @@
 import os
 import logging
 from datetime import datetime
+from typing import Union, Tuple, Any
 from urllib.parse import urljoin
 
 import bs4
+import requests
 
+# 使用相对导入
 from .config import USER_AGENT
 
-def save_page_content(content, step_name, location_name):
+def validate_page_step(html_content: Union[str, requests.Response, Any], expected_step: str) -> bool:
+    """
+    通过DOM解析验证页面步骤，而不是字符串比较
+    
+    Args:
+        html_content: HTML内容（字符串或响应对象）
+        expected_step: 期望的步骤编号（如 "2", "3"）
+    
+    Returns:
+        bool: 是否找到预期的步骤标题
+    """
+    if hasattr(html_content, 'content'):
+        content = html_content.content
+    elif hasattr(html_content, 'text'):
+        content = html_content.text
+    else:
+        content = html_content
+    
+    soup = bs4.BeautifulSoup(content, 'html.parser')
+    
+    # 查找包含步骤信息的h1标签
+    h1_element = soup.find('h1')
+    if h1_element:
+        h1_text = h1_element.get_text()
+        # 检查是否包含预期的步骤编号
+        return f"Schritt {expected_step}" in h1_text
+    
+    return False
+
+def save_page_content(content: str, step_name: str, location_name: str) -> None:
     """
     保存页面内容到文件
     """
@@ -25,7 +57,7 @@ def save_page_content(content, step_name, location_name):
         f.write(content)
     logging.info(f'页面内容已保存到: {filename}')
 
-def download_captcha(session, soup, location_name):
+def download_captcha(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
     """
     下载验证码图片
     """

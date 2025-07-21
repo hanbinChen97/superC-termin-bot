@@ -10,6 +10,8 @@ PERSONAL_INFO_FILE = "data/table" # 您可以重命名为 personal_info.json，�
 # 日志配置
 LOG_LEVEL = "INFO"
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+# 详细日志模式 - 设为False可在生产环境中减少日志输出
+VERBOSE_LOGGING = False
 
 # 地点特有配置
 LOCATIONS = {
