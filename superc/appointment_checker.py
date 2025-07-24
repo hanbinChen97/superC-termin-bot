@@ -11,6 +11,8 @@ from urllib.parse import urljoin
 from . import config
 from .utils import save_page_content, download_captcha, validate_page_step
 from .form_filler import fill_form
+from datetime import datetime
+import json
 
 
 USER_AGENT = config.USER_AGENT
@@ -77,10 +79,10 @@ def schritt_3_add_location_info(session: requests.Session, url: str) -> Tuple[bo
     log_verbose("Schritt 3 完成: 成功添加位置信息")
     return True, (loc.get('value'), res)
 
-def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+def check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str) -> Tuple[bool, str, Optional[requests.Response]]:
     """
-    Schritt 4: 提交位置信息并检查预约时间可用性，如有可用时间则选择第一个
-    可能显示 "Kein freier Termin verfügbar" 或 "时间选项"
+    纯检查逻辑：仅检查是否有可用预约，不进行选择和profile设置
+    返回: (有预约?, 信息, suggest_response)
     """
     payload = {
         'loc': str(loc),
@@ -103,7 +105,72 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
     if "Kein freier Termin verfügbar" in suggest_res.text:
         return False, "Schritt 4 结果: 当前没有可用预约时间", None
 
-    # 从这之后的 log 都要输出。
+    # 这是关键信息，始终输出
+    logging.info("Schritt 4: 发现可用预约时间")
+    return True, "发现可用预约时间", suggest_res
+
+def get_profile_user_defined(file_path: str) -> Optional[dict]:
+    """
+    获取用户定义的个人信息文件内容
+    用于月份 < 9 的情况
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            profile_data = json.load(f)
+        return profile_data
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logging.error(f"无法读取用户定义文件 {file_path}: {e}")
+        return None
+
+def set_profile(appointment_date_str: str, db_profile=None) -> bool:
+    """
+    根据预约时间设置当前 profile
+    返回是否成功设置profile
+    """
+    try:
+        # 从 "Mittwoch, 27.08.2025" 中提取月份
+        date_part = appointment_date_str.split(', ')[1] 
+        day, month, year = date_part.split('.')
+        month_int = int(month)
+        
+        rules = config.PROFILE_SELECTION_RULES
+        
+        if month_int < rules["cutoff_month"]:
+            # 使用用户定义文件
+            user_profile = get_profile_user_defined(rules["user_defined_file"])
+            if user_profile:
+                config.currentProfile = {
+                    "type": "user_defined",
+                    "data": user_profile,
+                    "source": rules["user_defined_file"]
+                }
+                logging.info(f"预约日期为 {appointment_date_str}，月份早于{rules['cutoff_month']}月，使用用户定义文件 '{rules['user_defined_file']}'")
+                return True
+            else:
+                logging.error(f"无法加载用户定义文件 {rules['user_defined_file']}")
+                return False
+        else:
+            # 使用数据库中的profile
+            if db_profile and rules["use_database"]:
+                config.currentProfile = {
+                    "type": "database",
+                    "data": db_profile,
+                    "source": "database"
+                }
+                logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，使用数据库中的用户信息 (ID: {db_profile.id})")
+                return True
+            else:
+                logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，但无可用的数据库profile，跳过此预约")
+                return False
+
+    except (IndexError, ValueError) as e:
+        logging.warning(f"无法从 '{appointment_date_str}' 解析日期，无法设置profile。错误: {e}")
+        return False
+
+def select_appointment_and_set_profile(session: requests.Session, suggest_res: requests.Response, location_name: str, db_profile=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+    """
+    选择第一个可用预约并设置profile
+    """
     soup = bs4.BeautifulSoup(suggest_res.text, 'html.parser')
     details_container = soup.find("details", {"id": "details_suggest_times"})
     if not details_container:
@@ -111,9 +178,6 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
 
     if not details_container:
         return False, "Schritt 4 失败: 在预约页面找不到时间容器", None
-
-    # 这是关键信息，始终输出
-    logging.info("Schritt 4: 发现可用预约时间")
     
     first_available_form = details_container.find("form", {"class": "suggestion_form"})
 
@@ -123,40 +187,23 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
     # 从表单的隐藏字段中提取所有需要提交的数据
     form_data = {inp.get('name'): inp.get('value') for inp in first_available_form.find_all("input", {"type": "hidden"})}
     
-    # 为了日志记录，提取可读的日期和时间
-    # 日期来自 <summary>
+    # 提取可读的日期和时间
     date_display = ""
     summary_tag = details_container.find("summary")
     if summary_tag:
         date_display = summary_tag.text.strip()
 
-    # 根据日期决定使用哪个个人信息文件
-    try:
-        # 从 "Mittwoch, 27.08.2025" 中提取 "dd.mm.yyyy" 部分
-        date_part = date_display.split(', ')[1] 
-        day, month, year = date_part.split('.')
-        month_int = int(month)
-        
-        if month_int < 9:
-            config.PERSONAL_INFO_FILE = "data/hanbin"
-            # 这是重要信息，始终输出
-            logging.info(f"预约日期为 {date_display}，月份早于9月，将使用 'hanbin' 文件中的个人信息。")
-        else:
-            # 这是重要信息，始终输出
-            logging.info(f"预约日期为 {date_display}，月份为9月或更晚，跳过此预约。")
-            return False, f"预约时间 {date_display} 不符合要求（仅处理9月前的预约）", None
+    # 如果 summary 中没有日期，可以尝试从 form_data 中获取
+    if not date_display:
+        date_display = form_data.get("date", "未知日期")
 
-    except (IndexError, ValueError) as e:
-        logging.warning(f"无法从 '{date_display}' 解析日期，将使用默认的 'table' 文件。错误: {e}")
-        config.PERSONAL_INFO_FILE = "data/table"
+    # 设置profile - 这是关键步骤
+    if not set_profile(date_display, db_profile):
+        return False, f"预约时间 {date_display} 无法设置合适的profile", None
     
     # 时间来自 <button>
     time_button = first_available_form.find("button", {"type": "submit"})
     time_info = time_button.get('title') if time_button else "未知时间"
-
-    # 如果 summary 中没有日期，可以尝试从 form_data 中获取
-    if not date_display:
-        date_display = form_data.get("date", "未知日期")
 
     # 这是关键信息，始终输出
     logging.info(f"Schritt 4: 找到可用时间: {date_display} {time_info}, 正在提交...")
@@ -173,16 +220,32 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
     logging.info("Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面")
     return True, "Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面", submit_soup
 
+def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, db_profile=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+    """
+    Schritt 4: 重构后的主函数，调用上述两个新函数
+    """
+    # 第一阶段：仅检查是否有预约
+    has_appointment, check_message, suggest_res = check_appointment_availability(session, url, loc, submit_text, location_name)
+    
+    if not has_appointment:
+        return False, check_message, None
+    
+    # 第二阶段：有预约时才进行选择和profile设置
+    return select_appointment_and_set_profile(session, suggest_res, location_name, db_profile)
+
 def schritt_5_fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
-    Schritt 5: 填写表单 - 下载验证码并填写个人信息
+    Schritt 5: 填写表单 - 使用 currentProfile 而不是固定文件
     """
+    if not config.currentProfile:
+        return False, "Schritt 5 失败: 未设置currentProfile", None
+    
     success, captcha_path = download_captcha(session, soup, location_name)
 
     if not success:
         return False, f"Schritt 5 失败: {captcha_path}", None
 
-    logging.info("Schritt 5: 准备填写表单...")
+    logging.info(f"Schritt 5: 准备使用 {config.currentProfile['type']} profile 填写表单...")
     result = fill_form(session, soup, captcha_path, location_name)
     if result[0]:
         # 这是关键信息，始终输出
@@ -211,7 +274,7 @@ def run_check(location_config: dict) -> Tuple[bool, str]:
     location_name = location_config["name"]
     
     # 这是关键信息，始终输出
-    logging.info(f"开始检查 {location_name} 的预约...")
+    # logging.info(f"开始检查 {location_name} 的预约...")
     log_verbose("=== 获取初始页面 ===")
 
     # 获取初始页面，进入Schritt 2
@@ -237,7 +300,9 @@ def run_check(location_config: dict) -> Tuple[bool, str]:
 
     log_verbose("=== Schritt 4: 检查预约时间可用性并选择 ===")
     # Schritt 4: 检查预约时间可用性并选择第一个
-    success, message, soup = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name)
+    # 获取数据库profile参数（如果提供了的话）
+    db_profile = location_config.get("db_profile", None)
+    success, message, soup = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, db_profile)
     if not success:
         logging.info(f"Schritt 4 结果: {message}")
         return False, message

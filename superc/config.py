@@ -26,3 +26,13 @@ LOCATIONS = {
         "submit_text": "Ausländeramt Aachen - Infostelle auswählen"
     }
 }
+
+# Profile 管理系统配置
+currentProfile = None  # 动态设置的当前用户配置
+
+# Profile 选择规则配置
+PROFILE_SELECTION_RULES = {
+    "cutoff_month": 9,  # 9月作为分界点
+    "user_defined_file": "data/hanbin",  # 月份 < 9 时使用的用户定义文件
+    "use_database": True,  # 月份 >= 9 时是否使用数据库
+}

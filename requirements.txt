@@ -8,3 +8,8 @@ python-dotenv==1.0.0
 
 # OpenAI integration for captcha recognition
 openai>=1.0.0
+
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0  # PostgreSQL适配器
+
+psycopg2

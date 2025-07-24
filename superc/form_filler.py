@@ -4,17 +4,40 @@ from urllib.parse import urljoin
 
 from .llmCall import recognize_captcha
 from .utils import save_page_content
-from .config import USER_AGENT, PERSONAL_INFO_FILE, BASE_URL
+from .config import USER_AGENT, BASE_URL
+from . import config
 
 def load_personal_info():
     """
-    从 table 文件加载个人信息
+    从 currentProfile 加载个人信息
     :return: 个人信息字典
     """
+    if not config.currentProfile:
+        logging.error("currentProfile 未设置")
+        return None
+    
     try:
-        with open(PERSONAL_INFO_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return {item['fuellen_in_name']: item['wert_zum_fuellen'] for item in data}
+        profile_data = config.currentProfile["data"]
+        profile_type = config.currentProfile["type"]
+        
+        if profile_type == "user_defined":
+            # 用户定义文件格式: [{fuellen_in_name: "", wert_zum_fuellen: ""}, ...]
+            return {item['fuellen_in_name']: item['wert_zum_fuellen'] for item in profile_data}
+        elif profile_type == "database":
+            # 数据库格式: AppointmentProfile 对象
+            return {
+                "vorname": profile_data.vorname,
+                "nachname": profile_data.nachname,
+                "phone": profile_data.phone,
+                "geburtsdatum_day": str(profile_data.geburtsdatum_day),
+                "geburtsdatum_month": str(profile_data.geburtsdatum_month),
+                "geburtsdatum_year": str(profile_data.geburtsdatum_year),
+                # 可以根据需要添加更多字段映射
+            }
+        else:
+            logging.error(f"未知的profile类型: {profile_type}")
+            return None
+            
     except Exception as e:
         logging.error(f"加载个人信息失败: {str(e)}")
         return None
