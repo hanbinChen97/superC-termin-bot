@@ -209,26 +209,26 @@ def main():
         print_first_waiting_profile()
         
         # 如果找到了等待中的用户，演示更新状态为 'booked'
-        if first_waiting_profile:
-            print(f"\n=== 为等待队列第一名（ID: {first_waiting_profile.id}）预约成功 ===")
-            success = update_appointment_status(first_waiting_profile.id, 'booked')
-            if success:
-                print("状态更新成功！队列第一名已完成预约")
+        # if first_waiting_profile:
+        #     print(f"\n=== 为等待队列第一名（ID: {first_waiting_profile.id}）预约成功 ===")
+            # success = update_appointment_status(first_waiting_profile.id, 'booked')
+            # if success:
+            #     print("状态更新成功！队列第一名已完成预约")
                 
-                # 再次查看等待队列状态
-                print("\n=== 更新后的等待队列状态 ===")
-                new_waiting_count = get_waiting_queue_count()
-                print(f"更新后等待队列长度: {new_waiting_count}")
+            #     # 再次查看等待队列状态
+            #     print("\n=== 更新后的等待队列状态 ===")
+            #     new_waiting_count = get_waiting_queue_count()
+            #     print(f"更新后等待队列长度: {new_waiting_count}")
                 
-                new_first_waiting = get_first_waiting_profile()
-                if new_first_waiting:
-                    print(f"新的队列第一名: {new_first_waiting.vorname} {new_first_waiting.nachname} (ID: {new_first_waiting.id})")
-                else:
-                    print("等待队列已空")
+            #     new_first_waiting = get_first_waiting_profile()
+            #     if new_first_waiting:
+            #         print(f"新的队列第一名: {new_first_waiting.vorname} {new_first_waiting.nachname} (ID: {new_first_waiting.id})")
+            #     else:
+            #         print("等待队列已空")
         
         # 测试查询所有预约配置文件
-        print("\n=== 查询所有预约配置文件 ===")
-        print_all_profiles()
+        # print("\n=== 查询所有预约配置文件 ===")
+        # print_all_profiles()
             
     except Exception as e:
         print(f"Failed to connect: {e}")

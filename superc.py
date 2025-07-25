@@ -10,6 +10,8 @@ from superc.appointment_checker import run_check
 from superc.config import LOCATIONS, LOG_FORMAT
 # 导入数据库工具模块
 from db.utils import get_first_waiting_profile, update_appointment_status
+# 导入Profile类
+from superc.profile import Profile
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
 
@@ -18,15 +20,18 @@ if __name__ == "__main__":
     superc_config = LOCATIONS["superc"]
 
     # 获取当前应该处理的用户profile
+    current_db_profile = None
     current_profile = None
     try:
-        current_profile = get_first_waiting_profile()
-        if current_profile:
-            logging.info(f"当前处理用户: {current_profile.vorname} {current_profile.nachname} (ID: {current_profile.id})")
+        current_db_profile = get_first_waiting_profile()
+        if current_db_profile:
+            current_profile = Profile.from_appointment_profile(current_db_profile)
+            logging.info(f"当前处理用户: {current_profile.full_name} (ID: {current_db_profile.id})")
         else:
             logging.info("等待队列为空，仅使用用户定义文件进行检查")
     except Exception as e:
         logging.error(f"获取数据库profile失败: {e}")
+        current_db_profile = None
         current_profile = None
 
     while True:
@@ -38,7 +43,8 @@ if __name__ == "__main__":
         
         # 将profile添加到配置中传递给appointment_checker
         superc_config_with_profile = superc_config.copy()
-        superc_config_with_profile["db_profile"] = current_profile
+        superc_config_with_profile["db_profile"] = current_db_profile
+        superc_config_with_profile["profile"] = current_profile
             
         try:
             has_appointment, message = run_check(superc_config_with_profile)
@@ -46,11 +52,11 @@ if __name__ == "__main__":
                 logging.info(f"成功！ {message}")
                 
                 # 如果使用了数据库profile，更新其状态为booked
-                if current_profile:
+                if current_db_profile:
                     try:
-                        success = update_appointment_status(current_profile.id, 'booked')
+                        success = update_appointment_status(current_db_profile.id, 'booked')
                         if success:
-                            logging.info(f"已更新用户 {current_profile.vorname} {current_profile.nachname} 的状态为 'booked'")
+                            logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
                         else:
                             logging.error(f"更新用户状态失败，但预约已成功")
                     except Exception as e:

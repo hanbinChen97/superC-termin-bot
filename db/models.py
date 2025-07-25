@@ -28,6 +28,7 @@ class AppointmentProfile(Base):
     # 基本信息
     vorname = Column(Text)
     nachname = Column(Text)
+    email = Column(Text)
     phone = Column(Text)
     geburtsdatum_day = Column(Integer)
     geburtsdatum_month = Column(Integer)

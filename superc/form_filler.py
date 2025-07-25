@@ -23,11 +23,15 @@ def load_personal_info():
         if profile_type == "user_defined":
             # 用户定义文件格式: [{fuellen_in_name: "", wert_zum_fuellen: ""}, ...]
             return {item['fuellen_in_name']: item['wert_zum_fuellen'] for item in profile_data}
+        elif profile_type == "profile_dataclass":
+            # Profile数据类格式: 直接使用 to_form_data() 方法
+            return profile_data.to_form_data()
         elif profile_type == "database":
             # 数据库格式: AppointmentProfile 对象
             return {
                 "vorname": profile_data.vorname,
                 "nachname": profile_data.nachname,
+                "email": profile_data.email,
                 "phone": profile_data.phone,
                 "geburtsdatum_day": str(profile_data.geburtsdatum_day),
                 "geburtsdatum_month": str(profile_data.geburtsdatum_month),

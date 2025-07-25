@@ -1,4 +1,4 @@
-# uv run superc/appointment_checker.py
+#  python -m superc.appointment_checker
 
 
 import requests
@@ -13,6 +13,7 @@ from .utils import save_page_content, download_captcha, validate_page_step
 from .form_filler import fill_form
 from datetime import datetime
 import json
+from superc.profile import Profile
 
 
 USER_AGENT = config.USER_AGENT
@@ -122,7 +123,7 @@ def get_profile_user_defined(file_path: str) -> Optional[dict]:
         logging.error(f"无法读取用户定义文件 {file_path}: {e}")
         return None
 
-def set_profile(appointment_date_str: str, db_profile=None) -> bool:
+def set_profile(appointment_date_str: str, db_profile=None, profile_dataclass=None) -> bool:
     """
     根据预约时间设置当前 profile
     返回是否成功设置profile
@@ -150,8 +151,16 @@ def set_profile(appointment_date_str: str, db_profile=None) -> bool:
                 logging.error(f"无法加载用户定义文件 {rules['user_defined_file']}")
                 return False
         else:
-            # 使用数据库中的profile
-            if db_profile and rules["use_database"]:
+            # 优先使用Profile dataclass，其次使用数据库profile
+            if profile_dataclass and rules["use_database"]:
+                config.currentProfile = {
+                    "type": "profile_dataclass",
+                    "data": profile_dataclass,
+                    "source": "profile_dataclass"
+                }
+                logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，使用Profile数据类 (用户: {profile_dataclass.full_name})")
+                return True
+            elif db_profile and rules["use_database"]:
                 config.currentProfile = {
                     "type": "database",
                     "data": db_profile,
@@ -160,14 +169,14 @@ def set_profile(appointment_date_str: str, db_profile=None) -> bool:
                 logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，使用数据库中的用户信息 (ID: {db_profile.id})")
                 return True
             else:
-                logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，但无可用的数据库profile，跳过此预约")
+                logging.info(f"预约日期为 {appointment_date_str}，月份为{rules['cutoff_month']}月或更晚，但无可用的profile，跳过此预约")
                 return False
 
     except (IndexError, ValueError) as e:
         logging.warning(f"无法从 '{appointment_date_str}' 解析日期，无法设置profile。错误: {e}")
         return False
 
-def select_appointment_and_set_profile(session: requests.Session, suggest_res: requests.Response, location_name: str, db_profile=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+def select_appointment_and_set_profile(session: requests.Session, suggest_res: requests.Response, location_name: str, db_profile=None, profile_dataclass=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
     选择第一个可用预约并设置profile
     """
@@ -198,7 +207,7 @@ def select_appointment_and_set_profile(session: requests.Session, suggest_res: r
         date_display = form_data.get("date", "未知日期")
 
     # 设置profile - 这是关键步骤
-    if not set_profile(date_display, db_profile):
+    if not set_profile(date_display, db_profile, profile_dataclass):
         return False, f"预约时间 {date_display} 无法设置合适的profile", None
     
     # 时间来自 <button>
@@ -220,7 +229,7 @@ def select_appointment_and_set_profile(session: requests.Session, suggest_res: r
     logging.info("Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面")
     return True, "Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面", submit_soup
 
-def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, db_profile=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, db_profile=None, profile_dataclass=None) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
     Schritt 4: 重构后的主函数，调用上述两个新函数
     """
@@ -231,7 +240,7 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
         return False, check_message, None
     
     # 第二阶段：有预约时才进行选择和profile设置
-    return select_appointment_and_set_profile(session, suggest_res, location_name, db_profile)
+    return select_appointment_and_set_profile(session, suggest_res, location_name, db_profile, profile_dataclass)
 
 def schritt_5_fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
@@ -300,9 +309,10 @@ def run_check(location_config: dict) -> Tuple[bool, str]:
 
     log_verbose("=== Schritt 4: 检查预约时间可用性并选择 ===")
     # Schritt 4: 检查预约时间可用性并选择第一个
-    # 获取数据库profile参数（如果提供了的话）
+    # 获取数据库profile和Profile dataclass参数（如果提供了的话）
     db_profile = location_config.get("db_profile", None)
-    success, message, soup = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, db_profile)
+    profile_dataclass = location_config.get("profile", None)
+    success, message, soup = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, db_profile, profile_dataclass)
     if not success:
         logging.info(f"Schritt 4 结果: {message}")
         return False, message
