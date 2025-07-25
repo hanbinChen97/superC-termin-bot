@@ -1,4 +1,5 @@
 """
+source .venv/bin/activate && python -m db.utils
 数据库工具模块 - 提供预约配置文件的数据库操作功能
 供 superc.py 和其他模块使用的纯工具模块
 """
@@ -18,11 +19,11 @@ def _init_database():
     load_dotenv()
     
     # Fetch variables
-    USER = os.getenv("user")
-    PASSWORD = os.getenv("password")
-    HOST = os.getenv("host")
-    PORT = os.getenv("port")
-    DBNAME = os.getenv("dbname")
+    USER = os.getenv("DB_USER")
+    PASSWORD = os.getenv("DB_PASSWORD")
+    HOST = os.getenv("DB_HOST")
+    PORT = os.getenv("DB_PORT")
+    DBNAME = os.getenv("DB_NAME")
     
     # Construct the SQLAlchemy connection string
     DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
@@ -75,8 +76,6 @@ def get_first_waiting_profile() -> Optional[AppointmentProfile]:
         return None
     finally:
         session.close()
-
-
 
 def update_appointment_status(profile_id: int, status: str) -> bool:
     """
@@ -165,8 +164,6 @@ def print_first_waiting_profile() -> None:
     print(f"创建时间: {profile.created_at}")
     print(f"更新时间: {profile.updated_at}")
     print("-" * 50)
-
-
 
 def print_all_profiles() -> None:
     """

@@ -75,7 +75,7 @@ sequenceDiagram
 
 ```bash
 # 使用uv创建虚拟环境并安装依赖
-uv venv
+uv venv --python 3.10
 source .venv/bin/activate  # Linux/Mac
 # .venv\Scripts\activate  # Windows
 
