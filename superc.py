@@ -27,6 +27,7 @@ if __name__ == "__main__":
         if current_db_profile:
             current_profile = Profile.from_appointment_profile(current_db_profile)
             logging.info(f"当前处理用户: {current_profile.full_name} (ID: {current_db_profile.id})")
+            current_profile.print_info()
         else:
             logging.info("等待队列为空，仅使用用户定义文件进行检查")
     except Exception as e:
@@ -70,6 +71,7 @@ if __name__ == "__main__":
                         current_db_profile = next_db_profile
                         current_profile = Profile.from_appointment_profile(current_db_profile)
                         logging.info(f"找到下一个用户: {current_profile.full_name} (ID: {current_db_profile.id})，继续查询预约...")
+                        current_profile.print_info()
                         continue  # 立即开始下一轮查询
                     else:
                         logging.info("没有更多等待的用户，程序退出")
