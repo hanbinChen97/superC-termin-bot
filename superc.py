@@ -15,6 +15,16 @@ from superc.profile import Profile
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
 
+def log_profile_info(profile):
+    """将Profile信息输出到日志"""
+    logging.info("=== Profile 信息 ===")
+    logging.info(f"姓名: {profile.full_name}")
+    logging.info(f"邮箱: {profile.email}")
+    logging.info(f"电话: {profile.phone}")
+    logging.info(f"生日: {profile.geburtsdatum_day}/{profile.geburtsdatum_month}/{profile.geburtsdatum_year}")
+    logging.info(f"偏好地点: {profile.preferred_locations}")
+    logging.info("-" * 30)
+
 if __name__ == "__main__":
     logging.info(f"启动 SuperC 预约检查程序，进程PID: {os.getpid()}")
     superc_config = LOCATIONS["superc"]
@@ -28,6 +38,7 @@ if __name__ == "__main__":
             current_profile = Profile.from_appointment_profile(current_db_profile)
             logging.info(f"当前处理用户: {current_profile.full_name} (ID: {current_db_profile.id})")
             current_profile.print_info()
+            log_profile_info(current_profile)
         else:
             logging.info("等待队列为空，仅使用用户定义文件进行检查")
     except Exception as e:
@@ -72,6 +83,7 @@ if __name__ == "__main__":
                         current_profile = Profile.from_appointment_profile(current_db_profile)
                         logging.info(f"找到下一个用户: {current_profile.full_name} (ID: {current_db_profile.id})，继续查询预约...")
                         current_profile.print_info()
+                        log_profile_info(current_profile)
                         continue  # 立即开始下一轮查询
                     else:
                         logging.info("没有更多等待的用户，程序退出")
