@@ -62,7 +62,21 @@ if __name__ == "__main__":
                     except Exception as e:
                         logging.error(f"更新数据库状态时发生错误: {e}")
                 
-                break  # 成功预约后退出循环
+                # 立即尝试获取下一个用户进行处理
+                logging.info("预约成功！立即检查是否有下一个用户需要处理...")
+                try:
+                    next_db_profile = get_first_waiting_profile()
+                    if next_db_profile:
+                        current_db_profile = next_db_profile
+                        current_profile = Profile.from_appointment_profile(current_db_profile)
+                        logging.info(f"找到下一个用户: {current_profile.full_name} (ID: {current_db_profile.id})，继续查询预约...")
+                        continue  # 立即开始下一轮查询
+                    else:
+                        logging.info("没有更多等待的用户，程序退出")
+                        break
+                except Exception as e:
+                    logging.error(f"获取下一个用户profile失败: {e}")
+                    break  # 获取失败则退出
 
             if message == "表单提交失败, zu vieler Terminanfragen":
                 logging.info(message)
