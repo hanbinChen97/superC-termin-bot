@@ -55,3 +55,13 @@ class Profile:
             month=self.geburtsdatum_month, 
             day=self.geburtsdatum_day
         )
+    
+    def print_info(self) -> None:
+        """打印所有Profile信息"""
+        print("=== Profile 信息 ===")
+        print(f"姓名: {self.full_name}")
+        print(f"邮箱: {self.email}")
+        print(f"电话: {self.phone}")
+        print(f"生日: {self.geburtsdatum_day}/{self.geburtsdatum_month}/{self.geburtsdatum_year}")
+        print(f"偏好地点: {self.preferred_locations}")
+        print("-" * 30)

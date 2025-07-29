@@ -109,7 +109,7 @@ def fill_form(session, soup, captcha_image_path, location_name):
         logging.info(f"\n表单提交响应状态码: {res.status_code}")
         
         # 检查是否提交成功
-        if "Schritt 6" in res.text:
+        if "Online-Terminanfrage erfolgreich" in res.text:
             logging.info("预约成功！")
             return True, res
         elif "zu vieler Terminanfragen" in res.text:
