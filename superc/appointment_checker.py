@@ -91,6 +91,7 @@ def check_appointment_availability(session: requests.Session, url: str, loc: str
         'gps_long': '65.07867',
         'select_location': submit_text
     }
+    # 进入 Schritt 4
     res = session.post(url, data=payload)
     
     if not validate_page_step(res, "4"):
@@ -98,13 +99,14 @@ def check_appointment_availability(session: requests.Session, url: str, loc: str
     
     log_verbose("Schritt 4: 成功进入预约时间检查页面")
     
-    # 检查是否有可用预约时间
+    # 这不是很清楚。。。
     suggest_url = urljoin(BASE_URL, 'suggest')
     suggest_res = session.get(suggest_url)
     # save_page_content(suggest_res.text, '4_availability', location_name)
 
+    # 检查是否有可用预约时间
     if "Kein freier Termin verfügbar" in suggest_res.text:
-        return False, "Schritt 4 结果: 当前没有可用预约时间", None
+        return False, "当前没有可用预约时间", None
 
     # 这是关键信息，始终输出
     logging.info("Schritt 4: 发现可用预约时间")
@@ -313,6 +315,7 @@ def run_check(location_config: dict) -> Tuple[bool, str]:
     db_profile = location_config.get("db_profile", None)
     profile_dataclass = location_config.get("profile", None)
     success, message, soup = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, db_profile, profile_dataclass)
+    
     if not success:
         logging.info(f"Schritt 4 结果: {message}")
         return False, message
