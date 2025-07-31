@@ -1,6 +1,8 @@
 # source .venv/bin/activate && python3 superc.py 2>&1
 # nohup python3 superc.py 2>&1 | tee superc.log
 
+# nohup python3 superc.py > superc.log 2>&1 &
+
 import logging
 import time
 import os

@@ -33,9 +33,10 @@ def load_personal_info():
                 "nachname": profile_data.nachname,
                 "email": profile_data.email,
                 "phone": profile_data.phone,
-                "geburtsdatum_day": str(profile_data.geburtsdatum_day),
-                "geburtsdatum_month": str(profile_data.geburtsdatum_month),
-                "geburtsdatum_year": str(profile_data.geburtsdatum_year),
+                # 映射为页面表单需要的字段名（驼峰命名）
+                "geburtsdatumDay": str(profile_data.geburtsdatum_day),
+                "geburtsdatumMonth": str(profile_data.geburtsdatum_month),
+                "geburtsdatumYear": str(profile_data.geburtsdatum_year),
                 # 可以根据需要添加更多字段映射
             }
         else:
@@ -72,6 +73,9 @@ def fill_form(session, soup, captcha_image_path, location_name):
 
     # 准备表单数据
     form_data = personal_info.copy()
+    # 填写 Wiederholung 邮箱
+    if 'email' in personal_info:
+        form_data['emailCheck'] = personal_info['email']
     # comment= ''
     form_data['comment'] = ''
     form_data['captcha_code'] = captcha_text
