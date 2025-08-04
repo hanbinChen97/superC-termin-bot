@@ -2,7 +2,7 @@ import types
 from bs4 import BeautifulSoup
 from superc import form_filler
 
-# mock config.currentProfile
+# 创建测试用的 profile
 test_profile = types.SimpleNamespace(
     vorname="TestVorname",
     nachname="TestNachname",
@@ -13,7 +13,7 @@ test_profile = types.SimpleNamespace(
     geburtsdatum_year=1999
 )
 
-form_filler.config.currentProfile = {
+profile_dict = {
     "type": "database",
     "data": test_profile
 }
@@ -46,7 +46,7 @@ class DummySession:
 
 session = DummySession()
 
-success, res = form_filler.fill_form(session, soup, "dummy_captcha.png", "test_location")
+success, res = form_filler.fill_form(session, soup, "test_location", profile_dict)
 print("提交是否成功:", success)
 if success:
     print("模拟提交成功，表单数据已生成。")

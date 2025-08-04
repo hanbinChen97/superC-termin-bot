@@ -11,7 +11,8 @@ test_profile = {
     "geburtsdatumDay": "15",
     "geburtsdatumMonth": "7",
     "geburtsdatumYear": "1999",
-    "emailCheck": "test@example.com"
+    "emailCheck": "test@example.com",
+    "captcha_code": "TEST123"  # 真正的验证码
 }
 
 # 读取html
@@ -29,6 +30,8 @@ input_map = {
     "geburtsdatumMonth": "geburtsdatumMonth",
     "geburtsdatumYear": "geburtsdatumYear",
     "phone": "phone",
+    "captcha_code": "captcha_code"  # 正确映射 captcha_code 到验证码
+    # 注意：hunangskrukka 不在映射中，保持为空（蜜罐字段）
 }
 
 # 填写 input 框

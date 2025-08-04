@@ -1,6 +1,7 @@
 # Aachen Termin Bot
 
-亚琛外管局（Ausländeramt）自动预约机器人，支持SuperC和Infostelle两个地点的RWTH学生预约。
+亚琛外管局（Ausländeramt）自动预约机器人，支持SuperC和Infostelle两个地点的RWTH学生预约。  
+https://termine.staedteregion-aachen.de/auslaenderamt/
 
 ## ✨ 特性
 
@@ -129,24 +130,28 @@ AZURE_OPENAI_API_VERSION=2024-12-01-preview
 
 #### SuperC地点预约
 ```bash
-# 前台运行
-uv run superc.py
-# 或使用传统方式
+# 使用uv运行（推荐）
+uv run python superc.py
+
+# 或者激活虚拟环境后运行
+source .venv/bin/activate
 python superc.py
 
 # 后台运行并记录日志
-nohup uv run superc.py 2>&1 | tee superc.log &
+nohup uv run python superc.py 2>&1 | tee superc.log &
 ```
 
 #### Infostelle地点预约  
 ```bash
-# 前台运行
-uv run infostelle.py
-# 或使用传统方式
+# 使用uv运行（推荐）
+uv run python infostelle.py
+
+# 或者激活虚拟环境后运行
+source .venv/bin/activate
 python infostelle.py
 
 # 后台运行
-nohup uv run infostelle.py > infostelle.log 2>&1 &
+nohup uv run python infostelle.py > infostelle.log 2>&1 &
 ```
 
 
@@ -181,16 +186,18 @@ nohup uv run infostelle.py > infostelle.log 2>&1 &
 ## 🧪 测试
 
 ```bash
-# 运行所有测试
-uv run tests/run_tests.py
-# 或使用传统方式
+# 使用uv运行测试（推荐）
+uv run python tests/run_tests.py
+
+# 或者激活虚拟环境后运行
+source .venv/bin/activate
 python tests/run_tests.py
 
 # 运行特定测试
-uv run tests/test_config.py
-uv run tests/test_integration.py
+uv run python tests/test_config.py
+uv run python tests/test_integration.py
 
-# 使用pytest (需先安装)
+# 使用pytest（需先安装）
 uv pip install pytest
 uv run pytest tests/
 ```

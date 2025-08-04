@@ -14,8 +14,10 @@ This is an automated appointment checking bot for the Aachen Ausländeramt (immi
 - **appointment_checker.py**: Core appointment checking logic that orchestrates the entire flow
 - **form_filler.py**: Handles final form submission with personal data and CAPTCHA recognition
 - **utils.py**: Utility functions for page content saving and CAPTCHA image downloading
-- **llmCall.py**: OpenAI integration for CAPTCHA text recognition
+- **llmCall.py**: Azure OpenAI integration for CAPTCHA text recognition
 - **config.py**: Configuration constants including locations, URLs, and file paths
+- **db/models.py**: Defines database models for users and appointment profiles
+- **db/utils.py**: Database utility functions for querying and updating appointment profiles
 
 ### Flow Architecture
 
@@ -29,9 +31,9 @@ The appointment booking follows a 6-step process:
 
 ### Personal Data Management
 
-- Personal information is stored in files named `table` or `hanbin`
+- Personal information is stored in files named `table` or `hanbin` (deprecated, use database instead now)
 - The system dynamically selects which file to use based on appointment date (before September uses `hanbin`, September+ uses `table`)
-- Data format: JSON array with `fuellen_in_name` and `wert_zum_fuellen` fields
+- Database integration is now the primary method for managing user profiles and appointment statuses
 
 ## Development Commands
 
@@ -39,7 +41,7 @@ The appointment booking follows a 6-step process:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 ### Running the Bot
@@ -58,7 +60,9 @@ source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 - requests>=2.31.0 - HTTP requests and web scraping
 - beautifulsoup4>=4.12.0 - HTML parsing
 - python-dotenv==1.0.0 - Environment variables
-- openai>=1.0.0 - CAPTCHA recognition via OpenAI API
+- openai>=1.0.0 - CAPTCHA recognition via Azure OpenAI API
+- sqlalchemy>=2.0.0 - Database ORM
+- psycopg2-binary>=2.9.0 - PostgreSQL adapter
 
 ## File Structure Notes
 
@@ -66,6 +70,7 @@ source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 - `logs/` - Application logs and saved HTML responses
 - `table` / `hanbin` - Personal information files (JSON format)
 - `requirements.txt` - Dependencies (note: contains Unicode BOM characters)
+- `db/` - Database models and utility functions
 
 ## Important Configuration
 
