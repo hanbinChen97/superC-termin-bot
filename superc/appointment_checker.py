@@ -15,7 +15,7 @@ from urllib.parse import urljoin
 # 使用相对导入
 from . import config
 from .utils import save_page_content, validate_page_step
-from .form_filler import fill_form
+from .form_filler import fill_form_with_captcha_retry
 from datetime import datetime
 import json
 from .profile import Profile
@@ -231,13 +231,15 @@ def schritt_4_check_appointment_availability(session: requests.Session, url: str
 
 def schritt_5_fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, selected_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
-    Schritt 5: 填写表单 - 使用schritt 4选择的profile
+    Schritt 5: 填写表单 - 使用schritt 4选择的profile，支持验证码重试
     """
     if not selected_profile:
         return False, "Schritt 5 失败: 未提供选择的profile", None
 
     logging.info(f"Schritt 5: 准备使用 {selected_profile.full_name} profile 填写表单...")
-    result = fill_form(session, soup, location_name, selected_profile)
+    
+    # 使用带重试的表单填写函数
+    result = fill_form_with_captcha_retry(session, soup, location_name, selected_profile, max_retries=3)
 
     # 检查表单填写结果
     if result[0]:

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
 测试完整的智能表单填写功能
+根目录
+python test_complete_form_filling.py
 """
 
 import logging

@@ -332,32 +332,113 @@ def map_profile_to_form_data(profile: Profile, form_fields: Dict[str, Dict[str, 
     return form_data
 
 
-def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, profile: Profile) -> Tuple[bool, str]:
+def check_captcha_error_from_response(response_text: str) -> bool:
+    """
+    通过DOM检查响应中是否包含验证码错误
+    
+    Args:
+        response_text: HTTP响应文本
+        
+    Returns:
+        bool: 是否为验证码错误
+    """
+    try:
+        soup_response = bs4.BeautifulSoup(response_text, 'html.parser')
+        error_div = soup_response.find('div', class_='content__error')
+        
+        if error_div:
+            error_text = error_div.get_text()
+            logging.info(f"检测到错误区域内容: {error_text}")
+            
+            # 检查是否包含"Sicherheitsfrage"
+            if "Sicherheitsfrage" in error_text:
+                logging.error("通过DOM检测到验证码错误 (Sicherheitsfrage)")
+                return True
+        
+        return False
+        
+    except Exception as e:
+        logging.error(f"检查验证码错误时发生异常: {str(e)}")
+        return False
+
+
+def fill_form_with_captcha_retry(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, profile: Profile, max_retries: int = 3) -> Tuple[bool, str]:
+    """
+    填写表单并提交，支持验证码重试
+    :param session: requests.Session 对象
+    :param soup: BeautifulSoup 对象
+    :param location_name: 地点名称，用于保存文件
+    :param profile: Profile 对象，必需参数
+    :param max_retries: 验证码最大重试次数，默认3次
+    :return: (是否成功, 响应信息)
+    """
+    
+    for attempt in range(max_retries):
+        is_retry = attempt > 0
+        attempt_info = f"(第{attempt + 1}次尝试)" if is_retry else ""
+        
+        if is_retry:
+            logging.info(f"验证码重试 {attempt_info}")
+        else:
+            logging.info("开始填写表单...")
+        
+        # 执行表单填写
+        success, message, response_text = fill_form(session, soup, location_name, profile)
+        
+        if success:
+            return True, message
+        
+        # 使用DOM检查是否是验证码错误
+        is_captcha_error = False
+        if response_text:
+            is_captcha_error = check_captcha_error_from_response(response_text)
+        
+        # 如果DOM检查失败，使用消息内容作为备选方案
+        if not is_captcha_error:
+            is_captcha_error = "验证码错误" in message
+        
+        if not is_captcha_error:
+            # 非验证码错误，直接返回失败
+            logging.info("检测到非验证码错误，不进行重试")
+            return False, message
+        
+        # 验证码错误，准备重试
+        if attempt < max_retries - 1:
+            logging.warning(f"验证码错误 {attempt_info}，准备重试...")
+        else:
+            # 已达到最大重试次数
+            logging.error(f"验证码重试失败，已达到最大重试次数({max_retries})")
+            return False, f"验证码重试失败: {message}"
+    
+    return False, "未知错误"
+
+
+def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, profile: Profile) -> Tuple[bool, str, Optional[str]]:
     """
     填写表单并提交
     :param session: requests.Session 对象
     :param soup: BeautifulSoup 对象
     :param location_name: 地点名称，用于保存文件
     :param profile: Profile 对象，必需参数
-    :return: (是否成功, 响应信息)
+    :return: (是否成功, 响应信息, 响应文本)
     """
     logging.info("\n开始智能填写表单...")
     
     # 直接使用 Profile 对象的 to_form_data() 方法并映射字段名
     if not profile:
         logging.error("profile 参数未提供")
-        return False, "profile 参数未提供"
+        return False, "profile 参数未提供", None
     
     try:
         # 1. 智能分析表单字段
         form_fields = find_form_fields_from_soup(soup)
         if not form_fields:
-            return False, "未找到有效的表单字段"
+            return False, "未找到有效的表单字段", None
         
         # 2. 智能映射Profile数据到表单
         form_data = map_profile_to_form_data(profile, form_fields)
         if not form_data:
-            return False, "Profile数据映射失败"
+            return False, "Profile数据映射失败", None
         
         # 记录映射结果
         logging.info(f"智能映射完成，生成 {len(form_data)} 个字段")
@@ -383,21 +464,21 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
             form_data = personal_info
         except Exception as e2:
             logging.error(f"传统方法也失败: {str(e2)}")
-            return False, f"表单数据准备失败: {str(e2)}"
+            return False, f"表单数据准备失败: {str(e2)}", None
     
     logging.info(f"表单数据准备完成: {form_data}")
 
     # 下载并识别验证码
     success, captcha_path = download_captcha(session, soup, location_name)
     if not success:
-        return False, f"验证码下载失败: {captcha_path}"
+        return False, f"验证码下载失败: {captcha_path}", None
 
     logging.info(f"\n开始识别验证码: {captcha_path}")
     captcha_text = recognize_captcha(captcha_path)
     logging.info(f"验证码识别结果: {captcha_text}")
     if not captcha_text:
         logging.error("验证码识别失败")
-        return False, "验证码识别失败"
+        return False, "验证码识别失败", None
 
     # 添加验证码和其他必要字段 
     if 'captcha_code' not in form_data:
@@ -430,7 +511,7 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
     form = soup.find('form')
     if not form or not isinstance(form, Tag):
         logging.error("无法找到表单")
-        return False, "无法找到表单"
+        return False, "无法找到表单", None
 
     # 收集隐藏字段
     hidden_fields = {}
@@ -464,7 +545,7 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
     if validation_errors:
         error_msg = "; ".join(validation_errors)
         logging.error(f"表单验证失败: {error_msg}")
-        return False, f"表单验证失败: {error_msg}"
+        return False, f"表单验证失败: {error_msg}", None
 
     logging.info(f"\n最终提交的表单数据: {form_data}")
 
@@ -491,7 +572,7 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
         # 检查成功标志
         if "Online-Terminanfrage erfolgreich" in response_text:
             logging.info("预约成功！")
-            return True, "预约成功！"
+            return True, "预约成功！", response_text
         
         # 检查各种错误情况
         error_patterns = {
@@ -505,26 +586,45 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
         }
         
         detected_errors = []
+        captcha_error_found = False
+        
+        # 更精确地检测验证码错误
+        soup_response = bs4.BeautifulSoup(response_text, 'html.parser')
+        error_div = soup_response.find('div', class_='content__error')
+        if error_div:
+            error_text = error_div.get_text()
+            logging.info(f"检测到错误区域内容: {error_text}")
+            
+            # 检查是否包含"Sicherheitsfrage"
+            if "Sicherheitsfrage" in error_text:
+                captcha_error_found = True
+                detected_errors.append("验证码错误")
+                logging.error("检测到验证码错误 (Sicherheitsfrage)")
+        
+        # 检查其他错误模式
         for pattern, description in error_patterns.items():
-            if pattern in response_text:
+            if pattern in response_text and pattern != "Sicherheitsfrage":  # 验证码错误已单独处理
                 detected_errors.append(description)
                 logging.error(f"检测到错误: {description} (关键词: {pattern})")
         
+        # 去重错误信息
+        detected_errors = list(dict.fromkeys(detected_errors))  # 保持顺序的去重
+        
         if detected_errors:
-            error_message = "表单提交失败: " + "; ".join(detected_errors)
-            logging.error(error_message)
+            error_message = "; ".join(detected_errors)
+            logging.error(f"表单提交失败: {error_message}")
             
             # 保存错误页面用于调试
             save_page_content(response_text, '6_form_error', location_name)
-            return False, error_message
+            return False, error_message, response_text
         else:
-            error_message = "表单提交失败，未知错误"
-            logging.error(f"{error_message}")
+            error_message = "未知错误"
+            logging.error(f"表单提交失败: {error_message}")
             logging.error(f"响应内容前500字符: {response_text[:500]}...")
             save_page_content(response_text, '6_form_unknown_error', location_name)
-            return False, error_message
+            return False, error_message, response_text
 
     except Exception as e:
         error_msg = f"提交表单时发生异常: {str(e)}"
         logging.error(error_msg)
-        return False, error_msg
+        return False, error_msg, None

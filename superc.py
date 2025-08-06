@@ -95,11 +95,11 @@ if __name__ == "__main__":
         current_profile = None
 
     while True:
-        # 检查当前时间，如果是22点或之后则退出
-        # current_hour = datetime.now().hour
-        # if current_hour >= 22:
-        #     logging.info("已到22点，程序自动退出")
-        #     break
+        # 检查当前时间，如果是凌晨 1 点 以后，也就是改成等于 2
+        current_hour = datetime.now().hour
+        if current_hour == 1:
+            logging.info("已到凌晨 1 点，程序自动退出")
+            break
             
         try:
             has_appointment, message = run_check(superc_config, current_profile, hanbin_profile)
