@@ -10,6 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 from typing import List, Optional
+from datetime import datetime
+import re
 from db.models import AppointmentProfile
 
 # 数据库连接配置
@@ -41,6 +43,28 @@ def _init_database():
 
 # 初始化数据库连接
 engine, SessionLocal = _init_database()
+
+def parse_appointment_date(appointment_date_str: str) -> Optional[datetime]:
+    """
+    解析预约日期字符串，转换为datetime对象
+    输入格式: "Donnerstag, 16.10.2025 11:00"
+    输出: datetime对象
+    """
+    try:
+        # 从 "Donnerstag, 16.10.2025 11:00" 中提取日期和时间部分
+        # 去掉星期几，只保留日期和时间
+        if ', ' in appointment_date_str:
+            date_time_part = appointment_date_str.split(', ')[1]  # "16.10.2025 11:00"
+        else:
+            date_time_part = appointment_date_str
+        
+        # 解析日期时间: "16.10.2025 11:00"
+        parsed_datetime = datetime.strptime(date_time_part, "%d.%m.%Y %H:%M")
+        return parsed_datetime
+        
+    except (ValueError, IndexError) as e:
+        print(f"无法解析预约日期 '{appointment_date_str}': {e}")
+        return None
 
 def get_all_appointment_profiles() -> List[AppointmentProfile]:
     """
@@ -77,12 +101,13 @@ def get_first_waiting_profile() -> Optional[AppointmentProfile]:
     finally:
         session.close()
 
-def update_appointment_status(profile_id: int, status: str) -> bool:
+def update_appointment_status(profile_id: int, status: str, appointment_date: Optional[str] = None) -> bool:
     """
-    更新预约配置文件的状态
+    更新预约配置文件的状态和预约日期
     参数:
         profile_id: 预约配置文件ID
-        status: 新的状态值（如 'booked'）
+        status: 新的状态值（如 'booked', 'error'）
+        appointment_date: 预约日期字符串，格式如 "Donnerstag, 16.10.2025 11:00"
     返回: 更新是否成功
     """
     session = SessionLocal()
@@ -90,7 +115,18 @@ def update_appointment_status(profile_id: int, status: str) -> bool:
         # 查找指定ID的记录
         profile = session.query(AppointmentProfile).filter(AppointmentProfile.id == profile_id).first()
         if profile:
-            profile.appointment_status = status
+            # 使用 setattr 来避免类型检查问题
+            setattr(profile, 'appointment_status', status)
+            
+            # 如果提供了预约日期，解析并存储
+            if appointment_date:
+                parsed_date = parse_appointment_date(appointment_date)
+                if parsed_date:
+                    setattr(profile, 'appointment_date', parsed_date)
+                    print(f"成功解析并存储预约日期: {appointment_date} -> {parsed_date}")
+                else:
+                    print(f"预约日期解析失败: {appointment_date}")
+            
             session.commit()
             print(f"成功更新ID {profile_id} 的状态为 '{status}'")
             return True

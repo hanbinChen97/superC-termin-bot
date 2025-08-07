@@ -117,10 +117,10 @@ def check_appointment_availability(session: requests.Session, url: str, loc: str
     logging.info("Schritt 4: 发现可用预约时间")
     return True, "发现可用预约时间", suggest_res
 
-def select_appointment_and_choose_profile(session: requests.Session, suggest_res: requests.Response, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup], Optional[Profile]]:
+def select_appointment_and_choose_profile(session: requests.Session, suggest_res: requests.Response, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup], Optional[Profile], Optional[str]]:
     """
     选择第一个可用预约并根据日期选择profile
-    返回: (成功?, 消息, soup, 选择的profile)
+    返回: (成功?, 消息, soup, 选择的profile, 预约日期时间字符串)
     """
     soup = bs4.BeautifulSoup(suggest_res.text, 'html.parser')
     details_container = soup.find("details", {"id": "details_suggest_times"})
@@ -128,12 +128,12 @@ def select_appointment_and_choose_profile(session: requests.Session, suggest_res
         details_container = soup.find("div", {"id": "sugg_accordion"})
 
     if not details_container:
-        return False, "Schritt 4 失败: 在预约页面找不到时间容器", None, None
+        return False, "Schritt 4 失败: 在预约页面找不到时间容器", None, None, None
     
     first_available_form = details_container.find("form", {"class": "suggestion_form"})
 
     if not first_available_form:
-        return False, "Schritt 4 失败: 有可用时间但无法找到具体的预约表单", None, None
+        return False, "Schritt 4 失败: 有可用时间但无法找到具体的预约表单", None, None, None
 
     # 从表单的隐藏字段中提取所有需要提交的数据
     form_data = {inp.get('name'): inp.get('value') for inp in first_available_form.find_all("input", {"type": "hidden"})}
@@ -151,14 +151,21 @@ def select_appointment_and_choose_profile(session: requests.Session, suggest_res
     # 根据日期选择profile
     selected_profile = choose_profile_by_date(date_display, current_profile, hanbin_profile)
     if not selected_profile:
-        return False, f"预约时间 {date_display} 无法选择合适的profile", None, None
+        return False, f"预约时间 {date_display} 无法选择合适的profile", None, None, None
     
     # 时间来自 <button>
     time_button = first_available_form.find("button", {"type": "submit"})
     time_info = time_button.get('title') if time_button else "未知时间"
+    
+    # 确保 time_info 是字符串
+    if time_info is None or not isinstance(time_info, str):
+        time_info = "未知时间"
+
+    # 组合完整的预约日期时间字符串
+    appointment_datetime_str = f"{date_display} {time_info}" if time_info != "未知时间" else str(date_display)
 
     # 这是关键信息，始终输出
-    logging.info(f"Schritt 4: 找到可用时间: {date_display} {time_info}, 选择profile: {selected_profile.full_name if selected_profile else '未知'}")
+    logging.info(f"Schritt 4: 找到可用时间: {appointment_datetime_str}, 选择profile: {selected_profile.full_name if selected_profile else '未知'}")
     logging.info("正在提交预约选择...")
     
     submit_url = urljoin(BASE_URL, 'suggest')
@@ -167,11 +174,11 @@ def select_appointment_and_choose_profile(session: requests.Session, suggest_res
 
     if not validate_page_step(submit_res, "5"):
         logging.warning("Schritt 4 失败: 提交时间后未进入Schritt 5，可能选择失败")
-        return False, "Schritt 4 失败: 提交时间后未进入Schritt 5", None, None
+        return False, "Schritt 4 失败: 提交时间后未进入Schritt 5", None, None, None
 
     submit_soup = bs4.BeautifulSoup(submit_res.text, 'html.parser')
     logging.info("Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面")
-    return True, "Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面", submit_soup, selected_profile
+    return True, "Schritt 4 完成: 成功选择时间，进入Schritt 5表单页面", submit_soup, selected_profile, appointment_datetime_str
 
 def choose_profile_by_date(appointment_date_str: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Optional[Profile]:
     """
@@ -212,20 +219,20 @@ def choose_profile_by_date(appointment_date_str: str, current_profile: Optional[
         logging.warning(f"无法从 '{appointment_date_str}' 解析日期，使用current_profile作为默认。错误: {e}")
         return current_profile if current_profile else hanbin_profile
 
-def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup], Optional[Profile]]:
+def schritt_4_check_appointment_availability(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup], Optional[Profile], Optional[str]]:
     """
     Schritt 4: 检查预约时间可用性并选择第一个可用时间，同时选择合适的profile
-    返回: (成功?, 消息, soup, 选择的profile)
+    返回: (成功?, 消息, soup, 选择的profile, 预约日期时间字符串)
     """
     # 第一阶段：仅检查是否有预约
     has_appointment, check_message, suggest_res = check_appointment_availability(session, url, loc, submit_text, location_name)
     
     if not has_appointment:
-        return False, check_message, None, None
+        return False, check_message, None, None, None
     
     # 第二阶段：有预约时才进行选择并选择profile
     if suggest_res is None:
-        return False, "内部错误：suggest_res为空", None, None
+        return False, "内部错误：suggest_res为空", None, None, None
     
     return select_appointment_and_choose_profile(session, suggest_res, location_name, current_profile, hanbin_profile)
 
@@ -260,9 +267,10 @@ def schritt_6_confirm_booking(session: requests.Session, soup: bs4.BeautifulSoup
     logging.info("Schritt 6: 预约已完成，等待邮件确认")
     return True, "Schritt 6 完成: 预约已完成，等待邮件确认"
 
-def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str]:
+def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[str]]:
     """
     执行一次完整的预约检查流程 - 6个Schritt步骤
+    返回: (成功?, 消息, 预约日期时间字符串)
     """
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
@@ -276,7 +284,7 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
     success, res_or_error = get_initial_page(session)
     if not success: 
         logging.error(f"获取初始页面失败: {res_or_error}")
-        return False, str(res_or_error)
+        return False, str(res_or_error), None
     
     res = res_or_error  # 此时已确认success为True，所以res_or_error是Response对象
     assert isinstance(res, requests.Response)  # 类型断言
@@ -286,33 +294,33 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
     success, url = schritt_2_select_service_and_location_type(session, res, location_config["selection_text"])
     if not success: 
         logging.error(f"Schritt 2 失败: {url}")
-        return False, url
+        return False, url, None
 
     log_verbose("=== Schritt 3: 添加位置信息 (Standortauswahl) ===")
     # Schritt 3: 添加位置信息
     success, result = schritt_3_add_location_info(session, url)
     if not success: 
         logging.error(f"Schritt 3 失败: {result}")
-        return False, str(result)
+        return False, str(result), None
     loc, res = result
 
     log_verbose("=== Schritt 4: 检查预约时间可用性并选择 ===")
     # Schritt 4: 检查预约时间可用性并选择第一个，同时选择profile
-    success, message, soup, selected_profile = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, current_profile, hanbin_profile)
+    success, message, soup, selected_profile, appointment_datetime_str = schritt_4_check_appointment_availability(session, url, loc, location_config["submit_text"], location_name, current_profile, hanbin_profile)
     
     if not success:
         logging.info(f"Schritt 4 结果: {message}")
-        return False, message
+        return False, message, None
 
     logging.info("=== Schritt 5: 填写表单 ===")
     # Schritt 5: 填写表单，使用schritt 4选择的profile
     if soup is None or selected_profile is None:
-        return False, "内部错误：soup或selected_profile为空"
+        return False, "内部错误：soup或selected_profile为空", None
         
     success, message, updated_soup = schritt_5_fill_form(session, soup, location_name, selected_profile)
     if not success:
         logging.error(f"Schritt 5 失败: {message}")
-        return False, message
+        return False, message, None
 
     logging.info("=== Schritt 6: 邮件确认 ===")
     # Schritt 6: 邮件确认
@@ -321,10 +329,10 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
     if result[0]:
         # 这是关键信息，始终输出
         logging.info(f"预约成功完成: {result[1]}")
+        return True, result[1], appointment_datetime_str
     else:
         logging.error(f"Schritt 6 失败: {result[1]}")
-    
-    return result
+        return False, result[1], None
 
 if __name__ == "__main__":
     # 配置日志记录
@@ -343,5 +351,7 @@ if __name__ == "__main__":
     }
     
     # 为测试提供 None 的 profile 参数
-    success, message = run_check(location_config, None, None)
+    success, message, appointment_datetime_str = run_check(location_config, None, None)
     print(f"检查结果: {'成功' if success else '失败'} - {message}")
+    if appointment_datetime_str:
+        print(f"预约时间: {appointment_datetime_str}")

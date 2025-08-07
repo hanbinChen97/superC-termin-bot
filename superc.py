@@ -5,7 +5,7 @@
 # source .venv/bin/activate && python3 superc.py 2>&1
 # nohup python3 superc.py 2>&1 | tee superc.log
 
-# source .venv/bin/activate && nohup python3 superc.py > superc.log 2>&1 &
+# source .venv/bin/activate && nohup python3 superc.py >> superc.log 2>&1 &
 
 import logging
 import time
@@ -102,17 +102,20 @@ if __name__ == "__main__":
             break
             
         try:
-            has_appointment, message = run_check(superc_config, current_profile, hanbin_profile)
+            has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile, hanbin_profile)
             
             if has_appointment:
                 logging.info(f"成功！ {message}")
                 
-                # 如果使用了数据库profile，更新其状态为booked
+                # 如果使用了数据库profile，更新其状态为booked，并存储预约时间
                 if current_db_profile:
                     try:
-                        success = update_appointment_status(current_db_profile.id, 'booked')  # type: ignore
+                        success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
                         if success and current_profile:
-                            logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
+                            if appointment_datetime_str:
+                                logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
+                            else:
+                                logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
                         else:
                             logging.error(f"更新用户状态失败，但预约已成功")
                     except Exception as e:
@@ -136,9 +139,22 @@ if __name__ == "__main__":
                     logging.error(f"获取下一个用户profile失败: {e}")
                     break  # 获取失败则退出
 
-            if message == "表单提交失败, zu vieler Terminanfragen":
-                logging.info(message)
-                break  # 成功预约后退出循环
+            # 检查 "zu vieler Terminanfragen" 错误并设置状态为 error
+            if "zu vieler Terminanfragen" in message:
+                logging.error(f"检测到错误: 提交过于频繁，请稍后再试 (关键词: zu vieler Terminanfragen)")
+                
+                # 如果使用了数据库profile，更新其状态为error
+                if current_db_profile:
+                    try:
+                        success = update_appointment_status(current_db_profile.id, 'error')  # type: ignore
+                        if success and current_profile:
+                            logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'error'")
+                        else:
+                            logging.error(f"更新用户状态为error失败")
+                    except Exception as e:
+                        logging.error(f"更新数据库状态时发生错误: {e}")
+                
+                break  # 遇到此错误后退出循环
             
             if "当前没有可用预约时间" in message:
                 # logging.info(message)
