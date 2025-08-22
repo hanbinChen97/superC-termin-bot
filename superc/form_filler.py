@@ -92,11 +92,11 @@ def find_form_fields_from_soup(soup: BeautifulSoup) -> Dict[str, Dict[str, Any]]
         # 记录字段信息
         form_fields[field_name] = field_info
         
-        logging.info(f"  找到字段: {field_name}")
-        logging.info(f"    类型: {field_info['type']}")
-        logging.info(f"    必填: {field_info['required']}")
-        logging.info(f"    ID: {field_info['id']}")
-        logging.info(f"    标题: {field_info['title']}")
+        # logging.info(f"  找到字段: {field_name}")
+        # logging.info(f"    类型: {field_info['type']}")
+        # logging.info(f"    必填: {field_info['required']}")
+        # logging.info(f"    ID: {field_info['id']}")
+        # logging.info(f"    标题: {field_info['title']}")
     
     logging.info(f"\n总共找到 {len(form_fields)} 个字段")
     return form_fields
@@ -579,8 +579,6 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
             "zu vieler Terminanfragen": "提交过于频繁，请稍后再试",
             "Geburtsdatum": "生日格式错误",
             "Sicherheitsfrage": "验证码错误",
-            "E-Mail": "邮箱格式错误或不匹配",
-            "Pflichtfeld": "缺少必填字段",
             "Bitte überprüfen Sie Ihre Eingaben": "表单输入有误，请检查",
             "fehlerhafte Eingaben": "输入数据有误"
         }
@@ -610,6 +608,14 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
         # 去重错误信息
         detected_errors = list(dict.fromkeys(detected_errors))  # 保持顺序的去重
         
+        # if “提交过于频繁，请稍后再试” in detected_errors
+        # return true，error_message, response_text
+        # 用来触发，email block 情况。
+        if "提交过于频繁，请稍后再试" in detected_errors:
+            error_message = "提交过于频繁，请稍后再试"
+            logging.error(f"表单提交失败: {error_message}")
+            return False, error_message, response_text
+
         if detected_errors:
             error_message = "; ".join(detected_errors)
             logging.error(f"表单提交失败: {error_message}")

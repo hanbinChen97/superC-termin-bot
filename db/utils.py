@@ -126,8 +126,11 @@ def update_appointment_status(profile_id: int, status: str, appointment_date: Op
                     print(f"成功解析并存储预约日期: {appointment_date} -> {parsed_date}")
                 else:
                     print(f"预约日期解析失败: {appointment_date}")
-            
+
+            setattr(profile, 'completed_at', datetime.now())
+
             session.commit()
+            
             print(f"成功更新ID {profile_id} 的状态为 '{status}'")
             return True
         else:

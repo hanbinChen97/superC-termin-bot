@@ -312,15 +312,18 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
         logging.info(f"Schritt 4 结果: {message}")
         return False, message, None
 
+    has_appointment = True
+
     logging.info("=== Schritt 5: 填写表单 ===")
     # Schritt 5: 填写表单，使用schritt 4选择的profile
     if soup is None or selected_profile is None:
-        return False, "内部错误：soup或selected_profile为空", None
+        return has_appointment, "内部错误：soup或selected_profile为空", None
         
     success, message, updated_soup = schritt_5_fill_form(session, soup, location_name, selected_profile)
+    
     if not success:
         logging.error(f"Schritt 5 失败: {message}")
-        return False, message, None
+        return has_appointment, message, None
 
     logging.info("=== Schritt 6: 邮件确认 ===")
     # Schritt 6: 邮件确认
@@ -329,10 +332,10 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
     if result[0]:
         # 这是关键信息，始终输出
         logging.info(f"预约成功完成: {result[1]}")
-        return True, result[1], appointment_datetime_str
+        return has_appointment, result[1], appointment_datetime_str
     else:
         logging.error(f"Schritt 6 失败: {result[1]}")
-        return False, result[1], None
+        return has_appointment, result[1], None
 
 if __name__ == "__main__":
     # 配置日志记录
