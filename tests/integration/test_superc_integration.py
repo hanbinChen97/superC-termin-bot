@@ -110,7 +110,7 @@ class TestSupercIntegration(unittest.TestCase):
             # 如果有等待用户，测试 Profile 转换
             if first_profile:
                 try:
-                    profile = Profile.from_appointment_profile(first_profile)
+                    profile = Profile.from_db_record(first_profile)
                     self.assertIsNotNone(profile.full_name, "Profile 应该有完整姓名")
                     print(f"✓ 找到等待用户: {profile.full_name}")
                 except Exception as e:

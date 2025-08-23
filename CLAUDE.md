@@ -64,6 +64,12 @@ source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 - sqlalchemy>=2.0.0 - Database ORM
 - psycopg2-binary>=2.9.0 - PostgreSQL adapter
 
+## Code Modification Instructions
+- spec-driven development
+- 请你按照，folder.spec.md 来修改代码。
+- 每个文件开头有一个 docstring，作为 mini spec。
+- 修改完代码后，同时 refine 一下 spec.md。
+
 ## File Structure Notes
 
 - `pages/` - Directory for saved HTML content during debugging

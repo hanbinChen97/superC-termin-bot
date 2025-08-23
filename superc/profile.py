@@ -1,3 +1,15 @@
+"""
+Profile management module for appointment booking system.
+
+Provides Profile dataclass that serves as bridge between database models and form data.
+Converts database AppointmentProfile records into program-friendly Profile objects
+for use in appointment booking workflows.
+
+Key Functions:
+- from_db_record(): Convert database AppointmentProfile to Profile instance
+- to_form_data(): Convert Profile to form submission data
+- Data validation and formatting utilities
+"""
 from dataclasses import dataclass
 from typing import Optional
 from datetime import datetime
@@ -17,8 +29,8 @@ class Profile:
     preferred_locations: str = 'superc'
     
     @classmethod
-    def from_appointment_profile(cls, appointment_profile: AppointmentProfile) -> 'Profile':
-        """Create Profile instance from AppointmentProfile database model"""
+    def from_db_record(cls, appointment_profile: AppointmentProfile) -> 'Profile':
+        """Convert database AppointmentProfile record to Profile instance for program use"""
         return cls(
             vorname=appointment_profile.vorname or "",
             nachname=appointment_profile.nachname or "",

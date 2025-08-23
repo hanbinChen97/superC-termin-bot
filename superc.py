@@ -62,6 +62,24 @@ def log_profile_info(profile):
     logging.info(f"偏好地点: {profile.preferred_locations}")
     logging.info("-" * 30)
 
+def get_next_user_profile():
+    """获取下一个等待中的用户profile，返回(db_profile, profile)或(None, None)"""
+    try:
+        next_db_profile = get_first_waiting_profile()
+        
+        if next_db_profile:
+            next_profile = Profile.from_db_record(next_db_profile)
+            logging.info(f"找到下一个用户: {next_profile.full_name} (ID: {next_db_profile.id})")
+            next_profile.print_info()
+            log_profile_info(next_profile)
+            return next_db_profile, next_profile
+        else:
+            logging.info("没有更多等待的用户")
+            return None, None
+    except Exception as e:
+        logging.error(f"获取下一个用户profile失败: {e}")
+        return None, None
+
 if __name__ == "__main__":
     logging.info(f"启动 SuperC 预约检查程序，进程PID: {os.getpid()}")
     superc_config = LOCATIONS["superc"]
@@ -81,7 +99,7 @@ if __name__ == "__main__":
     try:
         current_db_profile = get_first_waiting_profile()
         if current_db_profile:
-            current_profile = Profile.from_appointment_profile(current_db_profile)
+            current_profile = Profile.from_db_record(current_db_profile)
             logging.info(f"当前处理用户: {current_profile.full_name} (ID: {current_db_profile.id})")
             current_profile.print_info()
             log_profile_info(current_profile)
@@ -101,14 +119,23 @@ if __name__ == "__main__":
             
         try:
             has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile, hanbin_profile)
-            
+
+            # 无预约时等待1分钟后重新检查
+            if not has_appointment:
+                # logging.info(message)
+                time.sleep(60)
+                continue
+
+            # 有预约时，根据message分情况处理
             if has_appointment:
-                # 首先检查是否包含 "zu vieler Terminanfragen" 错误
-                # 检查原始德语错误信息和翻译后的中文错误信息
+                # 处理完成标志
+                should_get_next_user = False
+                
+                # 情况1: "zu vieler Terminanfragen" 错误
                 if "zu vieler Terminanfragen" in message or "提交过于频繁，请稍后再试" in message:
                     logging.error(f"检测到错误: 提交过于频繁，请稍后再试 (关键词: zu vieler Terminanfragen)")
                     
-                    # 如果使用了数据库profile，更新其状态为error
+                    # 更新数据库profile状态为error
                     if current_db_profile:
                         try:
                             success = update_appointment_status(current_db_profile.id, 'error')  # type: ignore
@@ -119,54 +146,39 @@ if __name__ == "__main__":
                         except Exception as e:
                             logging.error(f"更新数据库状态时发生错误: {e}")
                     
-                    break  # 遇到此错误后退出循环
-                
-                # 如果没有错误，继续正常的预约成功处理
-                logging.info(f"成功！ {message}")
-                
-                # 如果使用了数据库profile，更新其状态为booked，并存储预约时间
-                if current_db_profile:
-                    try:
-                        success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
-                        if success and current_profile:
-                            if appointment_datetime_str:
-                                logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
+                    should_get_next_user = True
+                    
+                # 情况2: 预约成功
+                else:
+                    logging.info(f"成功！ {message}")
+                    
+                    # 更新数据库profile状态为booked
+                    if current_db_profile:
+                        try:
+                            success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
+                            if success and current_profile:
+                                if appointment_datetime_str:
+                                    logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
+                                else:
+                                    logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
                             else:
-                                logging.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
-                        else:
-                            logging.error(f"更新用户状态失败，但预约已成功")
-                    except Exception as e:
-                        logging.error(f"更新数据库状态时发生错误: {e}")
+                                logging.error(f"更新用户状态失败，但预约已成功")
+                        except Exception as e:
+                            logging.error(f"更新数据库状态时发生错误: {e}")
+                    
+                    should_get_next_user = True
                 
-                # 立即尝试获取下一个用户进行处理
-                logging.info("预约成功！立即检查是否有下一个用户需要处理...")
-                try:
-                    next_db_profile = get_first_waiting_profile()
-                    if next_db_profile:
-                        current_db_profile = next_db_profile
-                        current_profile = Profile.from_appointment_profile(current_db_profile)
-                        logging.info(f"找到下一个用户: {current_profile.full_name} (ID: {current_db_profile.id})，继续查询预约...")
-                        current_profile.print_info()
-                        log_profile_info(current_profile)
-                        continue  # 立即开始下一轮查询
+                # 统一处理：获取下一个用户
+                if should_get_next_user:
+                    logging.info("处理完成！立即检查是否有下一个用户需要处理...")
+                    current_db_profile, current_profile = get_next_user_profile()
+                    
+                    if current_db_profile and current_profile:
+                        logging.info("继续查询下一个用户的预约...")
+                        continue
                     else:
                         logging.info("没有更多等待的用户，程序退出")
                         break
-                except Exception as e:
-                    logging.error(f"获取下一个用户profile失败: {e}")
-                    break  # 获取失败则退出
-            
-            if "当前没有可用预约时间" in message:
-                # logging.info(message)
-                
-                # 等待1分钟后重新检查...
-                time.sleep(60)
-                continue  # 下一轮查询
-            
-            # 如果profile设置失败（例如预约时间不符合条件），继续下一轮
-            if "无法设置合适的profile" in message:
-                logging.info(f"跳过当前预约: {message}")
-                continue
 
             logging.warning(f"出现未预期的消息: {message}")
         except Exception as e:
