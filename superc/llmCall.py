@@ -86,6 +86,7 @@ def recognize_captcha(image_path):
 if __name__ == "__main__":
     # 测试验证码识别
     image_path = "data/test_pic.png"
+
     if os.path.exists(image_path):
         result = recognize_captcha(image_path)
         print(f"验证码识别结果: {result}")

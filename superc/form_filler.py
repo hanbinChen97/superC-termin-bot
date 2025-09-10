@@ -19,7 +19,7 @@ import requests
 import bs4
 from bs4 import BeautifulSoup, Tag
 
-from .llmCall import recognize_captcha
+from .gpt_call import recognize_captcha_with_gpt
 from .utils import save_page_content, download_captcha
 from .config import USER_AGENT, BASE_URL
 from . import config
@@ -474,7 +474,7 @@ def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name:
         return False, f"验证码下载失败: {captcha_path}", None
 
     logging.info(f"\n开始识别验证码: {captcha_path}")
-    captcha_text = recognize_captcha(captcha_path)
+    captcha_text = recognize_captcha_with_gpt(captcha_path)
     logging.info(f"验证码识别结果: {captcha_text}")
     if not captcha_text:
         logging.error("验证码识别失败")

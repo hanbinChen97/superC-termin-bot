@@ -155,7 +155,7 @@ def enter_schritt_5_page(session: requests.Session, form_data: dict, location_na
     logging.info(f"Schritt 5页面: 准备使用 {selected_profile.full_name} profile 填写表单...")
     
     # 使用带重试的表单填写函数
-    result = fill_form_with_captcha_retry(session, submit_soup, location_name, selected_profile, max_retries=3)
+    result = fill_form_with_captcha_retry(session, submit_soup, location_name, selected_profile, max_retries=10)
 
     # 检查表单填写结果
     if result[0]:
