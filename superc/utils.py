@@ -8,12 +8,12 @@ from typing import Union, Tuple, Any
 from urllib.parse import urljoin
 
 import bs4
-import requests
+import httpx
 
 # 使用相对导入
 from .config import USER_AGENT
 
-def validate_page_step(html_content: Union[str, requests.Response, Any], expected_step: str) -> bool:
+def validate_page_step(html_content: Union[str, httpx.Response, Any], expected_step: str) -> bool:
     """
     通过DOM解析验证页面步骤，而不是字符串比较
     
@@ -57,7 +57,7 @@ def save_page_content(content: str, step_name: str, location_name: str) -> None:
         f.write(content)
     logging.info(f'页面内容已保存到: {filename}')
 
-def download_captcha(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
+def download_captcha(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
     """
     下载验证码图片
     """

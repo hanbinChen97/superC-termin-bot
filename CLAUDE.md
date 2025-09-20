@@ -57,7 +57,7 @@ source .venv/bin/activate && nohup python app.py > app.log 2>&1 &
 ```
 
 ### Key Dependencies
-- requests>=2.31.0 - HTTP requests and web scraping
+- httpx>=0.23.0 - HTTP requests and web scraping
 - beautifulsoup4>=4.12.0 - HTML parsing
 - python-dotenv==1.0.0 - Environment variables
 - openai>=1.0.0 - CAPTCHA recognition via Azure OpenAI API

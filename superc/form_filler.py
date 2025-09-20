@@ -15,7 +15,7 @@ import json
 import logging
 from urllib.parse import urljoin
 from typing import Optional, Tuple, Dict, Any, List, Union
-import requests
+import httpx
 import bs4
 from bs4 import BeautifulSoup, Tag
 
@@ -362,10 +362,10 @@ def check_captcha_error_from_response(response_text: str) -> bool:
         return False
 
 
-def fill_form_with_captcha_retry(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, profile: Profile, max_retries: int = 3) -> Tuple[bool, str]:
+def fill_form_with_captcha_retry(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str, profile: Profile, max_retries: int = 3) -> Tuple[bool, str]:
     """
     填写表单并提交，支持验证码重试
-    :param session: requests.Session 对象
+    :param session: httpx.Client 对象
     :param soup: BeautifulSoup 对象
     :param location_name: 地点名称，用于保存文件
     :param profile: Profile 对象，必需参数
@@ -413,10 +413,10 @@ def fill_form_with_captcha_retry(session: requests.Session, soup: bs4.BeautifulS
     return False, "未知错误"
 
 
-def fill_form(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str, profile: Profile) -> Tuple[bool, str, Optional[str]]:
+def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str, profile: Profile) -> Tuple[bool, str, Optional[str]]:
     """
     填写表单并提交
-    :param session: requests.Session 对象
+    :param session: httpx.Client 对象
     :param soup: BeautifulSoup 对象
     :param location_name: 地点名称，用于保存文件
     :param profile: Profile 对象，必需参数

@@ -112,7 +112,7 @@ Each `enter_schritt_x_page()` function encapsulates both:
 ## Data Flow and State Management
 
 ### Session Management
-- Single `requests.Session` instance throughout entire flow
+- Single `httpx.Client` instance throughout entire flow
 - User-Agent header set from config
 - Session state preserved across all pages
 
@@ -138,7 +138,7 @@ Each `enter_schritt_x_page()` function encapsulates both:
 - `appointment_selector`: Appointment parsing and profile selection logic
 
 ### External Dependencies
-- `requests`: HTTP session management
+- `httpx`: HTTP client management
 - `beautifulsoup4`: HTML parsing and form extraction
 - `logging`: Structured logging throughout flow
 - `urllib.parse`: URL construction with `urljoin()`

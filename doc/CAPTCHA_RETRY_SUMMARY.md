@@ -67,7 +67,7 @@ def check_captcha_error_from_response(response_text: str) -> bool:
 
 **代码示例**:
 ```python
-def fill_form_with_captcha_retry(session: requests.Session, soup: bs4.BeautifulSoup, 
+def fill_form_with_captcha_retry(session: httpx.Client, soup: bs4.BeautifulSoup, 
                                location_name: str, profile: Profile, max_retries: int = 3) -> Tuple[bool, str]:
     for attempt in range(max_retries):
         success, message, response_text = fill_form(session, soup, location_name, profile)
