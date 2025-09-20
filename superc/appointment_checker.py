@@ -2,8 +2,8 @@
 Appointment Checker Logic Flow
 
 fold: cmd k + cmd 0
+python -m superc.appointment_checker
 """
-#  python -m superc.appointment_checker
 
 
 import httpx
