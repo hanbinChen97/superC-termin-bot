@@ -2,11 +2,11 @@
 Appointment Checker Logic Flow
 
 fold: cmd k + cmd 0
+python -m superc.appointment_checker
 """
-#  python -m superc.appointment_checker
 
 
-import requests
+import httpx
 import bs4
 import logging
 from typing import Tuple, Union, Optional
@@ -34,7 +34,7 @@ def log_verbose(message: str, level: int = logging.INFO):
         logging.log(level, message)
 
 
-def enter_schritt_2_page(session: requests.Session, selection_text: str) -> Tuple[bool, str]:
+def enter_schritt_2_page(session: httpx.Client, selection_text: str) -> Tuple[bool, str]:
     """
     进入Schritt 2页面并完成操作: 选择RWTH Studenten服务类型并选择地点类型 (Super C oder Infostelle)
     """
@@ -65,7 +65,7 @@ def enter_schritt_2_page(session: requests.Session, selection_text: str) -> Tupl
     log_verbose(f"Schritt 2 完成: 成功选择服务类型")
     return True, next_url
 
-def enter_schritt_3_page(session: requests.Session, url: str) -> Tuple[bool, Union[str, str]]:
+def enter_schritt_3_page(session: httpx.Client, url: str) -> Tuple[bool, Union[str, str]]:
     """
     进入Schritt 3页面并完成操作: 添加位置信息 (Standortauswahl)
     """
@@ -85,7 +85,7 @@ def enter_schritt_3_page(session: requests.Session, url: str) -> Tuple[bool, Uni
     log_verbose("Schritt 3 完成: 成功提取位置信息")
     return True, loc.get('value')
 
-def enter_schritt_4_page(session: requests.Session, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
+def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
     """
     进入Schritt 4页面并完成操作: 检查预约时间可用性并选择第一个可用时间，同时选择合适的profile
     返回: (成功?, 消息, form_data, 选择的profile, 预约日期时间字符串)
@@ -126,7 +126,7 @@ def enter_schritt_4_page(session: requests.Session, url: str, loc: str, submit_t
     
     return True, "Schritt 4 完成: 成功选择预约和profile", form_data, selected_profile, appointment_datetime_str
 
-def enter_schritt_5_page(session: requests.Session, form_data: dict, location_name: str, selected_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
+def enter_schritt_5_page(session: httpx.Client, form_data: dict, location_name: str, selected_profile: Optional[Profile]) -> Tuple[bool, str, Optional[bs4.BeautifulSoup]]:
     """
     进入Schritt 5页面并完成所有操作: 
     1. 提交预约选择
@@ -165,7 +165,7 @@ def enter_schritt_5_page(session: requests.Session, form_data: dict, location_na
     else:
         return False, f"Schritt 5页面填写表单失败: {result[1]}", None
 
-def enter_schritt_6_page(session: requests.Session, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
+def enter_schritt_6_page(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
     """
     进入Schritt 6页面并完成操作: 邮件确认 - 完成预约确认流程
     """
@@ -183,7 +183,7 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
     执行一次完整的预约检查流程 - 6个Schritt步骤
     返回: (成功?, 消息, 预约日期时间字符串)
     """
-    session = requests.Session()
+    session = httpx.Client()
     session.headers.update({"User-Agent": USER_AGENT})
     location_name = location_config["name"]
     
