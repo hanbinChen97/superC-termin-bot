@@ -164,3 +164,41 @@ nohup uv run python infostelle.py > infostelle.log 2>&1 &
 2. **请求频率**：程序每分钟检查一次，避免过于频繁
 3. **个人信息**：确保`data/table`文件信息正确且最新
 4. **时间限制**：建议在工作时间运行，22点后自动停止
+
+## 🟢 连接 Supabase（数据库）
+
+后端使用 SQLAlchemy 连接 Supabase 的 PostgreSQL。请在运行环境中设置以下环境变量（`.env`）：
+
+直连（Direct，默认 5432）：
+
+```
+DB_USER=postgres
+DB_PASSWORD=YOUR_DB_PASSWORD
+DB_HOST=db.PROJECT_REF.supabase.co
+DB_PORT=5432
+DB_NAME=postgres
+```
+
+或使用连接池（Pooler，常见 6543）：
+
+```
+DB_USER=postgres
+DB_PASSWORD=YOUR_DB_PASSWORD
+DB_HOST=PROJECT_REF.pooler.supabase.com
+DB_PORT=6543
+DB_NAME=postgres
+```
+
+代码会拼接出如下连接串并强制启用 SSL：
+
+```
+postgresql+psycopg2://DB_USER:DB_PASSWORD@DB_HOST:DB_PORT/DB_NAME?sslmode=require
+```
+
+快速连通性检查（可选）：
+
+```
+uv run python -m db.utils
+```
+
+如果连接成功，会打印 “Connection successful!” 并显示等待队列统计。
