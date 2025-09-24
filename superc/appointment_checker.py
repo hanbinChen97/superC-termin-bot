@@ -85,7 +85,7 @@ def enter_schritt_3_page(session: httpx.Client, url: str) -> Tuple[bool, Union[s
     log_verbose("Schritt 3 完成: 成功提取位置信息")
     return True, loc.get('value')
 
-def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
+def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text: str, location_name: str, current_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
     """
     进入Schritt 4页面并完成操作: 检查预约时间可用性并选择第一个可用时间，同时选择合适的profile
     返回: (成功?, 消息, form_data, 选择的profile, 预约日期时间字符串)
