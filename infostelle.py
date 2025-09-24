@@ -8,6 +8,7 @@ from superc.appointment_checker import run_check
 from superc.config import LOCATIONS, LOG_FORMAT
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 if __name__ == "__main__":
     logging.info(f"启动 Infostelle 预约检查程序，进程PID: {os.getpid()}")

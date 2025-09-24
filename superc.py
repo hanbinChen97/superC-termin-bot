@@ -8,7 +8,6 @@ source .venv/bin/activate && nohup python3 superc.py >> superc.log 2>&1 &
 import logging
 import time
 import os
-import json
 from datetime import datetime
 from typing import Optional
 
@@ -18,10 +17,9 @@ from superc.config import LOCATIONS, LOG_FORMAT
 from db.utils import get_first_waiting_profile, update_appointment_status
 # 导入Profile类
 from superc.profile import Profile
-# 导入config模块用于设置profile
-from superc import config
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 
@@ -60,7 +58,6 @@ if __name__ == "__main__":
     # 获取当前应该处理的用户profile
     current_db_profile = None
     current_profile: Optional[Profile] = None
-    
 
     
     try:
@@ -76,6 +73,7 @@ if __name__ == "__main__":
         logging.error(f"获取数据库profile失败: {e}")
         current_db_profile = None
         current_profile = None
+
 
     while True:
         # 检查当前时间，如果是凌晨 1 点 以后，也就是改成等于 2

@@ -97,16 +97,50 @@ def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text:
         'select_location': submit_text
     }
     # 进入 Schritt 4
-    res = session.post(url, data=payload)
+    try:
+        res = session.post(url, data=payload, follow_redirects=True)
+        
+        # 添加调试信息
+        log_verbose(f"Schritt 4 请求后状态码: {res.status_code}")
+        log_verbose(f"Schritt 4 最终URL: {res.url}")
+        log_verbose(f"响应内容长度: {len(res.text)}")
+        log_verbose(f"重定向历史: {[str(r.url) for r in res.history]}")
+        
+        # 保存页面内容用于调试
+        save_page_content(res.text, '4_after_redirect', location_name)
+        
+        if res.status_code != 200:
+            return False, f"Schritt 4 请求失败，状态码: {res.status_code}", None, None, None
+            
+    except Exception as e:
+        return False, f"Schritt 4 请求发生异常: {str(e)}", None, None, None
     
     if not validate_page_step(res, "4"):
-        return False, "Schritt 4 页面加载失败: 未找到预期的Schritt 4 标题", None, None, None
+        # 检查页面内容，看看实际包含什么
+        soup = bs4.BeautifulSoup(res.content, 'html.parser')
+        h1_element = soup.find('h1')
+        h1_text = h1_element.get_text() if h1_element else "未找到h1元素"
+        
+        log_verbose(f"页面实际h1内容: {h1_text}")
+        
+        # 检查是否直接跳转到了suggest页面或其他步骤
+        if res.url.path.endswith('/suggest') or "suggest" in str(res.url):
+            log_verbose("检测到已经跳转到suggest页面，跳过Schritt 4验证")
+        else:
+            return False, f"Schritt 4 页面加载失败: 未找到预期的Schritt 4 标题，实际h1内容: {h1_text}", None, None, None
     
     log_verbose("成功进入Schritt 4页面")
     
     # 在页面上进行操作：检查预约可用性
-    suggest_url = urljoin(BASE_URL, 'suggest')
-    suggest_res = session.get(suggest_url)
+    # 检查当前URL，如果已经在suggest页面则直接使用当前响应
+    if res.url.path.endswith('/suggest') or "suggest" in str(res.url):
+        log_verbose("已经在suggest页面，使用当前响应")
+        suggest_res = res
+    else:
+        # 否则发送GET请求到suggest页面
+        suggest_url = urljoin(BASE_URL, 'suggest')
+        suggest_res = session.get(suggest_url)
+    
     # save_page_content(suggest_res.text, '4_availability', location_name)
 
     # 检查是否有可用预约时间
@@ -250,6 +284,7 @@ if __name__ == "__main__":
             logging.StreamHandler(),  # 输出到控制台
         ]
     )
+    logging.getLogger("httpx").setLevel(logging.WARNING)
     
     location_config = {
         "name": "superc",

@@ -7,6 +7,7 @@ LOG_LEVEL = "INFO"
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
 # 详细日志模式 - 设为False可在生产环境中减少日志输出
 VERBOSE_LOGGING = False
+# VERBOSE_LOGGING = True
 
 # 地点特有配置
 LOCATIONS = {
@@ -21,3 +22,4 @@ LOCATIONS = {
         "submit_text": "Ausländeramt Aachen - Infostelle auswählen"
     }
 }
+# 
