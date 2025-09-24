@@ -11,7 +11,7 @@ from datetime import datetime
 from .profile import Profile
 
 
-def select_appointment_and_choose_profile(suggest_res_text: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
+def select_appointment_and_choose_profile(suggest_res_text: str, current_profile: Optional[Profile]) -> Tuple[bool, str, Optional[dict], Optional[Profile], Optional[str]]:
     """
     选择第一个可用预约并根据日期选择profile
     返回: (成功?, 消息, form_data, 选择的profile, 预约日期时间字符串)
@@ -42,10 +42,10 @@ def select_appointment_and_choose_profile(suggest_res_text: str, current_profile
     if not date_display:
         date_display = form_data.get("date", "未知日期")
     
-    # 根据日期选择profile
-    selected_profile = choose_profile_by_date(date_display, current_profile, hanbin_profile)
+    # 使用当前 profile
+    selected_profile = current_profile
     if not selected_profile:
-        return False, f"预约时间 {date_display} 无法选择合适的profile", None, None, None
+        return False, f"预约时间 {date_display} 无可用profile", None, None, None
     
     # 时间来自 <button>
     time_button = first_available_form.find("button", {"type": "submit"})
@@ -62,43 +62,3 @@ def select_appointment_and_choose_profile(suggest_res_text: str, current_profile
     logging.info(f"找到可用时间: {appointment_datetime_str}, 选择profile: {selected_profile.full_name if selected_profile else '未知'}")
     
     return True, "成功解析预约信息", form_data, selected_profile, appointment_datetime_str
-
-
-def choose_profile_by_date(appointment_date_str: str, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Optional[Profile]:
-    """
-    根据预约日期选择profile
-    规则：月份 < 10 使用 hanbin_profile，>= 10 使用 current_profile
-    """
-    try:
-        # 从 "Mittwoch, 27.08.2025" 中提取月份
-        date_part = appointment_date_str.split(', ')[1] 
-        day, month, year = date_part.split('.')
-        month_int = int(month)
-
-        cutoff_month = 10  # 10月作为分界点
-
-        if month_int < cutoff_month:
-            # 使用hanbin_profile
-            if hanbin_profile:
-                logging.info(f"预约日期为 {appointment_date_str}，月份早于{cutoff_month}月，使用hanbin_profile")
-                return hanbin_profile
-            else:
-                logging.error("无法使用hanbin_profile，因为未设置")
-                return None
-        else:
-            # 使用current_profile
-            if current_profile:
-                logging.info(f"预约日期为 {appointment_date_str}，月份为{cutoff_month}月或更晚，使用current_profile")
-                return current_profile
-            else:
-                # 如果没有current_profile，回退到hanbin_profile
-                if hanbin_profile:
-                    logging.info(f"预约日期为 {appointment_date_str}，无current_profile，回退使用hanbin_profile")
-                    return hanbin_profile
-                else:
-                    logging.error("无可用的profile")
-                    return None
-
-    except (IndexError, ValueError) as e:
-        logging.warning(f"无法从 '{appointment_date_str}' 解析日期，使用current_profile作为默认。错误: {e}")
-        return current_profile if current_profile else hanbin_profile

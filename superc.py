@@ -23,34 +23,7 @@ from superc import config
 
 logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
 
-def load_hanbin_profile(file_path: str = "data/hanbin") -> Optional[Profile]:
-    """
-    加载hanbin用户定义文件并转换为Profile对象
-    """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            profile_data = json.load(f)
-        
-        # 从用户定义格式转换为Profile对象需要的数据
-        profile_dict = {item['fuellen_in_name']: item['wert_zum_fuellen'] for item in profile_data}
-        
-        # 创建Profile对象
-        hanbin_profile = Profile(
-            vorname=profile_dict.get('vorname', ''),
-            nachname=profile_dict.get('nachname', ''),
-            email=profile_dict.get('email', ''),
-            phone=profile_dict.get('phone', ''),
-            geburtsdatum_day=int(profile_dict.get('geburtsdatumDay', 1)),
-            geburtsdatum_month=int(profile_dict.get('geburtsdatumMonth', 1)),
-            geburtsdatum_year=int(profile_dict.get('geburtsdatumYear', 1990)),
-            preferred_locations=profile_dict.get('preferred_locations', 'superc')
-        )
-        
-        return hanbin_profile
-        
-    except (FileNotFoundError, json.JSONDecodeError, KeyError, ValueError) as e:
-        logging.error(f"无法读取hanbin profile文件 {file_path}: {e}")
-        return None
+
 
 def log_profile_info(profile):
     """将Profile信息输出到日志"""
@@ -87,14 +60,8 @@ if __name__ == "__main__":
     # 获取当前应该处理的用户profile
     current_db_profile = None
     current_profile: Optional[Profile] = None
-    hanbin_profile: Optional[Profile] = None
     
-    # 加载hanbin_profile (始终加载)
-    hanbin_profile = load_hanbin_profile()
-    if hanbin_profile:
-        logging.info("已加载hanbin_profile")
-    else:
-        logging.warning("无法加载hanbin_profile")
+
     
     try:
         current_db_profile = get_first_waiting_profile()
@@ -104,7 +71,7 @@ if __name__ == "__main__":
             current_profile.print_info()
             log_profile_info(current_profile)
         else:
-            logging.info("等待队列为空，仅使用hanbin profile进行检查")
+            logging.info("等待队列为空，暂无用户进行检查")
     except Exception as e:
         logging.error(f"获取数据库profile失败: {e}")
         current_db_profile = None
@@ -118,7 +85,7 @@ if __name__ == "__main__":
             break
             
         try:
-            has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile, hanbin_profile)
+            has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile)
 
             # 无预约时等待1分钟后重新检查
             if not has_appointment:

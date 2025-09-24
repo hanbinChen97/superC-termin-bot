@@ -118,7 +118,7 @@ def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text:
     
     # 选择第一个可用预约并选择profile
     success, message, form_data, selected_profile, appointment_datetime_str = select_appointment_and_choose_profile(
-        suggest_res.text, current_profile, hanbin_profile
+        suggest_res.text, current_profile
     )
     
     if not success:
@@ -178,7 +178,7 @@ def enter_schritt_6_page(session: httpx.Client, soup: bs4.BeautifulSoup, locatio
     logging.info("Schritt 6: 预约已完成，等待邮件确认")
     return True, "Schritt 6 完成: 预约已完成，等待邮件确认"
 
-def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_profile: Optional[Profile]) -> Tuple[bool, str, Optional[str]]:
+def run_check(location_config: dict, current_profile: Optional[Profile]) -> Tuple[bool, str, Optional[str]]:
     """
     执行一次完整的预约检查流程 - 6个Schritt步骤
     返回: (成功?, 消息, 预约日期时间字符串)
@@ -206,7 +206,7 @@ def run_check(location_config: dict, current_profile: Optional[Profile], hanbin_
 
     log_verbose("=== 进入Schritt 4页面 ===")
     # 进入Schritt 4页面并完成操作
-    success, message, form_data, selected_profile, appointment_datetime_str = enter_schritt_4_page(session, url, loc, location_config["submit_text"], location_name, current_profile, hanbin_profile)
+    success, message, form_data, selected_profile, appointment_datetime_str = enter_schritt_4_page(session, url, loc, location_config["submit_text"], location_name, current_profile)
     
     if not success:
         logging.info(f"Schritt 4 page: {message}")
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     }
     
     # 为测试提供 None 的 profile 参数
-    success, message, appointment_datetime_str = run_check(location_config, None, None)
+    success, message, appointment_datetime_str = run_check(location_config, None)
     
     print(f"检查结果: {'成功' if success else '失败'} - {message}")
 
