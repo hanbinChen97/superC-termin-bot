@@ -179,7 +179,7 @@ All `enter_schritt_x_page()` functions return tuples with:
 - Filename format: `{step}_{description}_{location_name}`
 - Controlled by configuration settings
 
-### Verbose Logging
-- `log_verbose()` function for detailed debugging information
-- Controlled by `config.VERBOSE_LOGGING` setting
-- Provides step-by-step flow visibility for troubleshooting
+
+### html DOM check
+schritt 2 has only 1 <h1>
+![schritt2](../assets/schritt2.png)

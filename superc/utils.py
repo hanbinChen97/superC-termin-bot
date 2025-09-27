@@ -38,6 +38,7 @@ def validate_page_step(html_content: Union[str, httpx.Response, Any], expected_s
     
     # 查找包含步骤信息的h1标签
     h1_element = soup.find('h1')
+    
     if h1_element:
         h1_text = h1_element.get_text()
         # 检查是否包含预期的步骤编号
