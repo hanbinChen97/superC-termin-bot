@@ -237,13 +237,6 @@ def print_all_profiles() -> None:
         print(f"更新时间: {profile.updated_at}")
         print("-" * 50)
 
-# TODO
-# "app_logs_min" table
-DEFAULT_SCHRITT = "-"
-_LOG_LINE_PATTERN = re.compile(
-    r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<level>[A-Z]+) - (?P<schritt>.*?) - (?P<message>.*)$"
-)
-
 
 def write_log(message: str) -> None:
     """Persist a log line into app_logs_min.

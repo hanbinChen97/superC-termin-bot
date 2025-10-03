@@ -7,12 +7,12 @@ BASE_URL = "https://termine.staedteregion-aachen.de/auslaenderamt/"
 
 # 日志配置
 LOG_LEVEL = "INFO"
-LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(schritt)s - %(message)s'
 DEFAULT_SCHRITT = "-"
 ENABLE_SUPABASE_LOGS = True
 # 详细日志模式 - 设为False可在生产环境中减少日志输出
-# VERBOSE_LOGGING = False
-VERBOSE_LOGGING = True
+VERBOSE_LOGGING = False
+# VERBOSE_LOGGING = True
 
 
 _SCHRITT_PATTERN = re.compile(r"(Schritt\s*\d+)")
@@ -27,7 +27,10 @@ def _inject_schritt(*factory_args, **factory_kwargs):
         message = ""
 
     match = _SCHRITT_PATTERN.search(message) if isinstance(message, str) else None
-    record.schritt = match.group(1) if match else DEFAULT_SCHRITT
+    if match:
+        record.schritt = match.group(1)
+    else:
+        record.schritt = record.name or DEFAULT_SCHRITT
     return record
 
 

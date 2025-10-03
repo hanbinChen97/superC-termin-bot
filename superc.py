@@ -12,35 +12,17 @@ from datetime import datetime
 from typing import Optional
 
 from superc.appointment_checker import run_check
-from superc.config import ENABLE_SUPABASE_LOGS, LOCATIONS, LOG_FORMAT
+from superc.config import LOCATIONS
+from superc.logging_utils import setup_logging
 # 导入数据库工具模块
-from db.utils import get_first_waiting_profile, update_appointment_status, write_log
+from db.utils import get_first_waiting_profile, update_appointment_status
 # 导入Profile类
 from superc.profile import Profile
 
-logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)
-logging.getLogger("httpx").setLevel(logging.WARNING)
+setup_logging()
 
 main_logger = logging.getLogger("main")
 main_logger.setLevel(logging.INFO)
-
-
-class SupabaseLogHandler(logging.Handler):
-    """Custom handler that mirrors log output into Supabase."""
-
-    def emit(self, record: logging.LogRecord) -> None:
-        try:
-            formatted = self.format(record)
-            write_log(formatted)
-        except Exception:
-            self.handleError(record)
-
-
-if ENABLE_SUPABASE_LOGS:
-    supabase_handler = SupabaseLogHandler()
-    supabase_handler.setLevel(logging.INFO)
-    supabase_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-    logging.getLogger().addHandler(supabase_handler)
 
 
 
@@ -117,6 +99,11 @@ if __name__ == "__main__":
             if has_appointment:
                 # 处理完成标志
                 should_get_next_user = False
+
+                if message == "superC server error":
+                    main_logger.warning("检测到superC server error，等待60秒后重试")
+                    time.sleep(60)
+                    continue
                 
                 # 情况1: "zu vieler Terminanfragen" 错误
                 if "zu vieler Terminanfragen" in message:

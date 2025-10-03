@@ -26,6 +26,9 @@ from . import config
 from .profile import Profile
 
 
+logger = logging.getLogger(__name__)
+
+
 def find_form_fields_from_soup(soup: BeautifulSoup) -> Dict[str, Dict[str, Any]]:
     """
     从soup中智能分析表单字段，返回字段信息字典
@@ -36,11 +39,11 @@ def find_form_fields_from_soup(soup: BeautifulSoup) -> Dict[str, Dict[str, Any]]
     Returns:
         Dict: 字段信息字典，格式为 {field_name: {type, required, element, ...}}
     """
-    logging.info("\n开始分析表单字段...")
+    logger.info("\n开始分析表单字段...")
     
     form = soup.find('form')
     if not form or not isinstance(form, Tag):
-        logging.error("未找到表单")
+        logger.error("未找到表单")
         return {}
     
     form_fields = {}
@@ -92,13 +95,13 @@ def find_form_fields_from_soup(soup: BeautifulSoup) -> Dict[str, Dict[str, Any]]
         # 记录字段信息
         form_fields[field_name] = field_info
         
-        # logging.info(f"  找到字段: {field_name}")
-        # logging.info(f"    类型: {field_info['type']}")
-        # logging.info(f"    必填: {field_info['required']}")
-        # logging.info(f"    ID: {field_info['id']}")
-        # logging.info(f"    标题: {field_info['title']}")
+        # logger.info(f"  找到字段: {field_name}")
+        # logger.info(f"    类型: {field_info['type']}")
+        # logger.info(f"    必填: {field_info['required']}")
+        # logger.info(f"    ID: {field_info['id']}")
+        # logger.info(f"    标题: {field_info['title']}")
     
-    logging.info(f"\n总共找到 {len(form_fields)} 个字段")
+    logger.info(f"\n总共找到 {len(form_fields)} 个字段")
     return form_fields
 
 
@@ -110,55 +113,55 @@ def compare_with_expected_fields(found_fields: Dict[str, Dict[str, Any]], expect
         found_fields: 从表单中发现的字段
         expected_fields: 预期的字段字典 (key: 字段名, value: 示例值)
     """
-    logging.info("\n开始对比字段...")
+    logger.info("\n开始对比字段...")
     
     found_field_names = set(found_fields.keys())
     expected_field_names = set(expected_fields.keys())
     
     # 找到匹配的字段
     matching_fields = found_field_names & expected_field_names
-    logging.info(f"匹配的字段 ({len(matching_fields)}): {sorted(matching_fields)}")
+    logger.info(f"匹配的字段 ({len(matching_fields)}): {sorted(matching_fields)}")
     
     # 找到缺失的字段 (预期有但实际没找到)
     missing_fields = expected_field_names - found_field_names
     if missing_fields:
-        logging.warning(f"缺失的字段 ({len(missing_fields)}): {sorted(missing_fields)}")
+        logger.warning(f"缺失的字段 ({len(missing_fields)}): {sorted(missing_fields)}")
         for field in missing_fields:
-            logging.warning(f"  预期字段 '{field}' 未在表单中找到")
+            logger.warning(f"  预期字段 '{field}' 未在表单中找到")
     
     # 找到额外的字段 (实际找到但不在预期中)
     extra_fields = found_field_names - expected_field_names
     if extra_fields:
-        logging.info(f"额外的字段 ({len(extra_fields)}): {sorted(extra_fields)}")
+        logger.info(f"额外的字段 ({len(extra_fields)}): {sorted(extra_fields)}")
         for field in extra_fields:
             field_info = found_fields[field]
-            logging.info(f"  额外字段 '{field}' - 类型: {field_info['type']}, 必填: {field_info['required']}")
+            logger.info(f"  额外字段 '{field}' - 类型: {field_info['type']}, 必填: {field_info['required']}")
     
     # 详细分析匹配字段的属性
-    logging.info(f"\n匹配字段详细信息:")
+    logger.info(f"\n匹配字段详细信息:")
     for field in sorted(matching_fields):
         field_info = found_fields[field]
-        logging.info(f"  {field}:")
-        logging.info(f"    类型: {field_info['type']}")
-        logging.info(f"    必填: {field_info['required']}")
-        logging.info(f"    ID: {field_info['id']}")
-        logging.info(f"    预期值示例: {expected_fields[field]}")
+        logger.info(f"  {field}:")
+        logger.info(f"    类型: {field_info['type']}")
+        logger.info(f"    必填: {field_info['required']}")
+        logger.info(f"    ID: {field_info['id']}")
+        logger.info(f"    预期值示例: {expected_fields[field]}")
     
     # 总结
     total_expected = len(expected_field_names)
     total_found = len(found_field_names)
     match_rate = len(matching_fields) / total_expected * 100 if total_expected > 0 else 0
     
-    logging.info(f"\n对比总结:")
-    logging.info(f"  预期字段数: {total_expected}")
-    logging.info(f"  实际找到字段数: {total_found}")
-    logging.info(f"  匹配字段数: {len(matching_fields)}")
-    logging.info(f"  匹配率: {match_rate:.1f}%")
+    logger.info(f"\n对比总结:")
+    logger.info(f"  预期字段数: {total_expected}")
+    logger.info(f"  实际找到字段数: {total_found}")
+    logger.info(f"  匹配字段数: {len(matching_fields)}")
+    logger.info(f"  匹配率: {match_rate:.1f}%")
     
     if missing_fields:
-        logging.warning(f"  缺失字段数: {len(missing_fields)}")
+        logger.warning(f"  缺失字段数: {len(missing_fields)}")
     if extra_fields:
-        logging.info(f"  额外字段数: {len(extra_fields)}")
+        logger.info(f"  额外字段数: {len(extra_fields)}")
 
 
 def test_form_parsing(html_file_path: str) -> bool:
@@ -171,7 +174,7 @@ def test_form_parsing(html_file_path: str) -> bool:
     Returns:
         bool: 测试是否成功
     """
-    logging.info(f"\n开始测试表单解析: {html_file_path}")
+    logger.info(f"\n开始测试表单解析: {html_file_path}")
     
     # 预期的表单字段 (基于测试结果更新字段名)
     expected_fields = {
@@ -203,31 +206,31 @@ def test_form_parsing(html_file_path: str) -> bool:
         found_fields = find_form_fields_from_soup(soup)
         
         if not found_fields:
-            logging.error("未找到任何表单字段")
+            logger.error("未找到任何表单字段")
             return False
         
         # 对比字段
         compare_with_expected_fields(found_fields, expected_fields)
         
         # 检查关键字段映射
-        logging.info(f"\n检查关键字段映射:")
+        logger.info(f"\n检查关键字段映射:")
         
         # 检查生日字段的实际名称
         birthday_fields = {k: v for k, v in found_fields.items() if 'geburtsdatum' in k.lower()}
-        logging.info(f"生日相关字段: {list(birthday_fields.keys())}")
+        logger.info(f"生日相关字段: {list(birthday_fields.keys())}")
         
         # 检查邮箱确认字段的实际名称  
         email_fields = {k: v for k, v in found_fields.items() if 'email' in k.lower()}
-        logging.info(f"邮箱相关字段: {list(email_fields.keys())}")
+        logger.info(f"邮箱相关字段: {list(email_fields.keys())}")
         
         # 检查验证码字段的实际名称
         captcha_fields = {k: v for k, v in found_fields.items() if 'captcha' in k.lower()}
-        logging.info(f"验证码相关字段: {list(captcha_fields.keys())}")
+        logger.info(f"验证码相关字段: {list(captcha_fields.keys())}")
         
         return True
         
     except Exception as e:
-        logging.error(f"测试表单解析失败: {str(e)}")
+        logger.error(f"测试表单解析失败: {str(e)}")
         return False
 
 
@@ -242,10 +245,10 @@ def map_profile_to_form_data(profile: Profile, form_fields: Dict[str, Dict[str, 
     Returns:
         Dict: 映射后的表单数据
     """
-    logging.info("\n开始映射Profile数据到表单字段...")
+    logger.info("\n开始映射Profile数据到表单字段...")
     
     if not profile:
-        logging.error("Profile对象为空")
+        logger.error("Profile对象为空")
         return {}
     
     # 获取Profile的原始数据
@@ -295,14 +298,14 @@ def map_profile_to_form_data(profile: Profile, form_fields: Dict[str, Dict[str, 
                         # 文本类型字段
                         form_data[form_field_name] = str(profile_value)
                     
-                    logging.info(f"  映射: {profile_field} -> {form_field_name} = '{form_data[form_field_name]}'")
+                    logger.info(f"  映射: {profile_field} -> {form_field_name} = '{form_data[form_field_name]}'")
                     break
     
     # 2. 处理特殊映射 (如邮箱确认)
     for form_field_name, profile_field in special_mappings.items():
         if form_field_name in form_fields and profile_field in profile_data:
             form_data[form_field_name] = profile_data[profile_field]
-            logging.info(f"  特殊映射: {profile_field} -> {form_field_name} = '{form_data[form_field_name]}'")
+            logger.info(f"  特殊映射: {profile_field} -> {form_field_name} = '{form_data[form_field_name]}'")
     
     # 3. 设置固定字段
     fixed_fields = {
@@ -315,7 +318,7 @@ def map_profile_to_form_data(profile: Profile, form_fields: Dict[str, Dict[str, 
     for field_name, value in fixed_fields.items():
         if field_name in form_fields:
             form_data[field_name] = value
-            logging.info(f"  固定字段: {field_name} = '{value}'")
+            logger.info(f"  固定字段: {field_name} = '{value}'")
     
     # 4. 检查未映射的必填字段
     unmapped_required = []
@@ -326,9 +329,9 @@ def map_profile_to_form_data(profile: Profile, form_fields: Dict[str, Dict[str, 
                 unmapped_required.append(field_name)
     
     if unmapped_required:
-        logging.warning(f"  发现未映射的必填字段: {unmapped_required}")
+        logger.warning(f"  发现未映射的必填字段: {unmapped_required}")
     
-    logging.info(f"\n成功映射 {len(form_data)} 个字段")
+    logger.info(f"\n成功映射 {len(form_data)} 个字段")
     return form_data
 
 
@@ -348,17 +351,17 @@ def check_captcha_error_from_response(response_text: str) -> bool:
         
         if error_div:
             error_text = error_div.get_text()
-            logging.info(f"检测到错误区域内容: {error_text}")
+            logger.info(f"检测到错误区域内容: {error_text}")
             
             # 检查是否包含"Sicherheitsfrage"
             if "Sicherheitsfrage" in error_text:
-                logging.error("通过DOM检测到验证码错误 (Sicherheitsfrage)")
+                logger.error("通过DOM检测到验证码错误 (Sicherheitsfrage)")
                 return True
         
         return False
         
     except Exception as e:
-        logging.error(f"检查验证码错误时发生异常: {str(e)}")
+        logger.error(f"检查验证码错误时发生异常: {str(e)}")
         return False
 
 
@@ -378,9 +381,9 @@ def fill_form_with_captcha_retry(session: httpx.Client, soup: bs4.BeautifulSoup,
         attempt_info = f"(第{attempt + 1}次尝试)" if is_retry else ""
         
         if is_retry:
-            logging.info(f"验证码重试 {attempt_info}")
+            logger.info(f"验证码重试 {attempt_info}")
         else:
-            logging.info("开始填写表单...")
+            logger.info("开始填写表单...")
         
         # 执行表单填写
         success, message, response_text = fill_form(session, soup, location_name, profile)
@@ -396,15 +399,15 @@ def fill_form_with_captcha_retry(session: httpx.Client, soup: bs4.BeautifulSoup,
         
         if not is_captcha_error:
             # 非验证码错误，直接返回失败
-            logging.info("检测到非验证码错误，不进行重试")
+            logger.info("检测到非验证码错误，不进行重试")
             return False, message
         
         # 验证码错误，准备重试
         if attempt < max_retries - 1:
-            logging.warning(f"验证码错误 {attempt_info}，准备重试...")
+            logger.warning(f"验证码错误 {attempt_info}，准备重试...")
         else:
             # 已达到最大重试次数
-            logging.error(f"验证码重试失败，已达到最大重试次数({max_retries})")
+            logger.error(f"验证码重试失败，已达到最大重试次数({max_retries})")
             return False, f"验证码重试失败: {message}"
     
     return False, "未知错误"
@@ -419,11 +422,11 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
     :param profile: Profile 对象，必需参数
     :return: (是否成功, 响应信息, 响应文本)
     """
-    logging.info("\n开始智能填写表单...")
+    logger.info("\n开始智能填写表单...")
     
     # 直接使用 Profile 对象的 to_form_data() 方法并映射字段名
     if not profile:
-        logging.error("profile 参数未提供")
+        logger.error("profile 参数未提供")
         return False, "profile 参数未提供", None
     
     try:
@@ -438,12 +441,12 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
             return False, "Profile数据映射失败", None
         
         # 记录映射结果
-        logging.info(f"智能映射完成，生成 {len(form_data)} 个字段")
+        logger.info(f"智能映射完成，生成 {len(form_data)} 个字段")
             
     except Exception as e:
-        logging.error(f"智能表单分析失败: {str(e)}")
+        logger.error(f"智能表单分析失败: {str(e)}")
         # 如果智能分析失败，回退到传统方法
-        logging.info("回退到传统表单填写方法...")
+        logger.info("回退到传统表单填写方法...")
         try:
             form_data_raw = profile.to_form_data()
             
@@ -460,21 +463,21 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
             }
             form_data = personal_info
         except Exception as e2:
-            logging.error(f"传统方法也失败: {str(e2)}")
+            logger.error(f"传统方法也失败: {str(e2)}")
             return False, f"表单数据准备失败: {str(e2)}", None
     
-    logging.info(f"表单数据准备完成: {form_data}")
+    logger.info(f"表单数据准备完成: {form_data}")
 
     # 下载并识别验证码
     success, captcha_path = download_captcha(session, soup, location_name)
     if not success:
         return False, f"验证码下载失败: {captcha_path}", None
 
-    logging.info(f"\n开始识别验证码: {captcha_path}")
+    logger.info(f"\n开始识别验证码: {captcha_path}")
     captcha_text = recognize_captcha_with_gpt(captcha_path)
-    logging.info(f"验证码识别结果: {captcha_text}")
+    logger.info(f"验证码识别结果: {captcha_text}")
     if not captcha_text:
-        logging.error("验证码识别失败")
+        logger.error("验证码识别失败")
         return False, "验证码识别失败", None
 
     # 添加验证码和其他必要字段 
@@ -497,17 +500,17 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
             form_data[field] = int(form_data[field])
 
     # 记录关键字段的值
-    logging.info(f"\n关键字段检查:")
-    logging.info(f"  captcha_code (验证码): '{form_data.get('captcha_code')}'")
-    logging.info(f"  hunangskrukka (蜜罐字段): '{form_data.get('hunangskrukka')}'")
-    logging.info(f"  email: '{form_data.get('email')}'")
-    logging.info(f"  emailCheck: '{form_data.get('emailCheck')}'")
-    logging.info(f"准备提交的完整表单数据: {form_data}")
+    logger.info(f"\n关键字段检查:")
+    logger.info(f"  captcha_code (验证码): '{form_data.get('captcha_code')}'")
+    logger.info(f"  hunangskrukka (蜜罐字段): '{form_data.get('hunangskrukka')}'")
+    logger.info(f"  email: '{form_data.get('email')}'")
+    logger.info(f"  emailCheck: '{form_data.get('emailCheck')}'")
+    logger.info(f"准备提交的完整表单数据: {form_data}")
 
     # 获取表单提交URL
     form = soup.find('form')
     if not form or not isinstance(form, Tag):
-        logging.error("无法找到表单")
+        logger.error("无法找到表单")
         return False, "无法找到表单", None
 
     # 收集隐藏字段
@@ -519,7 +522,7 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
         field_value = hidden_input.get('value', '')
         if field_name:
             hidden_fields[field_name] = field_value
-            logging.info(f"  隐藏字段: {field_name} = '{field_value}'")
+            logger.info(f"  隐藏字段: {field_name} = '{field_value}'")
     
     form_data.update(hidden_fields)
 
@@ -536,19 +539,19 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
     
     # 确保蜜罐字段为空
     if form_data.get('hunangskrukka') != '':
-        logging.warning("警告: hunangskrukka 字段不为空，可能触发反机器人检测")
+        logger.warning("警告: hunangskrukka 字段不为空，可能触发反机器人检测")
         form_data['hunangskrukka'] = ''  # 强制设为空
     
     if validation_errors:
         error_msg = "; ".join(validation_errors)
-        logging.error(f"表单验证失败: {error_msg}")
+        logger.error(f"表单验证失败: {error_msg}")
         return False, f"表单验证失败: {error_msg}", None
 
-    logging.info(f"\n最终提交的表单数据: {form_data}")
+    logger.info(f"\n最终提交的表单数据: {form_data}")
 
     # 这我不是很清楚
     submit_url = urljoin('https://termine.staedteregion-aachen.de/auslaenderamt/', str(form.get('action', '')))
-    logging.info(f"\n提交URL: {submit_url}")
+    logger.info(f"\n提交URL: {submit_url}")
 
 
     # ===================================================
@@ -560,23 +563,23 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
             'Content-Type': 'application/x-www-form-urlencoded',
             'Referer': 'https://termine.staedteregion-aachen.de/auslaenderamt/'
         }
-        logging.info(f"\n准备提交请求，headers: {headers}")
+        logger.info(f"\n准备提交请求，headers: {headers}")
 
         res = session.post(submit_url, data=form_data, headers=headers)
         
         save_page_content(res.text, '6_form_submitted', location_name)
-        logging.info(f"\n表单提交响应状态码: {res.status_code}")
+        logger.info(f"\n表单提交响应状态码: {res.status_code}")
 
         # 详细分析响应内容
         response_text = res.text
         
         # 检查成功标志
         if "Online-Terminanfrage erfolgreich" in response_text:
-            logging.info("预约成功！")
+            logger.info("预约成功！")
             return True, "预约成功！", response_text
         
         if "zu vieler Terminanfragen" in response_text:
-            logging.error("预约失败: zu vieler Terminanfragen")
+            logger.error("预约失败: zu vieler Terminanfragen")
             save_page_content(response_text, '6_form_error', location_name)
             return False, "预约失败: zu vieler Terminanfragen", response_text
 
@@ -588,25 +591,25 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
         error_div = soup_response.find('div', class_='content__error')
         if error_div:
             error_text = error_div.get_text()
-            logging.info(f"检测到错误区域内容: {error_text}")
+            logger.info(f"检测到错误区域内容: {error_text}")
 
             # 检查是否包含"Sicherheitsfrage"
             if "Sicherheitsfrage" in error_text:
                 error_message = "验证码错误"
-                logging.error("检测到验证码错误 (Sicherheitsfrage)")
+                logger.error("检测到验证码错误 (Sicherheitsfrage)")
 
         if error_message:
-            logging.error(f"表单提交失败: {error_message}")
+            logger.error(f"表单提交失败: {error_message}")
             save_page_content(response_text, '6_form_error', location_name)
             return False, error_message, response_text
 
         error_message = "未知错误"
-        logging.error(f"表单提交失败: {error_message}")
-        logging.error(f"响应内容前500字符: {response_text[:500]}...")
+        logger.error(f"表单提交失败: {error_message}")
+        logger.error(f"响应内容前500字符: {response_text[:500]}...")
         save_page_content(response_text, '6_form_unknown_error', location_name)
         return False, error_message, response_text
 
     except Exception as e:
         error_msg = f"提交表单时发生异常: {str(e)}"
-        logging.error(error_msg)
+        logger.error(error_msg)
         return False, error_msg, None

@@ -4,35 +4,56 @@ This document explains where logs go, how they are formatted, which modules emit
 
 ### Quick summary
 
-- Default sink: stdout/stderr (you typically redirect to a file via shell).
-- Format: `%(asctime)s - %(levelname)s - %(message)s` (for example: `2025-09-21 12:34:56,789 - INFO - 启动 SuperC 预约检查程序...`).
-- Levels used: INFO, WARNING, ERROR (no DEBUG in code). Some step logs are gated by a verbose flag.
-- Verbose toggle: `superc/config.py` → `VERBOSE_LOGGING` controls extra “step” logs via `log_verbose()`.
+- Default sink: stdout/stderr (redirect with shell helpers such as `tee` or `nohup`).
+- Real-time Supabase mirror: enabled when `ENABLE_SUPABASE_LOGS = True`; installed via `superc.logging_utils.setup_logging()`.
+- Format: `%(asctime)s - %(levelname)s - %(schritt)s - %(message)s` (the Schritt column shows `Schritt N` when present in the message, otherwise the emitting logger name).
+- Levels used: INFO, WARNING, ERROR (no DEBUG in code). Step-level chatter is behind a verbose flag.
+- Verbose toggle: `superc/config.py` → `VERBOSE_LOGGING` controls extra “Schritt X” navigation logs.
 - Artifacts saved for debugging: HTML pages and captcha images saved to disk; their paths are logged.
 
 
 ## Configuration and sinks
 
 - Config file: `superc/config.py`
-	- `LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'`
-	- `LOG_LEVEL = 'INFO'` (note: the main script currently hard-codes `INFO` when calling `basicConfig`)
+	- `LOG_FORMAT = '%(asctime)s - %(levelname)s - %(schritt)s - %(message)s'`
+	- `LOG_LEVEL = 'INFO'` (used by logging setup helpers)
+	- `ENABLE_SUPABASE_LOGS = True` enables the Supabase handler; set to `False` to keep logs local-only.
 	- `VERBOSE_LOGGING = False` (set to `True` to see detailed step logs from the checker)
 
 - Initialization:
-	- `superc.py` and `infostelle.py` call: `logging.basicConfig(format=LOG_FORMAT, level=logging.INFO)`
+	- Use `superc.logging_utils.setup_logging()` to configure logging and (optionally) attach the Supabase handler.
+	- `superc.py`, `infostelle.py`, and the CLI entry point of `superc/appointment_checker.py` already call `setup_logging()`.
 	- When running headless, recommended shell redirection (examples in `superc.py` header comments):
 		- Interactive: `source .venv/bin/activate && python3 superc.py 2>&1`
 		- Background: `source .venv/bin/activate && nohup python3 superc.py >> superc.log 2>&1 &`
 
-- Handlers: no explicit file handler in production code. Logs go to stdout/stderr unless the shell redirects.
-	- Tests sometimes add a file handler (e.g., `tests/test_form_parsing.py` writes `test_form_parsing.log`).
+- Handlers:
+	- Supabase: `SupabaseLogHandler` in `superc/logging_utils.py`, attached automatically when enabled.
+	- Console/file: the root handler created by `logging.basicConfig`; redirect via shell if you want a local file copy.
+	- Tests sometimes add temporary file handlers (e.g., `tests/test_form_parsing.py` writes `test_form_parsing.log`).
+
+
+## Supabase mirroring
+
+- Runtime streaming:
+	- Controlled by `ENABLE_SUPABASE_LOGS`.
+	- `setup_logging()` attaches `SupabaseLogHandler`, which formats each record with `LOG_FORMAT` and forwards it to `db.utils.write_log`.
+	- Failures (missing credentials, network issues) are surfaced on stderr once; the handler then disables itself to avoid noisy retries.
+
+- Backfilling historical files:
+	- Use `python -m db.utils --persist-log superc.log` to replay an existing log file into Supabase.
+	- Non-log shell noise like `nohup: ignoring input` is skipped automatically.
+	- `write_log(...)` can be imported directly for ad-hoc inserts; pass either a fully formatted line that matches `LOG_FORMAT` or a free-form message (defaults to level INFO and Schritt `-`).
+
+- Table schema: `public.app_logs_min` (see `db/ddl_app_logs_min.sql`) stores `log_timestamp`, `level`, `schritt`, `message`, and `created_at`. Indexes exist on timestamp and level for quick filtering.
 
 
 ## Log entry format
 
-- Format string: `%(asctime)s - %(levelname)s - %(message)s`
+- Format string: `%(asctime)s - %(levelname)s - %(schritt)s - %(message)s`
+- The Schritt column is populated by a custom LogRecord factory (`superc/config.py`) that scans the message for `Schritt N`; when none is found it automatically falls back to the logger name (e.g., `main`, `form_filler`, `infostelle`).
 - Example:
-	- `2025-09-21 00:05:32,102 - INFO - 启动 SuperC 预约检查程序，进程PID: 12345`
+	- `2025-10-03 17:24:18,606 - ERROR - Schritt 5 - Schritt 5: superC server error`
 	- Some errors include tracebacks via `exc_info=True` (e.g., unexpected exceptions in the main loop).
 
 
@@ -200,4 +221,3 @@ These file writes are always accompanied by INFO logs with the full path.
 
 
 — End —
-

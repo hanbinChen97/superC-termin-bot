@@ -13,6 +13,9 @@ from pathlib import Path
 from typing import Tuple, Optional
 
 
+logger = logging.getLogger(__name__)
+
+
 def select_first_appointment(suggest_res_text: str) -> Tuple[bool, str, Optional[dict], Optional[str]]:
     """
     选择页面中的第一个可用预约并返回其表单数据
@@ -56,7 +59,7 @@ def select_first_appointment(suggest_res_text: str) -> Tuple[bool, str, Optional
     appointment_datetime_str = f"{date_display} {time_info}" if time_info != "未知时间" else str(date_display)
 
     # 这是关键信息，始终输出
-    logging.info(f"找到可用时间: {appointment_datetime_str}")
+    logger.info(f"找到可用时间: {appointment_datetime_str}")
 
     return True, "成功解析预约信息", form_data, appointment_datetime_str
 

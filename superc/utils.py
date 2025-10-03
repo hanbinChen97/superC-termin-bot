@@ -13,6 +13,9 @@ import httpx
 # 使用相对导入
 from .config import USER_AGENT
 
+
+logger = logging.getLogger(__name__)
+
 def validate_page_step(html_content: Union[str, httpx.Response, Any], expected_step: str) -> bool:
     """
     通过DOM解析验证页面步骤，而不是字符串比较
@@ -55,7 +58,7 @@ def save_page_content(content: str, step_name: str, location_name: str) -> None:
     
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
-    logging.info(f'页面内容已保存到: {filename}')
+    logger.info(f'页面内容已保存到: {filename}')
 
 def download_captcha(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str) -> Tuple[bool, str]:
     """
@@ -91,7 +94,7 @@ def download_captcha(session: httpx.Client, soup: bs4.BeautifulSoup, location_na
         with open(filename, 'wb') as f:
             f.write(img_response.content)
         
-        logging.info(f'验证码图片已保存到: {filename}')
+        logger.info(f'验证码图片已保存到: {filename}')
         return True, filename
     except Exception as e:
         return False, f"下载验证码图片时发生错误：{str(e)}"

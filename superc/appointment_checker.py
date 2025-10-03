@@ -14,6 +14,7 @@ from urllib.parse import urljoin
 
 # 使用相对导入
 from . import config
+from .logging_utils import setup_logging
 from .utils import save_page_content, validate_page_step
 from .form_filler import fill_form_with_captcha_retry
 from datetime import datetime
@@ -189,71 +190,55 @@ def enter_schritt_5_page(session: httpx.Client, form_data: dict, location_name: 
         return False, "Schritt 5: form_data为空", None
     
     # 添加详细的调试信息
-    SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求URL: {submit_url}")
-    SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据类型: {type(form_data)}")
-    SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据字段数: {len(form_data)}")
-    SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据内容: {form_data}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求URL: {submit_url}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据类型: {type(form_data)}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据字段数: {len(form_data)}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求数据内容: {form_data}")
     
-    # 添加重试机制
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            if attempt > 0:
-                SCHRITT_5_LOGGER.info(f"Schritt 5 POST请求重试 (第{attempt + 1}次尝试)")
-            
-            # 设置适当的请求头
-            headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Referer': submit_url,
-                'User-Agent': USER_AGENT
-            }
-            
-            submit_res = session.post(submit_url, data=form_data, headers=headers, timeout=30.0)
-            
-            # 记录响应状态
-            SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应状态码: {submit_res.status_code}")
-            SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应头: {dict(submit_res.headers)}")
-            SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应内容长度: {len(submit_res.text)}")
-            
-            # 检查HTTP错误状态码
-            if submit_res.status_code not in [200, 302]:
-                error_msg = f"Schritt 5 POST请求失败，状态码: {submit_res.status_code}"
-                SCHRITT_5_LOGGER.error(error_msg)
-                if attempt < max_retries - 1:
-                    continue  # 重试
-                return False, error_msg, None
-            
-            # 如果响应为空，记录详细信息
-            if not submit_res.text.strip():
-                error_msg = "Schritt 5 POST响应内容为空"
-                SCHRITT_5_LOGGER.error(f"{error_msg}！")
-                SCHRITT_5_LOGGER.error(f"状态码: {submit_res.status_code}")
-                SCHRITT_5_LOGGER.error(f"响应头: {dict(submit_res.headers)}")
-                SCHRITT_5_LOGGER.error(f"请求URL: {submit_res.url}")
-                if attempt < max_retries - 1:
-                    continue  # 重试
-                return False, error_msg, None
-            
-            save_page_content(submit_res.text, '5_term_selected', location_name)
-            
-            # 成功，跳出重试循环
-            break
-            
-        except httpx.TimeoutException as e:
-            error_msg = f"Schritt 5 POST请求超时: {str(e)}"
-            SCHRITT_5_LOGGER.error(error_msg)
-            if attempt < max_retries - 1:
-                continue  # 重试
-            return False, error_msg, None
-        except Exception as e:
-            error_msg = f"Schritt 5 POST请求发生异常: {str(e)}"
-            SCHRITT_5_LOGGER.error(error_msg)
-            if attempt < max_retries - 1:
-                continue  # 重试
-            return False, error_msg, None
-    else:
-        # 所有重试都失败了
-        return False, "Schritt 5 POST请求重试失败", None
+    # 设置适当的请求头
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Referer': submit_url,
+        'User-Agent': USER_AGENT
+    }
+
+    try:
+        submit_res = session.post(submit_url, data=form_data, headers=headers, timeout=30.0)
+    except httpx.TimeoutException as e:
+        error_msg = f"Schritt 5 POST请求超时: {str(e)}"
+        SCHRITT_5_LOGGER.error(error_msg)
+        return False, error_msg, None
+    except Exception as e:
+        error_msg = f"Schritt 5 POST请求发生异常: {str(e)}"
+        SCHRITT_5_LOGGER.error(error_msg)
+        return False, error_msg, None
+
+    # 记录响应状态
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应状态码: {submit_res.status_code}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应头: {dict(submit_res.headers)}")
+    # SCHRITT_5_LOGGER.info(f"Schritt 5 POST响应内容长度: {len(submit_res.text)}")
+
+    # 检查superC服务器错误提示
+    if "Fehlermeldung: Prozess fehlgeschlagen." in submit_res.text:
+        SCHRITT_5_LOGGER.error("Schritt 5: superC server error")
+        return True, "superC server error", None
+
+    # 检查HTTP错误状态码
+    if submit_res.status_code not in [200, 302]:
+        error_msg = f"Schritt 5 POST请求失败，状态码: {submit_res.status_code}"
+        SCHRITT_5_LOGGER.error(error_msg)
+        return False, error_msg, None
+
+    # 如果响应为空，记录详细信息
+    if not submit_res.text.strip():
+        error_msg = "Schritt 5 POST响应内容为空"
+        SCHRITT_5_LOGGER.error(f"{error_msg}！")
+        SCHRITT_5_LOGGER.error(f"状态码: {submit_res.status_code}")
+        SCHRITT_5_LOGGER.error(f"响应头: {dict(submit_res.headers)}")
+        SCHRITT_5_LOGGER.error(f"请求URL: {submit_res.url}")
+        return False, error_msg, None
+
+    save_page_content(submit_res.text, '5_term_selected', location_name)
 
     if not validate_page_step(submit_res, "5"):
         SCHRITT_5_LOGGER.warning("Schritt 5 失败: 提交时间后未进入Schritt 5，可能选择失败")
@@ -350,7 +335,11 @@ def run_check(location_config: dict, current_profile: Optional[Profile]) -> Tupl
             return has_appointment, "内部错误：form_data或selected_profile为空", None
             
         success, message, soup = enter_schritt_5_page(session, form_data, location_name, selected_profile)
-        
+
+        if message == "superC server error":
+            SCHRITT_5_LOGGER.error("Schritt 5: superC server error，停止本轮流程")
+            return has_appointment, message, None
+
         if not success:
             SCHRITT_5_LOGGER.error(f"Schritt 5页面失败: {message}")
             return has_appointment, message, None
@@ -375,16 +364,8 @@ def run_check(location_config: dict, current_profile: Optional[Profile]) -> Tupl
         session.close()
 
 if __name__ == "__main__":
-    # 配置日志记录
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(),  # 输出到控制台
-        ]
-    )
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    
+    setup_logging(force=True)
+
     location_config = {
         "name": "superc",
         "selection_text": "Super C",
