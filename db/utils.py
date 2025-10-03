@@ -2,17 +2,22 @@
 source .venv/bin/activate && python -m db.utils
 数据库工具模块 - 提供预约配置文件的数据库操作功能
 供 superc.py 和其他模块使用的纯工具模块
+
+db 操作就像是 api。不是一个 connection。
+
 """
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 # from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
 import os
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import re
-from db.models import AppointmentProfile
+from db.models import AppointmentProfile, AppLogsMin
+import argparse
 
 # 数据库连接配置
 def _init_database():
@@ -232,45 +237,119 @@ def print_all_profiles() -> None:
         print(f"更新时间: {profile.updated_at}")
         print("-" * 50)
 
+# TODO
+# "app_logs_min" table
+DEFAULT_SCHRITT = "-"
+_LOG_LINE_PATTERN = re.compile(
+    r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<level>[A-Z]+) - (?P<schritt>.*?) - (?P<message>.*)$"
+)
+
+
+def write_log(message: str) -> None:
+    """Persist a log line into app_logs_min.
+
+    Accepts a formatted log line (default logging format in this project) and inserts
+    the parsed timestamp, level, schritt identifier, and message into the database.
+    Falls back to the current UTC timestamp if parsing fails.
+    """
+    if not message:
+        return
+
+    log_timestamp = datetime.now(timezone.utc)
+    level = "INFO"
+    schritt = DEFAULT_SCHRITT
+    log_message = message
+
+    try:
+        cleaned = message.strip()
+        match = _LOG_LINE_PATTERN.match(cleaned)
+        if match:
+            level = match.group("level")
+            raw_schritt = match.group("schritt")
+            schritt = raw_schritt.strip() if raw_schritt else DEFAULT_SCHRITT
+            log_message = match.group("message")
+            ts_str = match.group("timestamp")
+            try:
+                parsed_ts = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S,%f")
+                log_timestamp = parsed_ts.replace(tzinfo=timezone.utc)
+            except ValueError:
+                log_timestamp = datetime.now(timezone.utc)
+        else:
+            log_message = cleaned
+    except Exception as exc:  # pragma: no cover - defensive fallback
+        print(f"解析日志失败: {exc}")
+        log_timestamp = datetime.now(timezone.utc)
+        level = "ERROR"
+        schritt = DEFAULT_SCHRITT
+        log_message = f"[write_log parse error] {message}"
+
+    # 使用 SQLAlchemy 模型插入数据
+    session = SessionLocal()
+    try:
+        log_entry = AppLogsMin(
+            log_timestamp=log_timestamp,
+            level=level,
+            schritt=schritt,
+            message=log_message
+        )
+        session.add(log_entry)
+        session.commit()
+    except Exception as exc:  # pragma: no cover - ensure main flow never breaks
+        session.rollback()
+        print(f"写入日志失败: {exc}")
+    finally:
+        session.close()
+
+
+def persist_log_file(file_path: str) -> int:
+    """Read a local log file and persist each line into Supabase."""
+    if not os.path.exists(file_path):
+        print(f"文件不存在: {file_path}")
+        return 0
+
+    inserted = 0
+    with open(file_path, "r", encoding="utf-8") as log_file:
+        for line in log_file:
+            cleaned = line.strip()
+            if not cleaned:
+                continue
+
+            # 跳过nohup等非日志输出
+            if cleaned.lower().startswith("nohup: ignoring input"):
+                continue
+
+            write_log(cleaned)
+            inserted += 1
+
+    print(f"已写入 {inserted} 条日志到 Supabase")
+    return inserted
+
 def main():
-    """测试数据库连接和功能的主函数"""
-    # Test the connection
+    """CLI entry point for database utilities."""
+    parser = argparse.ArgumentParser(description="Database utility helpers")
+    parser.add_argument(
+        "--persist-log",
+        dest="log_path",
+        help="路径到需要写入 Supabase 的日志文件",
+    )
+    args = parser.parse_args()
+
+    if args.log_path:
+        persist_log_file(args.log_path)
+        return
+
+    # 默认执行数据库连通性检查
     try:
         with engine.connect() as connection:
             print("Connection successful!")
-            
-        # 测试等待队列相关功能（使用 waiting_queue_idx 索引）
+
         print("\n=== 等待队列统计信息 ===")
         waiting_count = get_waiting_queue_count()
         print(f"当前等待队列长度: {waiting_count}")
-        
-        # 测试查询等待队列中的第一个用户（排队最久的用户）
+
         print("\n=== 查询等待队列第一名（使用 waiting_queue_idx 索引）===")
-        first_waiting_profile = get_first_waiting_profile()
         print_first_waiting_profile()
-        
-        # 如果找到了等待中的用户，演示更新状态为 'booked'
-        # if first_waiting_profile:
-        #     print(f"\n=== 为等待队列第一名（ID: {first_waiting_profile.id}）预约成功 ===")
-            # success = update_appointment_status(first_waiting_profile.id, 'booked')
-            # if success:
-            #     print("状态更新成功！队列第一名已完成预约")
-                
-            #     # 再次查看等待队列状态
-            #     print("\n=== 更新后的等待队列状态 ===")
-            #     new_waiting_count = get_waiting_queue_count()
-            #     print(f"更新后等待队列长度: {new_waiting_count}")
-                
-            #     new_first_waiting = get_first_waiting_profile()
-            #     if new_first_waiting:
-            #         print(f"新的队列第一名: {new_first_waiting.vorname} {new_first_waiting.nachname} (ID: {new_first_waiting.id})")
-            #     else:
-            #         print("等待队列已空")
-        
-        # 测试查询所有预约配置文件
-        # print("\n=== 查询所有预约配置文件 ===")
-        # print_all_profiles()
-            
+
     except Exception as e:
         print(f"Failed to connect: {e}")
 

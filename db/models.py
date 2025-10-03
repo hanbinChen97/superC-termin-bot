@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, Text, DateTime, Boolean, Index, String, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, Text, DateTime, Boolean, Index, String, ForeignKey, CheckConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func, text
 
@@ -58,4 +58,36 @@ waiting_queue_idx = Index(
     'waiting_queue_idx',
     AppointmentProfile.created_at,
     postgresql_where=text("appointment_status = 'waiting'")
+)
+
+class AppLogsMin(Base):
+    __tablename__ = 'app_logs_min'
+    
+    id = Column(BigInteger, primary_key=True)  # bigserial in PostgreSQL
+    log_timestamp = Column(DateTime(timezone=True), nullable=False)
+    level = Column(Text, nullable=False)
+    schritt = Column(Text, nullable=False, default='-')
+    message = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
+    
+    # Check constraint for level
+    __table_args__ = (
+        CheckConstraint(
+            "level IN ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')",
+            name='app_logs_min_level_check'
+        ),
+    )
+    
+    def __repr__(self):
+        return f"<AppLogsMin(id={self.id}, level='{self.level}', log_timestamp='{self.log_timestamp}')>"
+
+# 定义 app_logs_min 的索引
+app_logs_min_timestamp_idx = Index(
+    'idx_app_logs_min_timestamp',
+    AppLogsMin.log_timestamp.desc()
+)
+
+app_logs_min_level_idx = Index(
+    'idx_app_logs_min_level',
+    AppLogsMin.level
 )

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <!--###NOINDEX###-->
+        <meta charset="UTF-8">
+        <title>Termine Städteregion Aachen - Ausländerbehörde -</title>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="styles/web/basis/css/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/web/basis/css/fontawesome/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="styles/web/basis/css/leaflet.css"/>
+        <script src="app/js/leaflet.js"></script>
+        <script src="app/js/osm2geojson-lite.js"></script>
+        <script src="app/js/svg-icon.js"></script>
+        
+        <script type="text/javascript" src="app/js/jquery-3.7.1.min.js"></script>
+        
+        <link rel="stylesheet" href="styles/web/basis/css/jquery-ui_1.14.1.css">
+        <script src="app/js/jquery-ui_1.14.1.min.js"></script>
+
+        <link rel="stylesheet" href="styles/web/basis/css/combobox.css"/>
+        <script src="app/js/combobox.js"></script>
+
+        <link rel="stylesheet" href="styles/web/basis/css/Font.css">
+        <link rel="stylesheet" href="styles/web/basis/css/tvo.css?cache_buster=1759395868" type="text/css" />
+        <link rel="stylesheet" href="styles/web/tevis011/css/custom.css?cache_buster=1759396099" type="text/css" />
+        <!--###KONTRASTSTYLE###-->
+
+        <script type="text/javascript" src="styles/web/basis/css/bootstrap/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="app/js/tvweb.js?cache_buster=1759395864"></script>
+        <script type="text/javascript" src="scripts/web/basis/javascript/basis.js"></script>
+        <script type="text/javascript" src="scripts/web/basis/javascript/calendar.js"></script>
+        <script type="text/javascript" src="app/js/js.cookie.min.js"></script>
+
+        <link rel="icon" href="data:,">
+
+        <script src="app/js/customA11ySelect.js"></script>
+
+        <!--##CONWORD_ONLOAD##-->
+    </head>
+
+    <body class="TEVISWEB">
+
+        <div id="cookie_msg">
+            <span tabindex="1" style="">Diese Website verwendet Cookies - nähere Informationen dazu und zu Ihren Rechten als Benutzer finden Sie in unserer Datenschutzerklärung.</span>
+            <input type="button" id="cookie_msg_btn_yes" class="btn" value="Akzeptieren"/>
+            <input type="button" id="cookie_msg_btn_no" class="btn" value="Ablehnen"/>
+            <a href="#" onclick="showFooterModals('privacy', $(this).text())">Datenschutzerklärung</a>
+        </div>
+        
+         <nav id="einstellungen-nav" class="mainheader" aria-labelledby="Einstellungen-Label">
+                <div style="margin-top:-17px;">
+                    <a class="unsichtbar" href="#inhalt" style="margin-top:-10px;">Hauptregion der Seite anspringen</a><p id="Einstellungen-Label" class="menuEinstellung" >Einstellungen</p><ul id="exTest" role="menu" class="disclosure-nav"><li><button class="NavigationButton nomenu set_contrast_btn" title="Kontrast an" data-languageAN="Kontrast an" data-languageAUS="Kontrast aus" style="height: 100% !important;"><img  alt="Icon Kontrast" aria-hidden="true" src="styles/web/basis/images/contrast_low_black.svg" width="32"><img  alt="Icon Kontrast" aria-hidden="true" src="styles/web/basis/images/contrast_low_white.svg" width="32"></button > </li > <li><button id="easyLanguage" class="NavigationButton nomenu"  aria-label="Einfache Sprache umschalten" title="Einfache Sprache an" data-easyLanguageON="Einfache Sprache an" data-easyLanguageOFF="Einfache Sprache aus"><img alt="Icon einfache Sprache" aria-hidden="true" focusable="false" src="styles/web/basis/images/leichte_Sprache_aktiv_252525.svg" width="32px"><img alt="Icon einfache Sprache" aria-hidden="true" focusable="false" src="styles/web/basis/images/leichte_Sprache_aktiv_FFFFFF.svg" width="32px"></button></li></ul>
+                </div>
+                </nav>
+	<div id="banner"></div>
+            <!--##LANGUAGE_MENU##-->
+        <!--##CORONA_LOGOUT##-->
+
+        <main class="container wrapper">
+
+            <div class="content content--mdt" id="inhalt">
+<input type="hidden" id="loc_details_hidden" name="loc_details_hidden" value="Ausländeramt Aachen - Außenstelle RWTH<br/>Templergraben 57<br/>52062 Aachen" />
+            <div role="banner" class="wizard">
+                <div class="wizard-inner">
+                
+                    <ul class="nav nav-tabs" role="presentation" aria-hidden="true">
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">1</span>
+                        </li>
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">2</span>
+                        </li>
+                        <li role="presentation" class="done">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">3</span>
+                        </li>
+                        <li role="presentation" class="active">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Terminvorschläge - Auswahl der Zeit" data-trigger="hover">4</span>
+                        </li>
+                        <li role="presentation" class="disabled">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">5</span>
+                        </li>
+                        <li role="presentation" class="disabled">
+                            <span class="round-tab" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="" data-trigger="hover">6</span>
+                        </li>
+                    </ul>
+                
+                    <div>
+                        <h1> Schritt 4<span class='visuallyhidden'> von 6</span>: Terminvorschläge - Auswahl der Zeit </h1>
+                    </div><!--ende div inhalt-->
+                </div><!-- ende div wizard-inner-->
+            </div><!--ende div wizard-->
+            <details id="details_infobox" class="ui-accordion ui-widget ui-helper-reset" isOpen>
+                            <summary id="infobox_summary" class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons">
+                                <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>Übersicht zu Ihrem Termin</summary>
+                            <div id="infobox_content" class="ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+                                <dl class="grid" style="margin-bottom: 0px;"><dt><span class='infobox_text'>Funktionseinheit</span></dt><dd class=''>Aufenthaltsangelegenheiten</dd><dt><span class='infobox_text'>Anliegen</span></dt><dd class=''><ul id="info_box_cnc_list"><li>1 <span class="visuallyhidden">Mal</span><span aria-hidden="true">x</span> RWTH Studenten</li></ul></dd><dt><span class='infobox_text'>Standort</span></dt><dd class=''><span class='cnw_skip_translation'>Ausländeramt Aachen - Außenstelle RWTH, Templergraben 57, 52062 Aachen</span></dd><dt><span class='infobox_text'>Termin</span></dt><dd><span class='visuallyhidden '>noch nicht gesetzt</span></dd><dt><span class='infobox_text'>Persönliche Daten</span></dt><dd><span class='visuallyhidden cnw_skip_translation'>noch nicht gesetzt</span></dd></dl>
+                            </div>
+                        </details>
+            <script>
+                $(document).ready(function(){
+                    var title = document.title.split("Schritt");
+                    var titleNeu = title[0] + " - " + $("h1:not(#Einstellungen-Label)").html();
+                    titleNeu = titleNeu.replace('<span class="visuallyhidden">', '');
+                    titleNeu = titleNeu.replace('</span>', '').trim();
+                    document.title= titleNeu;
+                    var lang = "de_DE"
+                    lang = lang.split('_')[0];
+                    if( lang != "vs" ){ //nicht vereinfachte Sprache -> lang-Attribut setzen
+                        $('html').attr('lang', lang);
+                    } else { //vereinfachte Sprache -> de nehmen
+                        $('html').attr('lang', 'de');
+                    }
+                });
+            </script>
+
+<h2 class="h1like">Bitte wählen Sie die gewünschte Uhrzeit für Ihren Termin aus:</h2>
+<details id="details_vorschlage" class="ui-accordion ui-widget ui-helper-reset" >
+<summary id="vorschlag_summary" class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons"><span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
+                                         Vorschläge filtern
+                                          </summary>
+<div class="ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+                        <form action="" method="get" id="suggest_filter_form">
+                            <input type="hidden" name="loc" value="50">
+                                <input type="hidden" name="mdt" value="0" /><input type="hidden" name="cnc-344" value="1" />
+                            <label><b>Zeitraum</b></label>
+                            <div id="suggest_date_wrap">
+                                <label for="filter_date_from" title="Filter für den Zeitraum von">Von:</label>
+                                <input type="text" name="filter_date_from" id="filter_date_from" class="suggest_date" value="03.10.2025"/>
+                                <label id="filterlabel" for="filter_date_to" title="Filter für den Zeitraum bis" style="margin-left:20px;">Bis: </label>
+                                <input type="text" name="filter_date_to" id="filter_date_to"  class="suggest_date" value="11.12.2025"/>
+                                <p class="error-text" aria-live="polite" style="left:0%"></p>
+                            </div>
+                
+                            <script src="app/js/datepicker-ac.js"></script>
+                            <script src="app/js/datepicker-de.js"></script>
+                            <script>
+                                month = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+                                $( "#filter_date_from, #filter_date_to" ).datepicker({
+                                    showOn: 'button',
+                                    buttonText: "Öffnen des Kalenders",
+                                    buttonImage: "styles/web/basis/images/calendar.svg",
+                                    buttonImageOnly: false,
+                                    dayNames: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+                                    dayNamesShort: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                                    dayNamesMin: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
+                                    monthNames: month,//["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+                                    monthNamesShort: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
+                                    weekHeader: "KW",
+                                    dateFormat: "dd.mm.yy",
+                                    firstDay: 1,
+                                    onClose: removeAria,
+                                    showButtonPanel: true,
+                                    closeText: "Schließen",
+                                    goToCurrent: false,
+                                    prevText: "Zurück",
+                                    nextText: "Vor",
+                                    currentText: "Heute",
+                                    minDate: new Date( 2025, 10 - 1, 03 ),
+                                    maxDate: new Date( 2025, 12 - 1, 11 ),
+                                    onSelect: function (date) {
+                                        var myDT = $.datepicker.parseDate( $(this).datepicker("option", "dateFormat"), date );
+                                        var ariaDate = $.datepicker.formatDate("DD, dd. MM yy", myDT);
+                                        $(this).attr("aria-label", ariaDate);
+        
+                                        var date1 = $('#filter_date_from').datepicker('getDate');
+                                        var date2 = $('#filter_date_to').datepicker('getDate');
+        
+                                        if( date1 > date2 ){
+                                            if( $(this).attr('id') == 'filter_date_from' ){
+                                                $('#filter_date_to').datepicker('setDate', date1);
+                                                $('#filter_date_from').datepicker('setDate', date2);
+                                            }else{
+                                                $('#filter_date_to').datepicker('setDate', date1);
+                                                $('#filter_date_from').datepicker('setDate', date2);
+                                            }
+                                        }
+                                    }
+                                });
+                                
+                                $('.ui-datepicker-trigger').click(
+                                function(){
+                                    var input = this.previousElementSibling;
+                                    setTimeout(function(){
+                                        var today = document.querySelector( ".ui-datepicker-today a" );
+                                        //falls nicht sichtbar (weil z.b. im Monat davor), dann das maximale Datum fokussieren.
+                                        if (!today)
+                                            today = $('a.ui-state-active')[0] ||$('a.ui-state-default')[0];
+                                        
+                                        //aria-hide des primären Anzeige-containers, solange der Datepicker geöffnet
+                                        $("div:not(#ui-datepicker-div):not(.ui-datepicker-header, .ui-datepicker-title)").attr("aria-label", "hidden");
+                                        document.getElementById('ui-datepicker-div').style.zIndex="1000";
+                                        $(".ui-datepicker-prev").attr("tabindex", "1");
+                                        $(".ui-datepicker-next").attr("tabindex", "1");
+                                        today.focus();
+                                        datePickHandler(input, "Anzeige des Kalender-Datepickers", "Kalender schließen", "Schließen", month, "Nächster Monat: ", "Voriger Monat: ");
+                                        $(".ui-datepicker-current").attr("style", "display:none");
+                                        $(".ui-datepicker-today").children().attr("style", "background:yellow");
+                                        $(".ui-datepicker-today").children().attr("style", "color:block");
+                                        $(document).on("click", "#ui-datepicker-div .ui-datepicker-close", function(){
+                                            closeCalendar();
+                                        });
+                                    },0);
+                                })//end function buttonClicked
+                            </script>
+<details id="suggest_filter_timespan">
+<summary class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" title="Zeitbereich">
+                                                                        <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
+                                                                        Zeitbereich
+                                                                    </summary>
+                                                                    <div id="panel_zeitbereich" class="ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom: 4px; margin-top: 4px;vertical-align: middle;" for="filter_timespan-08">
+                                            <input style="left: -20000px;" id="filter_timespan-08" type="checkbox" value="08" title="08 Uhr bis 9 Uhr" name="filter_timespan[]"  />
+                                            <span></span>
+                                            <span style="padding-left: 50px; top: -4px; position: relative;" title="08 Uhr bis 9 Uhr">08:00 - 9:00 </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom: 4px; margin-top: 4px;vertical-align: middle;" for="filter_timespan-09">
+                                            <input style="left: -20000px;" id="filter_timespan-09" type="checkbox" value="09" title="09 Uhr bis 10 Uhr" name="filter_timespan[]"  />
+                                            <span></span>
+                                            <span style="padding-left: 50px; top: -4px; position: relative;" title="09 Uhr bis 10 Uhr">09:00 - 10:00 </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom: 4px; margin-top: 4px;vertical-align: middle;" for="filter_timespan-10">
+                                            <input style="left: -20000px;" id="filter_timespan-10" type="checkbox" value="10" title="10 Uhr bis 11 Uhr" name="filter_timespan[]"  />
+                                            <span></span>
+                                            <span style="padding-left: 50px; top: -4px; position: relative;" title="10 Uhr bis 11 Uhr">10:00 - 11:00 </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom: 4px; margin-top: 4px;vertical-align: middle;" for="filter_timespan-11">
+                                            <input style="left: -20000px;" id="filter_timespan-11" type="checkbox" value="11" title="11 Uhr bis 12 Uhr" name="filter_timespan[]"  />
+                                            <span></span>
+                                            <span style="padding-left: 50px; top: -4px; position: relative;" title="11 Uhr bis 12 Uhr">11:00 - 12:00 </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom: 4px; margin-top: 4px;vertical-align: middle;" for="filter_timespan-12">
+                                            <input style="left: -20000px;" id="filter_timespan-12" type="checkbox" value="12" title="12 Uhr bis 13 Uhr" name="filter_timespan[]"  />
+                                            <span></span>
+                                            <span style="padding-left: 50px; top: -4px; position: relative;" title="12 Uhr bis 13 Uhr">12:00 - 13:00 </span>
+                                        </label>
+                                    </div>
+</div>
+</details>
+<details id="suggest_filter_weekday">
+<summary class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons" title="Wochentag">
+                                                                        <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
+                                                                        Wochentag
+                                                                    </summary>
+                                                                    <div id="panel_wochentag" class="ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+                                    <div>
+                                        <label style="font-size: 1em; line-height: 30px; margin-bottom:4px; margin-top:4px;vertical-align:middle;" for="filter_day-3">
+                                            <input style="left: -20000px;" id="filter_day-3" type="checkbox" value="3" title="Donnerstag" name="filter_day[]"  />
+                                            <span></span>
+                                            <span title="Donnerstag" style="padding-left: 50px;top:-4px; position: relative;">Donnerstag</span>
+                                        </label>
+                                    </div>
+</div>
+</details>
+                            <input title="Zurücksetzen" type="button" class="sel_button btn btn-primary fifty" style="float: left;" aria-live="assertive" value="Zurücksetzen" name="suggest_reset" onclick="$(this).attr('aria-busy', true); window.location.href='?suggest&mdt=0&cnc-344=1'"/>
+<input title="Filtern" type="submit" class="sel_button btn btn-primary fifty" style="float: right;" value="Filtern" aria-live="assertive" onclick="$(this).attr('aria-busy', true);" name="suggest_filter" />
+</form>
+</div>
+</details>
+<hr/>
+ <div class="info">
+                                <p class="hint">
+                                    <strong>
+                                        <span class="important_info_msg" style="margin-bottom: 10px;">Hinweis: Ein Klick auf die Uhrzeit führt automatisch zum nächsten Schritt der Terminvergabe.</span>
+                                    </strong>
+                                </p>
+                            </div>
+<details id="details_suggest_times" class="ui-accordion ui-widget ui-helper-reset" isOpen>
+                                    <summary id="suggest_details_summary" class="ui-accordion-header ui-corner-top ui-state-default ui-accordion-header-active ui-state-active ui-accordion-icons">
+                                        <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>
+                                        Donnerstag, 11.12.2025
+                                    </summary>
+                                    <div id="panel_1765407600" class="suggest_details_panel ui-accordion-content ui-corner-bottom ui-helper-reset ui-widget-content">
+<table class="sugg_table ">
+<tr>
+
+                                            <th scope="row">
+                                                <span aria-hidden="true">08:00 - 09:00</span>
+                                                <span class="invisible_text">08 Uhr bis 09 Uhr </span>
+                                            </th>
+                                        
+<td><button type="button" class="suggest_btn btn btn-primary " disabled>08:00</button></td>
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="510" />
+                            <input type="hidden" name="end" value="540" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="2" />
+                            <input type="hidden" name="hour" value="2" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="5394e1a615dffdf520cbfc908bcd75626f57ad2a4a2f8d95e13491dd61105d34" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="08:30">08:30</button >
+                        </form></td>
+</tr>
+<tr>
+
+                                            <th scope="row">
+                                                <span aria-hidden="true">09:00 - 10:00</span>
+                                                <span class="invisible_text">09 Uhr bis 10 Uhr </span>
+                                            </th>
+                                        
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="540" />
+                            <input type="hidden" name="end" value="570" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="1" />
+                            <input type="hidden" name="hour" value="3" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="9e27d8e54e6d32ddba1697375c08a88e45ba6dc9ed577fd27fd1021eae71ecad" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="09:00">09:00</button >
+                        </form></td>
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="570" />
+                            <input type="hidden" name="end" value="600" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="2" />
+                            <input type="hidden" name="hour" value="3" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="8cb19d94e4654c39a40cf637195c52639786400c1ce99c55cd3b89f943ad6d86" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="09:30">09:30</button >
+                        </form></td>
+</tr>
+<tr>
+
+                                            <th scope="row">
+                                                <span aria-hidden="true">10:00 - 11:00</span>
+                                                <span class="invisible_text">10 Uhr bis 11 Uhr </span>
+                                            </th>
+                                        
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="600" />
+                            <input type="hidden" name="end" value="630" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="1" />
+                            <input type="hidden" name="hour" value="4" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="3a024dcc75bb3b2d75774e6173ae9c619fc4ed702fb26d4bdcc7596f22cc1dee" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="10:00">10:00</button >
+                        </form></td>
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="630" />
+                            <input type="hidden" name="end" value="660" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="2" />
+                            <input type="hidden" name="hour" value="4" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="db3f6094efb5aa75650b9c8010edc5bcd9c977bfb30a11fb294019473fa2e8a7" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="10:30">10:30</button >
+                        </form></td>
+</tr>
+<tr>
+
+                                            <th scope="row">
+                                                <span aria-hidden="true">11:00 - 12:00</span>
+                                                <span class="invisible_text">11 Uhr bis 12 Uhr </span>
+                                            </th>
+                                        
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="660" />
+                            <input type="hidden" name="end" value="690" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="1" />
+                            <input type="hidden" name="hour" value="5" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="6257a830e737c013025f1310f2db24ac9ed8ae05c542502066a397090f97a299" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="11:00">11:00</button >
+                        </form></td>
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="690" />
+                            <input type="hidden" name="end" value="720" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="2" />
+                            <input type="hidden" name="hour" value="5" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="7fd177d675af149f5781d272f3ec7177b614dfe2cf5389193370989646e56cf1" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="11:30">11:30</button >
+                        </form></td>
+</tr>
+<tr>
+
+                                            <th scope="row">
+                                                <span aria-hidden="true">12:00 - 13:00</span>
+                                                <span class="invisible_text">12 Uhr bis 13 Uhr </span>
+                                            </th>
+                                        
+<td><form method="post" class="suggestion_form" style="margin-bottom: 0px;">
+                            <input type="hidden" name="start" value="720" />
+                            <input type="hidden" name="end" value="750" />
+                            <input type="hidden" name="day" value="4" />
+                            <input type="hidden" name="block" value="1" />
+                            <input type="hidden" name="hour" value="6" />
+                            <input type="hidden" name="week" value="202550" />
+                            <input type="hidden" name="date" value="20251211" />
+                            <input type="hidden" name="cal" value="169" />
+                            <input type="hidden" name="checksum" value="5f4b3c09b4e3526d372399971759164e25de9b1770fd9278f979a355fb9b05f1" />
+                            <input type="hidden" name="pow_token" value="" />
+                            <input type="hidden" name="pow_nonce" value="" />
+
+                            <button type="submit" class="suggest_btn btn btn-primary " title="12:00">12:00</button >
+                        </form></td>
+<td><button type="button" class="suggest_btn btn btn-primary " disabled>12:30</button></td>
+</tr>
+</table>
+</div>
+</details>
+<div style="margin-top: 20px; display: inline-block; width: 100%;">
+<input class="sel_button btn btn-primary pull-left fifty " type="button"  onClick="historyGoBack('location?mdt=95&select_cnc=1&cnc-344=1');" title="Zurück zu den Standorten" id="zurueck" value="Zurück zu den Standorten">
+</div>
+</div>
+
+        <div id="TevisDialog" class="modal fade" tabindex="-1" role="dialog" aria-label="Hinweisfenster" data-backdrop="static" data-keyboard="false" >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" id="close_btn_X_confirm_appointment" class="close" data-dismiss="modal" aria-label="Hinweisfenster schließen" title="Hinweisfenster schließen"><span aria-hidden="true">&times;</span></button>
+                        <h1 class="modal-title">Hinweis</h1>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="sel_button btn btn-primary pull-left fifty btn-abort" data-dismiss="modal">Nein</button>
+                        <button type="button" class="sel_button btn btn-primary pull-right fifty btn-ok" data-dismiss="modal">Ja</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    
+
+        <script type="application/javascript">
+            $(document).ready(function() {
+                //links unten rechts in der karte nicht mit tastatur erreichbar:
+                $(".leaflet-bottom.leaflet-right").find("a").attr("tabindex", "-1");
+                //elemente unten rechts in der karte nicht für screenreader sichtbar
+                $(".leaflet-bottom.leaflet-right").attr("aria-hidden", "true");
+                $(".leaflet-bottom.leaflet-right").find(".leaflet-control").attr("aria-hidden", "true");
+                $(".leaflet-bottom.leaflet-right").find("a").attr("aria-hidden", "true");
+                //und noch etwas stuff für die Karte hinsichtlich barrierefreiheit: images bekommen ein alt-attribut (vorgeschrieben bei bitv)
+                $("#map_loading").attr("alt", "Karte mit den Standorten");
+                $(".leaflet-marker-icon").attr("alt", "Standortmarker");
+                $("img.leaflet-tile").attr("alt", "Kartendarstellungselement");
+                
+                document.addEventListener("keydown", function(){
+                    if( document.activeElement.id == "TevisDialog" && document.activeElement.className == "modal fade in" ){
+                        document.getElementById("close_btn_X_confirm_appointment").children[0].focus();
+                    }
+                });
+                
+                var form;
+                var formSubmit = false;
+                var formShowModal = true;
+    
+                $("#TevisDialog .modal-footer .btn-ok").on("click", function () {
+                    if( formSubmit == true ) {
+                        $("button[type=submit], input[type=submit]").prop("disabled", true);
+    
+                        formShowModal = false;
+                        formSubmit = false;
+                        form.submit();
+                    }
+                });
+    
+                $(".suggestion_form").submit(function(event) {
+                    if( formShowModal == true ) {
+                        var date = event.target.querySelector("input[name=date]").value;
+                        var reverseDate = date.substring(6,8) + "." + date.substring(4,6) + "." + date.substring(0,4);
+                        var time = event.target.querySelector("button").textContent;
+                        var day = parseInt( event.target.querySelector("input[name=day]").value );
+                        day--; // montag = 0
+                        var days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+                        day = days[day];
+                   
+                        form = $(this);
+                        
+                        var loc_details = "";
+                        if( $("#loc_details_hidden").length > 0 )
+                            loc_details = $("#loc_details_hidden").val();
+    
+                        var modalContent = "<h3 style=\"margin-top: 0px;\">Sie haben folgenden Standort gewählt:</h3>";
+                            modalContent += "<p class=\"margin-left10 cnw_skip_translation\">" + loc_details + "</p>";
+                            modalContent += "<h3> Sie haben folgenden Termin gewählt:</h3>";
+                            modalContent += "<p class=\"margin-left10\">" + day + ", den " + reverseDate + " um " + time + " Uhr </p><br>";
+                            modalContent += "<p class=\"bold\" style=\"margin-bottom: 0px;\">Möchten Sie mit diesen Eingaben fortfahren?</p>";
+                        
+                        $("#TevisDialog .modal-body").html(modalContent);
+
+                        formSubmit = true;
+                        $("#TevisDialog").modal();
+                        event.preventDefault();
+                    }
+                });
+            });
+        </script>
+    
+<div id="pow_ariaregion" aria-live="polite" aria-busy="false">
+    <dialog id="pow_dialog" aria-modal="true" aria-labelledby="pow_dialog_progress">
+    <p aria-hidden="true">Bitte warten – wir prüfen Ihre Anfrage.</p>
+    <progress id="pow_dialog_progress" tabindex="0" aria-label="Seite wird geladen"></progress>
+    </dialog>
+</div>
+<script type="application/javascript" src="app/js/pow.js"></script>
+
+            <footer id="footer" class="tvweb_form">
+                <nav id="footer-nav" class="nav navHelp" aria-labelledby="footernavlabel">
+                    <p id="footernavlabel" class="visuallyhidden">Links zur Hilfe, Impressum, Datenschutzerklärung, Erklärung zur Barrierefreiheit</p>
+                    <div id="footer_dialog" class="modal fade" tabindex="-1" role="dialog" aria-label="Hinweisfenster"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" id="close_btn_X" data-dismiss="modal" aria-label="Hinweisfenster schließen" title="Hinweisfenster schließen" autofocus><span aria-hidden="true">&times;</span></button><h1 class="modal-title">Titel</h1></div><div class="modal-body"><div id="modal_help"><ol style="padding-left: 15px;">
+    <li><h2 class="h3like">Auswahl der Behörde</h2>
+        <p>Zunächst wählen Sie bitte die gewünschte Behörde aus den angebotenen Behörden aus.</p></li>
+    <li><h2 class="h3like">Auswahl des Anliegens</h2>
+        <p>Anschließend erhalten Sie die zur Behörde angebotenen Anliegen angezeigt, wählen Sie entsprechend aus.</p>
+    </li>
+    <li><h2 class="h3like">Terminauswahl</h2>
+        <p>Anschließend wird ein Kalender eingeblendet, aus dem die freien Zeiten hervorgehen. Rot gekennzeichnete
+            Bereiche bedeuten, dass zu diesen Zeiten keine Termin vergeben werden können. Markieren Sie dann bitte ihren
+            Terminwunsch mit einem Mausklick im Kalender. Der Bereich wird dann grün dargestellt. Die Angaben zum
+            Terminwunsch werden unterhalb der Überschrift textlich angezeigt.<br> Je nach Konfiguration kann es auch
+            sein, dass anstatt des Kalenders, eine Seite mit Terminvorschlägen angezeigt wird. Die Vorschläge lassen
+            sich nach Datum und Wochentag filtern. Bei Auswahl eines Termins werden Sie direkt auf die nächste Seite
+            weitergeleitet.</p></li>
+    <li><h2 class="h3like">Persönliche Daten</h2>
+        <p>Es erscheint die Eingabemaske für ihre persönlichen Daten. Alle mit einem Sternchen (*) gekennzeichneten
+            Felder sind Pflichtfelder und müssen ausgefüllt werden. Es besteht die Möglichkeit für spätere Anfragen die
+            persönlichen Daten auf Ihrem PC zu speichern, eine erneute Angabe dieser Daten bei zukünftigen Anfragen ist
+            dann nicht mehr erforderlich, abgesehen von evtl. Änderungen die dann erfolgen können wenn die neue Anfrage
+            erzeugt wird. Setzen Sie dazu bitte einen Haken in das Feld Persönliche Daten für zukünftige Anfragen
+            speichern. Bestätigen Sie die Anfrage, sofern nötig, nach der Eingabe des Sicherheitscodes, mit einem Klick
+            auf 'Weiter'.</p></li>
+    <li><h2 class="h3like">Terminübersicht</h2>
+        <p>Abschließend erhalten Sie eine Übersicht über ihren ausgewählten Termin und können einen weiteren Termin
+            reservieren.</p></li>
+    <li><h2 class="h3like">Bestätigungsmail</h2>
+        <p>Sie erhalten anschließend eine E-Mail in der Sie einen Bestätigungslink anklicken müssen. Erst nach der
+            Bestätigung wird Ihr Termin an die Behörde übertragen.</p></li>
+    <li><h2 class="h3like">Rückmeldung Sachbearbeiter</h2>
+        <p>Ihre Anfrage wird dann in der Behörde geprüft und Sie erhalten eine weitere E-Mail, diesmal direkt vom
+            Sachbearbeiter. Diese Mail enhält dann auch die Angaben zu ggf. beizubringenden Unterlagen.</p></li>
+</ol></div><div id="modal_imprint"><h3>Link zu dem Impressum der StädteRegion Aachen:<br>
+<a href="https://www.staedteregion-aachen.de/de/navigation/aemter/auslaenderamt-a-33/vois-tevis-impressum" target="_blank">
+Impressum der StädteRegion Aachen</a></h3>
+</div><div id="modal_privacy"><h3>Link zu der Datenschutzerklärung der StädteRegion Aachen:<br>
+<a href="https://www.staedteregion-aachen.de/de/datenschutz-1" target="_blank">
+Datenschutzerklärung der StädteRegion Aachen</a></h3>
+</div><div id="modal_accessibility"><a href="https://report.bitvtest.de/691ac4fa-85b1-4391-9eef-20f2b0550aa2.html" title="Zum BITV-Test Prüfbericht. Link öffnet in neuem Fenster." target="_blank">
+    <img src="https://www.bitvtest.de/fileadmin/user_upload/bik-bitv-konform-h44px.svg" alt="BIK - BITV-konform (geprüfte Seiten), zum Prüfbericht" width="135" height="44" />
+</a>
+</div><div id="modal_licenses">Diese Software enthält kopierte und modifizierte Inhalte von <a href='https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/' target="_blank">Editable Combobox With Both List and Inline Autocomplete Example</a>.<br/>
+<br/>
+Copyright C 2024 World Wide Web Consortium. <a href='https://www.w3.org/copyright/software-license-2023/' target="_blank">https://www.w3.org/copyright/software-license-2023/</a></div><div id="modal_session"><p>Ihre Sitzung läuft in einer Minute ab.</p><p>Für eine Verlängerung schließen Sie bitte dieses Fenster in den nächsten 60 Sekunden.</p></div></div><div class="modal-footer"><button type="button" id="close_btn" class="sel_button btn btn-primary fifty btn-ok" data-dismiss="modal">Schliessen</button></div></div></div></div>
+                    <ul id="footer_links">
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_help" title="Hilfe" onclick="showFooterModals('help', $(this).text())">Hilfe</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_imprint" title="Impressum" onclick="showFooterModals('imprint', $(this).text())">Impressum</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_privacy" title="Datenschutzerklärung" onclick="showFooterModals('privacy', $(this).text())">Datenschutzerklärung</a></li>
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_accessibility" title="Erklärung zur Barrierefreiheit" onclick="showFooterModals('accessibility', $(this).text())">Erklärung zur Barrierefreiheit</a></li>
+                        <!--##USAGE_FEEDBACK_URL##-->
+                        <!--##NEW_RESERVATION_URL##-->
+                        <!--##CONWORD_TRANSLATE_INFO##-->
+                        <!--##CUSTOM_FOOTER_LINKS##-->
+                        <li><a class="text-nowrap" href="#" aria-describedby="link-target-text" id="footer_link_licenses" title="Lizenzen" onclick="showFooterModals('licenses', $(this).text())">Lizenzen</a></li>
+                    </ul>
+                    <p id="link-target-text" class="visuallyhidden"> Öffnet im Dialogfenster.</p>
+                </nav>
+
+                <br/><input type="hidden" id="session_reset_lifetime" value="1440" /><input type="hidden" id="session_warning_str" value="Warnung" /><input type="hidden" id="infofenster_str" value="Infofenster: " /><div id="session_reset_wrap_wrap" role="timer" tabindex="0"><p id="session_reset_wrap">Ihre Sitzung läuft aus in <span id="session_reset_input">0</span> Minuten</p></div><nav id="inhalt-nav" aria-label="Sprunglink" tabindex="-1" style="margin-top:-10px"><p><a class="unsichtbar" href="#inhalt">Hauptregion der Seite anspringen</a></p></nav>
+            </footer>
+        </main>
+
+    </body>
+</html>

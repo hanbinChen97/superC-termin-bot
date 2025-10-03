@@ -388,14 +388,11 @@ def fill_form_with_captcha_retry(session: httpx.Client, soup: bs4.BeautifulSoup,
         if success:
             return True, message
         
-        # 使用DOM检查是否是验证码错误
-        is_captcha_error = False
-        if response_text:
-            is_captcha_error = check_captcha_error_from_response(response_text)
-        
-        # 如果DOM检查失败，使用消息内容作为备选方案
-        if not is_captcha_error:
-            is_captcha_error = "验证码错误" in message
+        if "zu vieler Terminanfragen" in message:
+            # 直接返回，不重试
+            return False, message
+
+        is_captcha_error = "验证码错误" in message
         
         if not is_captcha_error:
             # 非验证码错误，直接返回失败
@@ -553,6 +550,10 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
     submit_url = urljoin('https://termine.staedteregion-aachen.de/auslaenderamt/', str(form.get('action', '')))
     logging.info(f"\n提交URL: {submit_url}")
 
+
+    # ===================================================
+    # 提交表单
+    # ===================================================
     try:
         headers = {
             'User-Agent': USER_AGENT,
@@ -574,61 +575,36 @@ def fill_form(session: httpx.Client, soup: bs4.BeautifulSoup, location_name: str
             logging.info("预约成功！")
             return True, "预约成功！", response_text
         
-        # 检查各种错误情况
-        error_patterns = {
-            "zu vieler Terminanfragen": "提交过于频繁，请稍后再试",
-            "Geburtsdatum": "生日格式错误",
-            "Sicherheitsfrage": "验证码错误",
-            "Bitte überprüfen Sie Ihre Eingaben": "表单输入有误，请检查",
-            "fehlerhafte Eingaben": "输入数据有误"
-        }
+        if "zu vieler Terminanfragen" in response_text:
+            logging.error("预约失败: zu vieler Terminanfragen")
+            save_page_content(response_text, '6_form_error', location_name)
+            return False, "预约失败: zu vieler Terminanfragen", response_text
+
         
-        detected_errors = []
-        captcha_error_found = False
-        
-        # 更精确地检测验证码错误
+        # 通过 DOM 解析，更精确地检测验证码错误
         soup_response = bs4.BeautifulSoup(response_text, 'html.parser')
+        error_message = None
+
         error_div = soup_response.find('div', class_='content__error')
         if error_div:
             error_text = error_div.get_text()
             logging.info(f"检测到错误区域内容: {error_text}")
-            
+
             # 检查是否包含"Sicherheitsfrage"
             if "Sicherheitsfrage" in error_text:
-                captcha_error_found = True
-                detected_errors.append("验证码错误")
+                error_message = "验证码错误"
                 logging.error("检测到验证码错误 (Sicherheitsfrage)")
-        
-        # 检查其他错误模式
-        for pattern, description in error_patterns.items():
-            if pattern in response_text and pattern != "Sicherheitsfrage":  # 验证码错误已单独处理
-                detected_errors.append(description)
-                logging.error(f"检测到错误: {description} (关键词: {pattern})")
-        
-        # 去重错误信息
-        detected_errors = list(dict.fromkeys(detected_errors))  # 保持顺序的去重
-        
-        # if “提交过于频繁，请稍后再试” in detected_errors
-        # return true，error_message, response_text
-        # 用来触发，email block 情况。
-        if "提交过于频繁，请稍后再试" in detected_errors:
-            error_message = "提交过于频繁，请稍后再试"
-            logging.error(f"表单提交失败: {error_message}")
-            return False, error_message, response_text
 
-        if detected_errors:
-            error_message = "; ".join(detected_errors)
+        if error_message:
             logging.error(f"表单提交失败: {error_message}")
-            
-            # 保存错误页面用于调试
             save_page_content(response_text, '6_form_error', location_name)
             return False, error_message, response_text
-        else:
-            error_message = "未知错误"
-            logging.error(f"表单提交失败: {error_message}")
-            logging.error(f"响应内容前500字符: {response_text[:500]}...")
-            save_page_content(response_text, '6_form_unknown_error', location_name)
-            return False, error_message, response_text
+
+        error_message = "未知错误"
+        logging.error(f"表单提交失败: {error_message}")
+        logging.error(f"响应内容前500字符: {response_text[:500]}...")
+        save_page_content(response_text, '6_form_unknown_error', location_name)
+        return False, error_message, response_text
 
     except Exception as e:
         error_msg = f"提交表单时发生异常: {str(e)}"
