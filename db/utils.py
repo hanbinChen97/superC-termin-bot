@@ -19,6 +19,12 @@ import re
 from db.models import AppointmentProfile, AppLogsMin
 import argparse
 
+# Logging parse defaults
+DEFAULT_SCHRITT = "-"
+_LOG_LINE_PATTERN = re.compile(
+    r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - (?P<level>[A-Z]+) - (?P<schritt>.*?) - (?P<message>.*)$"
+)
+
 # 数据库连接配置
 def _init_database():
     """初始化数据库连接"""
