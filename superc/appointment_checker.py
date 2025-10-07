@@ -137,7 +137,7 @@ def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text:
         else:
             return False, f"Schritt 4 页面加载失败: 未找到预期的Schritt 4 标题，实际h1内容: {h1_text}", None, None, None
     
-    log_verbose(SCHRITT_4_LOGGER, "成功进入Schritt 4页面")
+    log_verbose("成功进入Schritt 4页面")
     
     # 在页面上进行操作：检查预约可用性
     # 检查当前URL，如果已经在suggest页面则直接使用当前响应

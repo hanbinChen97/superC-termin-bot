@@ -181,5 +181,11 @@ All `enter_schritt_x_page()` functions return tuples with:
 
 
 ### html DOM check
-schritt 2 has only 1 <h1>
+schritt 2,3,4  has only 1 'h1'
 ![schritt2](../assets/schritt2.png)
+
+#### Kein freier Termin verfügbar check
+```python
+if "Kein freier Termin verfügbar" in suggest_res.text:
+```
+
