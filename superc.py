@@ -18,6 +18,8 @@ from superc.logging_utils import setup_logging
 from db.utils import get_first_waiting_profile, update_appointment_status
 # 导入Profile类
 from superc.profile import Profile
+# 导入邮件通知模块
+from superc.notify_email import send_notify_email
 
 setup_logging()
 
@@ -135,6 +137,21 @@ if __name__ == "__main__":
                                     main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
                                 else:
                                     main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
+                                
+                                # 发送邮件通知
+                                try:
+                                    appointment_info = {
+                                        'name': current_profile.full_name,
+                                        'appointment_datetime': appointment_datetime_str or '待确认',
+                                        'location': 'SuperC'
+                                    }
+                                    email_sent = send_notify_email(current_profile.email, appointment_info)
+                                    if email_sent:
+                                        main_logger.info(f"已向用户 {current_profile.email} 发送预约确认邮件")
+                                    else:
+                                        main_logger.warning(f"邮件发送失败，但预约已成功完成")
+                                except Exception as e:
+                                    main_logger.error(f"发送邮件通知时发生错误: {e}")
                             else:
                                 main_logger.error(f"更新用户状态失败，但预约已成功")
                         except Exception as e:
