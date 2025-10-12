@@ -165,7 +165,8 @@ pages/
 
 # Project specific - generated pages and files
 data/pages/
-*.png
+# *.png
 captcha_*.png
 
 
+.env

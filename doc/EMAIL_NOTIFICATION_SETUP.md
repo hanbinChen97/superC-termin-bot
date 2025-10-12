@@ -21,54 +21,6 @@ SMTP_PASSWORD=your_email_password
 SMTP_SENDER=your_email@example.com
 ```
 
-### 2. Common SMTP Providers
-
-#### Gmail
-```bash
-SMTP_SERVER=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USER=your_email@gmail.com
-SMTP_PASSWORD=your_app_password  # Use App Password, not regular password
-SMTP_SENDER=your_email@gmail.com
-```
-
-**Note:** For Gmail, you need to:
-1. Enable 2-factor authentication
-2. Generate an App Password at https://myaccount.google.com/apppasswords
-3. Use the App Password (not your regular Gmail password)
-
-#### Outlook/Office 365
-```bash
-SMTP_SERVER=smtp.office365.com
-SMTP_PORT=587
-SMTP_USER=your_email@outlook.com
-SMTP_PASSWORD=your_password
-SMTP_SENDER=your_email@outlook.com
-```
-
-#### QQ Mail (腾讯QQ邮箱)
-```bash
-SMTP_SERVER=smtp.qq.com
-SMTP_PORT=465
-SMTP_USER=your_email@qq.com
-SMTP_PASSWORD=your_authorization_code  # Use authorization code, not password
-SMTP_SENDER=your_email@qq.com
-```
-
-**Note:** For QQ Mail:
-1. Enable SMTP service in settings
-2. Generate an authorization code
-3. Use the authorization code (not your QQ password)
-
-#### 163 Mail (网易163邮箱)
-```bash
-SMTP_SERVER=smtp.163.com
-SMTP_PORT=465
-SMTP_USER=your_email@163.com
-SMTP_PASSWORD=your_authorization_code  # Use authorization code, not password
-SMTP_SENDER=your_email@163.com
-```
-
 ### 3. Test Email Configuration
 
 You can test the email configuration by running the unit tests:
