@@ -170,3 +170,4 @@ captcha_*.png
 
 
 .env
+data/email_output/*

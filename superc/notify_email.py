@@ -14,6 +14,8 @@ Input types:
 
 Output types:
 - Returns: bool - True if email sent successfully, False otherwise
+
+python3 superc/notify_email.py
 """
 
 import smtplib
@@ -48,70 +50,36 @@ def get_email_content(appointment_info: dict) -> tuple[str, str]:
     
     subject = f"🎉 预约成功 - {location} 预约确认"
     
-    html_body = f"""
-    <html>
-    <head>
-        <style>
-            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-            .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px; }}
-            .content {{ background-color: #f9f9f9; padding: 20px; margin-top: 20px; border-radius: 5px; }}
-            .appointment-details {{ background-color: white; padding: 15px; margin: 15px 0; border-left: 4px solid #4CAF50; }}
-            .donation-section {{ background-color: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #ffc107; }}
-            .footer {{ text-align: center; margin-top: 20px; font-size: 0.9em; color: #777; }}
-            .important-note {{ background-color: #fff3e0; padding: 15px; margin: 15px 0; border-left: 4px solid #ff9800; }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🎉 预约成功！</h1>
-            </div>
-            
-            <div class="content">
-                <p>尊敬的 {name}，</p>
-                
-                <p>恭喜您！您的预约已经成功完成。</p>
-                
-                <div class="appointment-details">
-                    <h3>📅 预约详情</h3>
-                    <p><strong>预约时间：</strong>{appointment_datetime}</p>
-                    <p><strong>预约地点：</strong>{location}</p>
-                </div>
-                
-                <div class="important-note">
-                    <h3>⚠️ 重要提醒</h3>
-                    <p>您将会收到来自官方的确认邮件，请点击邮件中的链接以最终确认您的预约。</p>
-                    <p><strong>请注意检查您的邮箱（包括垃圾邮件文件夹），并在2小时内完成确认！</strong></p>
-                </div>
-                
-                <div class="donation-section">
-                    <h3>💝 支持我们的服务</h3>
-                    <p>如果我们的自动预约服务帮到了您，欢迎通过以下方式支持我们：</p>
-                    
-                    <div style="text-align: center; margin: 20px 0;">
-                        <div style="margin: 20px 0;">
-                            <p><strong>微信打赏</strong></p>
-                            <img src="cid:wechat_qr" alt="微信支付二维码" style="width: 150px; height: 150px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                        <div style="margin: 20px 0;">
-                            <p><strong>PayPal</strong></p>
-                            <img src="cid:paypal_qr" alt="PayPal支付二维码" style="width: 150px; height: 150px; border: 1px solid #ddd; border-radius: 5px;">
-                        </div>
-                    </div>
-                    
-                    <p>您的支持将帮助我们继续提供和改进这项服务！🙏</p>
-                </div>
-                
-                <p>祝您预约顺利！</p>
-                
-                <p>Best regards,<br>
-                Aachen Termin Bot Team</p>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
+    # Read HTML template from file
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        template_path = os.path.join(current_dir, 'email_template.html')
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            html_template = f.read()
+        
+        # Format the template with appointment information
+        html_body = html_template.format(
+            name=name,
+            appointment_datetime=appointment_datetime,
+            location=location
+        )
+        
+    except Exception as e:
+        logger.error(f"读取邮件模板文件时发生错误: {e}")
+        # Fallback to a simple HTML content if template reading fails
+        html_body = f"""
+        <html>
+        <body>
+            <h1>🎉 预约成功！</h1>
+            <p>尊敬的 {name}，</p>
+            <p>恭喜您！您的预约已经成功完成。</p>
+            <p><strong>预约时间：</strong>{appointment_datetime}</p>
+            <p><strong>预约地点：</strong>{location}</p>
+            <p>请注意检查您的邮箱（包括垃圾邮件文件夹），并在2小时内完成确认！</p>
+        </body>
+        </html>
+        """
     
     return subject, html_body
 
@@ -138,10 +106,14 @@ def save_email_html(appointment_info: dict, output_dir: str = "data/email_output
         current_dir = os.path.dirname(os.path.abspath(__file__))
         wechat_path = os.path.join(current_dir, 'wechat.png')
         paypal_path = os.path.join(current_dir, 'pp.png')
+        confirm_path = os.path.join(current_dir, 'confirm.jpg')
+        code_path = os.path.join(current_dir, 'code.jpg')
         
         # Replace cid references with file paths for preview
         html_body = html_body.replace('src="cid:wechat_qr"', f'src="file://{wechat_path}"')
         html_body = html_body.replace('src="cid:paypal_qr"', f'src="file://{paypal_path}"')
+        html_body = html_body.replace('src="cid:confirm_img"', f'src="file://{confirm_path}"')
+        html_body = html_body.replace('src="cid:code_img"', f'src="file://{code_path}"')
         
         # Create filename with timestamp
         from datetime import datetime
@@ -188,7 +160,7 @@ def send_notify_email(user_email: str, appointment_info: dict) -> bool:
         print("SMTP_SERVER:", smtp_server)
         print("SMTP_PORT:", smtp_port)
         print("SMTP_USER:", smtp_user)
-        print("SMTP_PASSWORD:", smtp_password)
+        # print("SMTP_PASSWORD:", smtp_password)
         print("SMTP_SENDER:", smtp_sender)
 
         # Encryption: 'SSL' (implicit TLS/SMTPS) or 'STARTTLS' (explicit TLS). 'TLS' will be treated as STARTTLS.
@@ -256,9 +228,35 @@ def send_notify_email(user_email: str, appointment_info: dict) -> bool:
                 logger.info("PayPal支付二维码已添加到邮件")
             else:
                 logger.warning(f"未找到PayPal支付二维码: {paypal_path}")
+            
+            # Attach confirm.jpg image (force subtype)
+            confirm_path = os.path.join(current_dir, 'confirm.jpg')
+            if os.path.exists(confirm_path):
+                with open(confirm_path, 'rb') as f:
+                    img_data = f.read()
+                confirm_image = MIMEImage(img_data, _subtype='jpeg')
+                confirm_image.add_header('Content-ID', '<confirm_img>')
+                confirm_image.add_header('Content-Disposition', 'inline', filename='confirm.jpg')
+                message.attach(confirm_image)
+                logger.info("确认邮件示例图片已添加到邮件: confirm.jpg")
+            else:
+                logger.warning(f"未找到确认邮件示例图片: confirm.jpg")
+
+            # Attach code.jpg image (force subtype)
+            code_path = os.path.join(current_dir, 'code.jpg')
+            if os.path.exists(code_path):
+                with open(code_path, 'rb') as f:
+                    img_data = f.read()
+                code_image = MIMEImage(img_data, _subtype='jpeg')
+                code_image.add_header('Content-ID', '<code_img>')
+                code_image.add_header('Content-Disposition', 'inline', filename='code.jpg')
+                message.attach(code_image)
+                logger.info("确认码示例图片已添加到邮件: code.jpg")
+            else:
+                logger.warning(f"未找到确认码示例图片: code.jpg")
                 
         except Exception as e:
-            logger.warning(f"添加支付二维码时发生错误: {e}")
+            logger.warning(f"添加图片时发生错误: {e}")
             # Continue sending email without images
         
         # Determine encryption method
