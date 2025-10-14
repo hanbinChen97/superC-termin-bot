@@ -19,7 +19,7 @@ from db.utils import get_first_waiting_profile, update_appointment_status
 # 导入Profile类
 from superc.profile import Profile
 # 导入邮件通知模块
-from superc.notify_email import send_notify_email
+from superc.notify_email import send_notify_email, send_update_email_notice
 
 setup_logging()
 
@@ -109,8 +109,19 @@ if __name__ == "__main__":
                 
                 # 情况1: "zu vieler Terminanfragen" 错误
                 if "zu vieler Terminanfragen" in message:
-                    main_logger.error(f"检测到错误: 提交过于频繁，请稍后再试 (关键词: zu vieler Terminanfragen)")
-                    
+                    main_logger.error(f"检测到错误: 提交过于频繁 (关键词: zu vieler Terminanfragen)")
+
+                    # 向用户发送邮箱更新提醒邮件（提示更新邮箱，不提及被系统 block）
+                    if current_profile:
+                        try:
+                            sent = send_update_email_notice(current_profile.email, current_profile.full_name)
+                            if sent:
+                                main_logger.info(f"已向用户 {current_profile.email} 发送邮箱更新提醒邮件")
+                            else:
+                                main_logger.warning(f"邮箱更新提醒邮件发送失败: {current_profile.email}")
+                        except Exception as e:
+                            main_logger.error(f"发送邮箱更新提醒邮件时发生异常: {e}")
+
                     # 更新数据库profile状态为error
                     if current_db_profile:
                         try:
@@ -118,10 +129,10 @@ if __name__ == "__main__":
                             if success and current_profile:
                                 main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'error'")
                             else:
-                                main_logger.error(f"更新用户状态为error失败")
+                                main_logger.error("更新用户状态为error失败")
                         except Exception as e:
                             main_logger.error(f"更新数据库状态时发生错误: {e}")
-                    
+
                     should_get_next_user = True
                     
                 # 情况2: 预约成功

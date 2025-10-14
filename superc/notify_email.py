@@ -34,6 +34,60 @@ load_dotenv()
 logger = logging.getLogger("notify_email")
 
 
+def _build_base_message(subject: str, user_email: str, smtp_sender: str, html_body: str, attach_donation_images: bool = True) -> MIMEMultipart:
+    """Internal helper to construct MIME email message.
+    
+    Input types:
+    - subject: str - Email subject line
+    - user_email: str - Recipient address
+    - smtp_sender: str - Sender address
+    - html_body: str - HTML body content
+    - attach_donation_images: bool - Whether to attach donation related inline images (default True)
+    
+    Output types:
+    - MIMEMultipart - Fully composed email message ready to send
+    """
+    message = MIMEMultipart('related')
+    message['Subject'] = subject
+    message['From'] = smtp_sender
+    message['To'] = user_email
+
+    msg_alternative = MIMEMultipart('alternative')
+    html_part = MIMEText(html_body, 'html', 'utf-8')
+    msg_alternative.attach(html_part)
+    message.attach(msg_alternative)
+
+    if not attach_donation_images:
+        return message
+
+    # Attach donation / reference images if available
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_specs = [
+            ("wechat.png", 'wechat_qr'),
+            ("pp.png", 'paypal_qr'),
+            ("confirm.jpg", 'confirm_img'),
+            ("code.jpg", 'code_img'),
+        ]
+        for filename, cid in image_specs:
+            path = os.path.join(current_dir, filename)
+            if not os.path.exists(path):
+                logger.debug(f"Inline image not found (optional): {path}")
+                continue
+            with open(path, 'rb') as f:
+                img_data = f.read()
+            # Force jpeg subtype for .jpg files
+            subtype = 'jpeg' if filename.lower().endswith(('.jpg', '.jpeg')) else None
+            image_part = MIMEImage(img_data, _subtype=subtype) if subtype else MIMEImage(img_data)
+            image_part.add_header('Content-ID', f'<{cid}>')
+            image_part.add_header('Content-Disposition', 'inline', filename=filename)
+            message.attach(image_part)
+    except Exception as e:
+        logger.warning(f"添加图片时发生错误(可忽略): {e}")
+
+    return message
+
+
 def get_email_content(appointment_info: dict) -> tuple[str, str]:
     """
     Generate email subject and body content.
@@ -152,11 +206,19 @@ def send_notify_email(user_email: str, appointment_info: dict) -> bool:
     """
     try:
         # Get SMTP configuration from environment variables
-        smtp_server = os.getenv('SMTP_SERVER')
+        smtp_server_env = os.getenv('SMTP_SERVER')
+        smtp_user_env = os.getenv('SMTP_USER')
+        smtp_password_env = os.getenv('SMTP_PASSWORD')
+        smtp_sender_env = os.getenv('SMTP_SENDER')
         smtp_port = int(os.getenv('SMTP_PORT', '465'))
-        smtp_user = os.getenv('SMTP_USER')
-        smtp_password = os.getenv('SMTP_PASSWORD')
-        smtp_sender = os.getenv('SMTP_SENDER', smtp_user)
+        # Validate presence before use to satisfy type checker
+        if not smtp_server_env or not smtp_user_env or not smtp_password_env:
+            logger.warning("SMTP 配置不完整，跳过邮件发送")
+            return False
+        smtp_server: str = smtp_server_env
+        smtp_user: str = smtp_user_env
+        smtp_password: str = smtp_password_env
+        smtp_sender: str = smtp_sender_env or smtp_user
         print("SMTP_SERVER:", smtp_server)
         print("SMTP_PORT:", smtp_port)
         print("SMTP_USER:", smtp_user)
@@ -182,82 +244,8 @@ def send_notify_email(user_email: str, appointment_info: dict) -> bool:
         # Generate email content
         subject, html_body = get_email_content(appointment_info)
         
-        # Create message
-        message = MIMEMultipart('related')
-        message['Subject'] = subject
-        message['From'] = smtp_sender
-        message['To'] = user_email
-        
-        # Create multipart alternative for HTML content
-        msg_alternative = MIMEMultipart('alternative')
-        
-        # Attach HTML content
-        html_part = MIMEText(html_body, 'html', 'utf-8')
-        msg_alternative.attach(html_part)
-        
-        # Attach the alternative part to the main message
-        message.attach(msg_alternative)
-        
-        # Attach QR code images
-        try:
-            # Get current directory (where this script is located)
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            
-            # Attach WeChat QR code
-            wechat_path = os.path.join(current_dir, 'wechat.png')
-            if os.path.exists(wechat_path):
-                with open(wechat_path, 'rb') as f:
-                    img_data = f.read()
-                wechat_image = MIMEImage(img_data)
-                wechat_image.add_header('Content-ID', '<wechat_qr>')
-                wechat_image.add_header('Content-Disposition', 'inline', filename='wechat.png')
-                message.attach(wechat_image)
-                logger.info("微信支付二维码已添加到邮件")
-            else:
-                logger.warning(f"未找到微信支付二维码: {wechat_path}")
-            
-            # Attach PayPal QR code
-            paypal_path = os.path.join(current_dir, 'pp.png')
-            if os.path.exists(paypal_path):
-                with open(paypal_path, 'rb') as f:
-                    img_data = f.read()
-                paypal_image = MIMEImage(img_data)
-                paypal_image.add_header('Content-ID', '<paypal_qr>')
-                paypal_image.add_header('Content-Disposition', 'inline', filename='pp.png')
-                message.attach(paypal_image)
-                logger.info("PayPal支付二维码已添加到邮件")
-            else:
-                logger.warning(f"未找到PayPal支付二维码: {paypal_path}")
-            
-            # Attach confirm.jpg image (force subtype)
-            confirm_path = os.path.join(current_dir, 'confirm.jpg')
-            if os.path.exists(confirm_path):
-                with open(confirm_path, 'rb') as f:
-                    img_data = f.read()
-                confirm_image = MIMEImage(img_data, _subtype='jpeg')
-                confirm_image.add_header('Content-ID', '<confirm_img>')
-                confirm_image.add_header('Content-Disposition', 'inline', filename='confirm.jpg')
-                message.attach(confirm_image)
-                logger.info("确认邮件示例图片已添加到邮件: confirm.jpg")
-            else:
-                logger.warning(f"未找到确认邮件示例图片: confirm.jpg")
-
-            # Attach code.jpg image (force subtype)
-            code_path = os.path.join(current_dir, 'code.jpg')
-            if os.path.exists(code_path):
-                with open(code_path, 'rb') as f:
-                    img_data = f.read()
-                code_image = MIMEImage(img_data, _subtype='jpeg')
-                code_image.add_header('Content-ID', '<code_img>')
-                code_image.add_header('Content-Disposition', 'inline', filename='code.jpg')
-                message.attach(code_image)
-                logger.info("确认码示例图片已添加到邮件: code.jpg")
-            else:
-                logger.warning(f"未找到确认码示例图片: code.jpg")
-                
-        except Exception as e:
-            logger.warning(f"添加图片时发生错误: {e}")
-            # Continue sending email without images
+        # Create message (with donation images)
+        message = _build_base_message(subject, user_email, smtp_sender, html_body, attach_donation_images=True)
         
         # Determine encryption method
         # Heuristics if not explicitly set
@@ -307,11 +295,121 @@ def send_notify_email(user_email: str, appointment_info: dict) -> bool:
     except smtplib.SMTPAuthenticationError as e:
         logger.error(f"SMTP 认证失败: {e}")
         return False
-    except smtplib.SMTPException as e:
-        logger.error(f"SMTP 错误: {e}")
-        return False
     except Exception as e:
         logger.error(f"发送邮件时发生错误: {e}", exc_info=True)
+        return False
+
+
+def get_update_email_notice_content(name: str) -> tuple[str, str]:
+    """Generate subject and HTML body for update-email notice.
+    
+    Input types:
+    - name: str - User full name
+    
+    Output types:
+    - tuple[str, str] - (subject, html_body)
+    """
+    display_name = name or '用户'
+    subject = "📬 邮箱需要更新 - 请尽快处理"
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        template_path = os.path.join(current_dir, 'email_update_required.html')
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template = f.read()
+        html_body = template.format(name=display_name)
+    except Exception as e:
+        logger.error(f"读取邮箱更新提醒模板失败: {e}")
+        html_body = f"""
+        <html><body>
+        <h2>邮箱需要更新</h2>
+        <p>尊敬的 {display_name}，</p>
+        <p>系统检测到您的邮箱存在异常，需要您登录系统更新一个新的邮箱地址，以确保后续预约通知能及时送达。</p>
+        <ol>
+          <li>请准备一个不同的邮箱（推荐 Gmail / Outlook 等国际邮箱）。</li>
+          <li>登录预约协助系统，进入个人资料页面。</li>
+          <li>更新邮箱后保存。</li>
+        </ol>
+        <p>完成后您将重新进入排队流程，无需重复提交信息。</p>
+        <p>感谢您的配合！</p>
+        </body></html>
+        """
+    return subject, html_body
+
+
+def send_update_email_notice(user_email: str, name: str) -> bool:
+    """Send an email asking the user to update their email address due to detected anomaly.
+    
+    Input types:
+    - user_email: str - Recipient email address
+    - name: str - User full name
+    
+    Output types:
+    - bool - True if sent successfully else False
+    """
+    try:
+        smtp_server_env = os.getenv('SMTP_SERVER')
+        smtp_user_env = os.getenv('SMTP_USER')
+        smtp_password_env = os.getenv('SMTP_PASSWORD')
+        smtp_sender_env = os.getenv('SMTP_SENDER')
+        smtp_port = int(os.getenv('SMTP_PORT', '465'))
+        if not smtp_server_env or not smtp_user_env or not smtp_password_env:
+            logger.warning("SMTP 配置不完整，跳过邮箱更新提醒邮件发送")
+            return False
+        smtp_server: str = smtp_server_env
+        smtp_user: str = smtp_user_env
+        smtp_password: str = smtp_password_env
+        smtp_sender: str = smtp_sender_env or smtp_user
+        encryption = os.getenv('SMTP_ENCRYPTION', '').strip().upper()
+        timeout = float(os.getenv('SMTP_TIMEOUT', '10'))
+
+        if not all([smtp_server, smtp_user, smtp_password]):
+            logger.warning("SMTP 配置不完整，跳过邮箱更新提醒邮件发送")
+            return False
+        if not user_email or '@' not in user_email:
+            logger.error(f"无效的邮箱地址: {user_email}")
+            return False
+
+        subject, html_body = get_update_email_notice_content(name)
+        # Do not attach donation images for this transactional notice
+        message = _build_base_message(subject, user_email, smtp_sender, html_body, attach_donation_images=False)
+
+        if not encryption:
+            encryption_mode = 'SSL' if smtp_port == 465 else 'STARTTLS'
+        elif encryption in ('TLS', 'STARTTLS'):
+            encryption_mode = 'STARTTLS'
+        elif encryption in ('SSL', 'SMTPS'):
+            encryption_mode = 'SSL'
+        elif encryption in ('NONE', 'PLAINTEXT'):
+            encryption_mode = 'NONE'
+        else:
+            logger.warning(f"未知的 SMTP_ENCRYPTION 值: {encryption}，将回退为 STARTTLS")
+            encryption_mode = 'STARTTLS'
+
+        logger.info(f"正在向 {user_email} 发送邮箱更新提醒邮件... (加密: {encryption_mode})")
+        context = ssl.create_default_context()
+        if encryption_mode == 'SSL':
+            with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=timeout, context=context) as server:
+                server.login(smtp_user, smtp_password)
+                server.send_message(message)
+        elif encryption_mode == 'STARTTLS':
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=timeout) as server:
+                server.ehlo()
+                server.starttls(context=context)
+                server.ehlo()
+                server.login(smtp_user, smtp_password)
+                server.send_message(message)
+        else:
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=timeout) as server:
+                server.ehlo()
+                server.login(smtp_user, smtp_password)
+                server.send_message(message)
+        logger.info(f"邮箱更新提醒邮件发送成功: {user_email}")
+        return True
+    except smtplib.SMTPAuthenticationError as e:  # pragma: no cover - specific branch
+        logger.error(f"SMTP 认证失败(更新提醒): {e}")
+        return False
+    except Exception as e:  # Broad catch to ensure function returns False on any failure
+        logger.error(f"发送邮箱更新提醒邮件时出现异常: {e}", exc_info=True)
         return False
 
 if __name__ == "__main__":
@@ -326,5 +424,8 @@ if __name__ == "__main__":
     # Save email content as HTML for testing
     html_file_path = save_email_html(test_appointment_info)
     
-    # Send email
+    # # Send email
     send_notify_email(test_email, test_appointment_info)
+    
+    # Send update-email notice (示例：模拟“需要更新邮箱”场景)
+    # send_update_email_notice(test_email, test_appointment_info['name'])
