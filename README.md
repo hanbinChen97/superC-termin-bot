@@ -202,3 +202,15 @@ uv run python -m db.utils
 ```
 
 如果连接成功，会打印 “Connection successful!” 并显示等待队列统计。
+
+
+## crontab 示例（每小时运行一次）：
+
+```bash
+* 6 * * * cd /home/hanbin/workspace/superC-termin-bot && /home/hanbin/workspace/superC-termin-bot/.venv/bin/python superc.py >> superc.log 2>&1
+
+# 测试
+* * * * *
+```
+
+
