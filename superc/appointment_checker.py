@@ -10,6 +10,8 @@ import httpx
 import bs4
 import logging
 from typing import Tuple, Union, Optional
+from datetime import date
+import re
 from urllib.parse import urljoin
 
 # 使用相对导入
@@ -32,6 +34,34 @@ SCHRITT_6_LOGGER = logging.getLogger("schritt6")
 
 USER_AGENT = config.USER_AGENT
 BASE_URL = config.BASE_URL
+
+
+def parse_appointment_date(form: Optional[dict], dt_str: Optional[str]) -> Optional[date]:
+    """
+    输入类型(input): form: Optional[dict], dt_str: Optional[str]
+    输出类型(output): Optional[datetime.date]
+
+    解析预约日期，优先使用隐藏字段 form['date'] 的 YYYYMMDD 格式；
+    若不可用，则从显示字符串中提取 DD.MM.YYYY。
+    """
+    # 1) Prefer yyyymmdd in hidden field
+    if form and isinstance(form, dict):
+        raw = form.get("date")
+        if raw and isinstance(raw, str) and re.fullmatch(r"\d{8}", raw):
+            try:
+                return datetime.strptime(raw, "%Y%m%d").date()
+            except Exception:
+                pass
+    # 2) Fallback: extract dd.mm.yyyy from display string
+    if dt_str and isinstance(dt_str, str):
+        m = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", dt_str)
+        if m:
+            d, mth, y = m.groups()
+            try:
+                return datetime.strptime(f"{d}.{mth}.{y}", "%d.%m.%Y").date()
+            except Exception:
+                pass
+    return None
 
 
 def log_verbose(logger: logging.Logger, message: str, level: int = logging.INFO):
@@ -160,7 +190,16 @@ def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text:
 
     # 选择第一个可用预约
     success, message, form_data, appointment_datetime_str = select_first_appointment(suggest_res.text)
+    # e.g. 可用预约时间 Mittwoch, 29.10.2025 16:00
     SCHRITT_4_LOGGER.info(f"可用预约时间 {appointment_datetime_str}")
+    
+    # ==================== ang ================================
+    # Compare appointment date with configured cutoff date
+    appt_date = parse_appointment_date(form_data, appointment_datetime_str)
+    if appt_date and appt_date >= config.APPOINTMENT_CUTOFF_DATE:
+        cutoff_str = config.APPOINTMENT_CUTOFF_DATE.strftime("%d.%m.%Y")
+        return False, f"预约时间过晚: {appointment_datetime_str} (截止: {cutoff_str})", None, None, None
+    # ============================================================
 
     if not success:
         return False, message, None, None, None

@@ -1,5 +1,6 @@
 import logging
 import re
+from datetime import datetime
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
 BASE_URL = "https://termine.staedteregion-aachen.de/auslaenderamt/"
@@ -50,3 +51,8 @@ LOCATIONS = {
     }
 }
 # 
+
+# Appointment cutoff date (only accept appointments strictly before this date)
+# 只接受严格早于此日期的预约
+APPOINTMENT_CUTOFF_DATE = datetime.strptime("17.11.2025", "%d.%m.%Y").date()
+
