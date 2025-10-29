@@ -235,7 +235,7 @@ def enter_schritt_5_page(session: httpx.Client, form_data: dict, location_name: 
     if not selected_profile:
         return False, "Schritt 5页面填写表单失败: 未提供选择的profile", None
 
-    SCHRITT_5_LOGGER.info(f"Schritt 5页面: 准备使用 {selected_profile.full_.name} profile 填写表单...")
+    SCHRITT_5_LOGGER.info(f"Schritt 5页面: 准备使用 {selected_profile.full_name} profile 填写表单...")
     
     # 使用带重试的表单填写函数
     result = fill_form_with_captcha_retry(session, submit_soup, location_name, selected_profile, max_retries=10)
