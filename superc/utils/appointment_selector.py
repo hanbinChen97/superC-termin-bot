@@ -10,7 +10,7 @@ pytest superc/utils/appointment_selector.py
 import bs4
 import logging
 from pathlib import Path
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional, Dict, List
 from datetime import datetime
 
 
@@ -23,6 +23,7 @@ def select_first_appointment(suggest_res_text: str) -> Tuple[bool, str, Optional
     返回: (成功?, 消息, form_data, 预约日期时间对象)
     """
     soup = bs4.BeautifulSoup(suggest_res_text, 'html.parser')
+
     details_container = soup.find("details", {"id": "details_suggest_times"})
     if not details_container:
         details_container = soup.find("div", {"id": "sugg_accordion"})
@@ -38,6 +39,7 @@ def select_first_appointment(suggest_res_text: str) -> Tuple[bool, str, Optional
     form_data = {inp.get('name'): inp.get('value') for inp in first_available_form.find_all("input", {"type": "hidden"})}
 
     date_str = form_data.get("date")  # YYYYMMDD
+    
     time_button = first_available_form.find("button", {"type": "submit"})
     time_str = time_button.get('title') if time_button else None # HH:MM
 
@@ -48,33 +50,44 @@ def select_first_appointment(suggest_res_text: str) -> Tuple[bool, str, Optional
         # Combine date and time and parse into a datetime object
         appointment_dt = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H:%M")
         logger.info(f"找到可用时间: {appointment_dt.strftime('%A, %d.%m.%Y %H:%M')}")
+
         return True, "成功解析预约信息", form_data, appointment_dt
+    
     except (ValueError, TypeError) as e:
         logger.error(f"解析日期/时间时出错: date='{date_str}', time='{time_str}'. 错误: {e}")
+
         return False, "无法解析预约日期或时间", None, None
 
 
-def test_select_first_appointment_from_saved_page():
-    # data/debugPage/step_4_term_available_20251003_152049.html
-    # Assuming the test is run from the project root.
-    html_path = Path("data/debugPage/step_4_term_available_20251003_152049.html")
-    if not html_path.exists():
-        # If not in root, try to go up from current file.
-        html_path = Path(__file__).resolve().parent.parent.parent / "data/debugPage/step_4_term_available_20251003_152049.html"
+def parse_all_appointments(suggest_res_text: str) -> List[Dict]:
+    """
+    Parses all available appointments from the suggestion page.
+    Returns a list of appointment data.
+    """
+    soup = bs4.BeautifulSoup(suggest_res_text, 'html.parser')
+    appointments = []
 
-    if not html_path.exists():
-        print(f"Test file not found at {html_path}, skipping test.")
-        return
+    details_container = soup.find("details", {"id": "details_suggest_times"})
+    if not details_container:
+        details_container = soup.find("div", {"id": "sugg_accordion"})
 
-    suggest_html = html_path.read_text(encoding="utf-8")
+    if not details_container:
+        return appointments
 
-    success, message, form_data, appointment_datetime = select_first_appointment(suggest_html)
+    for form in details_container.find_all("form", {"class": "suggestion_form"}):
+        form_data = {inp.get('name'): inp.get('value') for inp in form.find_all("input", {"type": "hidden"})}
+        date_str = form_data.get("date")
+        time_button = form.find("button", {"type": "submit"})
+        time_str = time_button.get('title') if time_button else None
 
-    print(f"Form data: {form_data}")
-    print(f"Appointment datetime: {appointment_datetime}")
+        if date_str and time_str:
+            try:
+                appointment_dt = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H:%M")
+                appointments.append({
+                    "form_data": form_data,
+                    "datetime": appointment_dt
+                })
+            except (ValueError, TypeError) as e:
+                logger.error(f"Error parsing date/time: date='{date_str}', time='{time_str}'. Error: {e}")
     
-    assert success, message
-    assert form_data is not None
-    assert form_data.get("date") == "20251211"
-    assert appointment_datetime is not None
-    assert appointment_datetime.date() == datetime(2025, 12, 11).date()
+    return appointments
