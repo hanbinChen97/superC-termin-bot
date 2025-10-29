@@ -1,5 +1,9 @@
+"""
 
-# -*- coding: utf-8 -*-
+
+uv run python -m db.utils
+
+"""
 
 import os
 import logging
@@ -11,7 +15,7 @@ import bs4
 import httpx
 
 # 使用相对导入
-from .config import USER_AGENT
+from ..config import USER_AGENT
 
 
 logger = logging.getLogger(__name__)

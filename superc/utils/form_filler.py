@@ -21,9 +21,9 @@ from bs4 import BeautifulSoup, Tag
 
 from .gpt_call import recognize_captcha_with_gpt
 from .utils import save_page_content, download_captcha
-from .config import USER_AGENT, BASE_URL
-from . import config
-from .profile import Profile
+from ..config import USER_AGENT, BASE_URL
+from .. import config
+from ..profile import Profile
 
 
 logger = logging.getLogger(__name__)

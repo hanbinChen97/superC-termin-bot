@@ -189,3 +189,32 @@ schritt 2,3,4  has only 1 'h1'
 if "Kein freier Termin verfügbar" in suggest_res.text:
 ```
 
+
+
+### 流程图
+```mermaid
+sequenceDiagram
+    participant S as Scheduler
+    participant A as Appointment Service
+    participant SC as SuperC Service
+    participant W as Website
+    participant AI as Azure OpenAI
+
+    S->>A: check_aachen_termin()
+    A->>SC: check_appointment_for_position()
+    SC->>W: 访问初始页面 (Schritt 2)
+    W-->>SC: 返回页面内容
+    SC->>W: 选择服务类型 (Schritt 3)
+    W-->>SC: 返回地点选择页面
+    SC->>W: 提交地点信息 (Schritt 4)
+    W-->>SC: 返回预约时间页面
+    SC->>W: 选择第一个可用时间 (Schritt 5)
+    W-->>SC: 返回表单页面
+    SC->>W: 下载验证码图片
+    SC->>AI: 识别验证码
+    AI-->>SC: 返回验证码文字
+    SC->>W: 提交填写好的表单 (Schritt 6)
+    W-->>SC: 返回确认页面
+    SC-->>A: 返回预约结果
+    A-->>S: 返回最终结果
+```

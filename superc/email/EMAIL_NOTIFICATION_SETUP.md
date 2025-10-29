@@ -49,7 +49,7 @@ python -m unittest tests.test_notify_email -v
 
 ### 5. Customize Email Content
 
-To customize the email template, edit `superc/notify_email.py`:
+To customize the email template, edit `superc/email/notify_email.py`:
 
 1. Update the `get_email_content()` function
 2. Modify the HTML template
