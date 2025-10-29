@@ -17,13 +17,13 @@ from typing import Optional
 
 from superc.appointment_checker import run_check
 from superc.config import LOCATIONS
-from superc.logging_utils import setup_logging
+from superc.utils.logging_utils import setup_logging
 # 导入数据库工具模块
 from db.utils import get_first_waiting_profile, update_appointment_status
 # 导入Profile类
 from superc.profile import Profile
 # 导入邮件通知模块
-from superc.notify_email import send_notify_email, send_update_email_notice
+from superc.email.notify_email import send_notify_email, send_update_email_notice
 
 setup_logging()
 

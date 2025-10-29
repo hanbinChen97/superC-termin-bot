@@ -1,48 +1,3 @@
-import base64
-def recognize_captcha_with_gpt(image_path, model=None):
-	"""
-	Recognize captcha from an image using OpenAI GPT-4o vision API.
-	Input:
-		image_path (str): Path to the captcha image file
-		model (str): Model name (default: 'gpt-4o')
-	Output:
-		str: Recognized captcha text
-	"""
-	# Read and encode image as base64
-	with open(image_path, "rb") as image_file:
-		base64_image = base64.b64encode(image_file.read()).decode('utf-8')
-
-	messages = [
-		{
-			"role": "system",
-			"content": (
-				"你是一个专业的验证码识别助手。你的任务是：\n"
-				"1. 仔细分析图片中的验证码字符\n"
-				"2. 只返回验证码字符，不要包含任何其他解释或文字\n"
-				"3. 如果字符不清晰，请根据最可能的字符进行判断\n"
-				"4. 保持原始大小写\n"
-				"5. 不要添加任何空格或标点符号"
-			)
-		},
-		{
-			"role": "user",
-			"content": [
-				{"type": "text", "text": "请识别这张验证码图片中的字符："},
-				{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
-			]
-		}
-	]
-	if model is None:
-		model = OPENAI_MODEL
-	client = _get_client()
-	response = client.chat.completions.create(
-		model=model,
-		messages=messages,
-		max_tokens=10,
-		temperature=0.1
-	)
-	content = response.choices[0].message.content
-	return content.strip() if content else ""
 """
 gpt_call.py
 
@@ -59,6 +14,7 @@ Environment Variables:
 """
 
 import os
+import base64
 import openai
 from dotenv import load_dotenv
 
@@ -107,6 +63,51 @@ def gpt_chat(messages, model=OPENAI_MODEL, max_tokens=256, temperature=0.7):
 	content = response.choices[0].message.content
 	return content.strip() if content else ""
 
+def recognize_captcha_with_gpt(image_path, model=None):
+	"""
+	Recognize captcha from an image using OpenAI GPT-4o vision API.
+	Input:
+		image_path (str): Path to the captcha image file
+		model (str): Model name (default: 'gpt-4o')
+	Output:
+		str: Recognized captcha text
+	"""
+	# Read and encode image as base64
+	with open(image_path, "rb") as image_file:
+		base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+
+	messages = [
+		{
+			"role": "system",
+			"content": (
+				"你是一个专业的验证码识别助手。你的任务是：\n"
+				"1. 仔细分析图片中的验证码字符\n"
+				"2. 只返回验证码字符，不要包含任何其他解释或文字\n"
+				"3. 如果字符不清晰，请根据最可能的字符进行判断\n"
+				"4. 保持原始大小写\n"
+				"5. 不要添加任何空格或标点符号"
+			)
+		},
+		{
+			"role": "user",
+			"content": [
+				{"type": "text", "text": "请识别这张验证码图片中的字符："},
+				{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
+			]
+		}
+	]
+	if model is None:
+		model = OPENAI_MODEL
+	client = _get_client()
+	response = client.chat.completions.create(
+		model=model,
+		messages=messages,
+		max_tokens=10,
+		temperature=0.1
+	)
+	content = response.choices[0].message.content
+	return content.strip() if content else ""
+
 if __name__ == "__main__":
 	# Test captcha recognition from image
 	image_path = "data/test_pic.png"
@@ -117,4 +118,4 @@ if __name__ == "__main__":
 		except Exception as e:
 			print(f"识别出错: {e}")
 	else:
-		print(f"错误：找不到图片文件 {image_path}")
+			print(f"错误：找不到图片文件 {image_path}")

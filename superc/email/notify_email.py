@@ -15,7 +15,7 @@ Input types:
 Output types:
 - Returns: bool - True if email sent successfully, False otherwise
 
-python3 superc/notify_email.py
+python3 -m superc.email.notify_email
 """
 
 import smtplib
