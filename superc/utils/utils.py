@@ -15,7 +15,7 @@ import bs4
 import httpx
 
 # 使用相对导入
-from ..config import USER_AGENT
+from ..config import USER_AGENT, get_captcha_dir
 
 
 logger = logging.getLogger(__name__)
@@ -89,7 +89,7 @@ def download_captcha(session: httpx.Client, soup: bs4.BeautifulSoup, location_na
         if img_response.status_code != 200:
             return False, f"下载验证码图片失败，状态码：{img_response.status_code}"
         
-        dir_path = f'pages/{location_name}/captcha'
+        dir_path = get_captcha_dir(location_name)
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         

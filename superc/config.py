@@ -56,3 +56,20 @@ LOCATIONS = {
 # 只接受严格早于此日期的预约
 APPOINTMENT_CUTOFF_DATE = datetime.strptime("17.11.2025", "%d.%m.%Y").date()
 
+# CAPTCHA 文件路径配置
+CAPTCHA_BASE_DIR = "data"
+CAPTCHA_SUBDIR = "captcha"
+
+
+def get_captcha_dir(location_name: str) -> str:
+    """
+    获取指定位置的 CAPTCHA 目录路径
+    
+    Args:
+        location_name: 位置名称 (如 'superc', 'infostelle')
+    
+    Returns:
+        str: CAPTCHA 目录完整路径
+    """
+    return f"{CAPTCHA_BASE_DIR}/{location_name}/{CAPTCHA_SUBDIR}"
+
