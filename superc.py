@@ -30,6 +30,12 @@ setup_logging()
 main_logger = logging.getLogger("main")
 main_logger.setLevel(logging.INFO)
 
+# German weekday names for appointment datetime formatting
+GERMAN_WEEKDAY_NAMES = {
+    0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag',
+    4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'
+}
+
 
 
 def log_profile_info(profile):
@@ -151,12 +157,7 @@ if __name__ == "__main__":
                             # This format matches what parse_appointment_date() expects in db/utils.py
                             appointment_datetime_str = None
                             if appointment_datetime:
-                                # Use locale-independent format to match German weekday names
-                                weekday_names = {
-                                    0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag',
-                                    4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'
-                                }
-                                weekday = weekday_names[appointment_datetime.weekday()]
+                                weekday = GERMAN_WEEKDAY_NAMES[appointment_datetime.weekday()]
                                 appointment_datetime_str = f"{weekday}, {appointment_datetime.strftime('%d.%m.%Y %H:%M')}"
                             
                             success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
