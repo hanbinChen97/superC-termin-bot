@@ -153,9 +153,9 @@ def enter_schritt_4_page(session: httpx.Client, url: str, loc: str, submit_text:
     
     # ==================== ang ================================
     # Compare appointment date with configured cutoff date
-    if appointment_datetime and appointment_datetime.date() >= config.APPOINTMENT_CUTOFF_DATE:
-        cutoff_str = config.APPOINTMENT_CUTOFF_DATE.strftime("%d.%m.%Y")
-        return False, f"预约时间过晚: {appointment_datetime.strftime('%d.%m.%Y')} (截止: {cutoff_str})", None, None, None
+    # if appointment_datetime and appointment_datetime.date() >= config.APPOINTMENT_CUTOFF_DATE:
+    #     cutoff_str = config.APPOINTMENT_CUTOFF_DATE.strftime("%d.%m.%Y")
+    #     return False, f"预约时间过晚: {appointment_datetime.strftime('%d.%m.%Y')} (截止: {cutoff_str})", None, None, None
     # ============================================================
 
     selected_profile = current_profile

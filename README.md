@@ -75,7 +75,9 @@ source .venv/bin/activate
 python superc.py
 
 # 使用uv运行（推荐）
-uv run python superc.py
+uv run superc.py
+
+uv run pytest
 
 # 后台运行并记录日志
 nohup uv run python superc.py 2>&1 | tee superc.log &

@@ -5,7 +5,7 @@
 
 source .venv/bin/activate && 
 
-nohup python3 superc.py >> superc.log 2>&1 &
+nohup uv run superc.py >> superc.log 2>&1 &
 
 ps aux | grep superc.py
 """
@@ -93,7 +93,8 @@ if __name__ == "__main__":
             break
             
         try:
-            has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile)
+            # run_check 现在返回 datetime 对象而非字符串
+            has_appointment, message, appointment_dt = run_check(superc_config, current_profile)
 
             # 无预约时等待1分钟后重新检查
             if not has_appointment:
@@ -146,10 +147,11 @@ if __name__ == "__main__":
                     # 更新数据库profile状态为booked
                     if current_db_profile:
                         try:
-                            success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
+                            success = update_appointment_status(current_db_profile.id, 'booked', appointment_dt)  # type: ignore[arg-type]
                             if success and current_profile:
-                                if appointment_datetime_str:
-                                    main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
+                                if appointment_dt:
+                                    formatted_dt = appointment_dt.strftime("%Y-%m-%d %H:%M")
+                                    main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {formatted_dt}")
                                 else:
                                     main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'")
                                 
@@ -157,7 +159,7 @@ if __name__ == "__main__":
                                 try:
                                     appointment_info = {
                                         'name': current_profile.full_name,
-                                        'appointment_datetime': appointment_datetime_str or '待确认',
+                                        'appointment_datetime': (appointment_dt.strftime("%Y-%m-%d %H:%M") if appointment_dt else '待确认'),
                                         'location': 'SuperC'
                                     }
                                     email_sent = send_notify_email(current_profile.email, appointment_info)

@@ -55,27 +55,9 @@ def _init_database():
 # 初始化数据库连接
 engine, SessionLocal = _init_database()
 
-def parse_appointment_date(appointment_date_str: str) -> Optional[datetime]:
-    """
-    解析预约日期字符串，转换为datetime对象
-    输入格式: "Donnerstag, 16.10.2025 11:00"
-    输出: datetime对象
-    """
-    try:
-        # 从 "Donnerstag, 16.10.2025 11:00" 中提取日期和时间部分
-        # 去掉星期几，只保留日期和时间
-        if ', ' in appointment_date_str:
-            date_time_part = appointment_date_str.split(', ')[1]  # "16.10.2025 11:00"
-        else:
-            date_time_part = appointment_date_str
-        
-        # 解析日期时间: "16.10.2025 11:00"
-        parsed_datetime = datetime.strptime(date_time_part, "%d.%m.%Y %H:%M")
-        return parsed_datetime
-        
-    except (ValueError, IndexError) as e:
-        print(f"无法解析预约日期 '{appointment_date_str}': {e}")
-        return None
+"""
+注意: 过去版本支持字符串日期解析(parse_appointment_date)，现已移除，统一使用 datetime 对象。
+"""
 
 def get_all_appointment_profiles() -> List[AppointmentProfile]:
     """
@@ -112,14 +94,17 @@ def get_first_waiting_profile() -> Optional[AppointmentProfile]:
     finally:
         session.close()
 
-def update_appointment_status(profile_id: int, status: str, appointment_date: Optional[str] = None) -> bool:
+def update_appointment_status(profile_id: int, status: str, appointment_date: Optional[datetime] = None) -> bool:
     """
     更新预约配置文件的状态和预约日期
-    参数:
-        profile_id: 预约配置文件ID
-        status: 新的状态值（如 'booked', 'error'）
-        appointment_date: 预约日期字符串，格式如 "Donnerstag, 16.10.2025 11:00"
-    返回: 更新是否成功
+
+    输入类型:
+    - profile_id: int - 预约配置文件ID
+    - status: str - 新的状态值（如 'booked', 'error'）
+        - appointment_date: Optional[datetime] - 预约日期时间对象（不再支持字符串）
+
+    输出类型:
+    - bool - 更新是否成功
     """
     session = SessionLocal()
     try:
@@ -129,14 +114,13 @@ def update_appointment_status(profile_id: int, status: str, appointment_date: Op
             # 使用 setattr 来避免类型检查问题
             setattr(profile, 'appointment_status', status)
             
-            # 如果提供了预约日期，解析并存储
-            if appointment_date:
-                parsed_date = parse_appointment_date(appointment_date)
-                if parsed_date:
-                    setattr(profile, 'appointment_date', parsed_date)
-                    print(f"成功解析并存储预约日期: {appointment_date} -> {parsed_date}")
+            # 如果提供了预约日期，直接存储（仅接受 datetime）
+            if appointment_date is not None:
+                if isinstance(appointment_date, datetime):
+                    setattr(profile, 'appointment_date', appointment_date)
+                    print(f"成功存储预约日期: {appointment_date}")
                 else:
-                    print(f"预约日期解析失败: {appointment_date}")
+                    print(f"预约日期类型无效(需datetime): {type(appointment_date)}")
 
             setattr(profile, 'completed_at', datetime.now())
 
