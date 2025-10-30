@@ -30,9 +30,6 @@ def test_get_captcha_dir_integration():
     # Test for infostelle location
     infostelle_path = config_module.get_captcha_dir("infostelle")
     assert infostelle_path == "data/infostelle/captcha"
-    
-    print(f"✓ SuperC captcha path: {superc_path}")
-    print(f"✓ Infostelle captcha path: {infostelle_path}")
 
 
 def test_config_constants():
@@ -41,8 +38,6 @@ def test_config_constants():
     assert hasattr(config_module, 'CAPTCHA_SUBDIR')
     assert config_module.CAPTCHA_BASE_DIR == "data"
     assert config_module.CAPTCHA_SUBDIR == "captcha"
-    print(f"✓ CAPTCHA_BASE_DIR: {config_module.CAPTCHA_BASE_DIR}")
-    print(f"✓ CAPTCHA_SUBDIR: {config_module.CAPTCHA_SUBDIR}")
 
 
 if __name__ == "__main__":
