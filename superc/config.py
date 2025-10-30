@@ -50,9 +50,9 @@ LOCATIONS = {
         "submit_text": "Ausländeramt Aachen - Infostelle auswählen"
     }
 }
-# 
+
 
 # Appointment cutoff date (only accept appointments strictly before this date)
 # 只接受严格早于此日期的预约
-APPOINTMENT_CUTOFF_DATE = datetime.strptime("17.11.2025", "%d.%m.%Y").date()
+# APPOINTMENT_CUTOFF_DATE = datetime.strptime("17.11.2025", "%d.%m.%Y").date()
 

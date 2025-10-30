@@ -5,7 +5,7 @@
 
 source .venv/bin/activate && 
 
-nohup python3 superc.py >> superc.log 2>&1 &
+nohup uv run superc.py >> superc.log 2>&1 &
 
 ps aux | grep superc.py
 """
@@ -93,6 +93,7 @@ if __name__ == "__main__":
             break
             
         try:
+            # TODO: appointment_datetime_str 不对，runcheck 里返回的值是 datetime
             has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile)
 
             # 无预约时等待1分钟后重新检查
@@ -147,6 +148,9 @@ if __name__ == "__main__":
                     if current_db_profile:
                         try:
                             success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
+
+                            # 这里出问题，这里到 else 去了
+                            # 也就是 success and current_profile: 有问题。
                             if success and current_profile:
                                 if appointment_datetime_str:
                                     main_logger.info(f"已更新用户 {current_profile.full_name} 的状态为 'booked'，预约时间: {appointment_datetime_str}")
