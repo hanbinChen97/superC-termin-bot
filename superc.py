@@ -197,7 +197,6 @@ if __name__ == "__main__":
             break
             
         try:
-            # run_check 现在返回 datetime 对象而非字符串
             has_appointment, message, appointment_dt = run_check(superc_config, current_profile)
 
             # 无预约时等待1分钟后重新检查
@@ -206,55 +205,55 @@ if __name__ == "__main__":
                 time.sleep(60)
                 continue
 
-            # 有预约时，根据message分情况处理
-            if has_appointment:
-                # 处理完成标志
-                should_get_next_user = False
+            # -------------- 有预约时的处理逻辑 --------------
+            # 处理完成标志
+            should_get_next_user = False
 
-                if message == "superC server error":
-                    main_logger.warning("检测到superC server error，等待60秒后重试")
-                    time.sleep(60)
+            if message == "superC server error":
+                main_logger.warning("检测到superC server error，等待60秒后重试")
+                time.sleep(60)
+                continue
+            
+            # 情况1: "zu vieler Terminanfragen" 错误
+            if "zu vieler Terminanfragen" in message:
+                main_logger.error(f"检测到错误: 提交过于频繁 (关键词: zu vieler Terminanfragen)")
+
+                # 向用户发送邮箱更新提醒邮件（提示更新邮箱，不提及被系统 block）
+                if current_profile:
+                    send_update_email_to_user(current_profile.email, current_profile.full_name)
+
+                # 更新数据库profile状态为error
+                if current_db_profile and current_profile:
+                    update_profile_status_to_error(current_db_profile.id, current_profile.full_name)
+
+                should_get_next_user = True
+                
+            # 情况2: 预约成功
+            if "预约已完成" in message :
+                main_logger.info(f"成功！ {message}")
+                
+                # 发送邮件通知
+                if current_profile:
+                    send_appointment_confirmation_email(current_profile.email, current_profile.full_name, appointment_dt, location='SuperC')
+
+                # 更新数据库profile状态为booked
+                if current_db_profile and current_profile:
+                    update_profile_status_to_booked(current_db_profile.id, current_profile.full_name, appointment_dt)
+                
+                should_get_next_user = True
+            
+            # 统一处理：获取下一个用户
+            if should_get_next_user:
+                main_logger.info("处理完成！立即检查是否有下一个用户需要处理...")
+                current_db_profile, current_profile = get_next_user_profile()
+                
+                if current_db_profile and current_profile:
+                    main_logger.info("继续查询下一个用户的预约...")
                     continue
-                
-                # 情况1: "zu vieler Terminanfragen" 错误
-                if "zu vieler Terminanfragen" in message:
-                    main_logger.error(f"检测到错误: 提交过于频繁 (关键词: zu vieler Terminanfragen)")
+                else:
+                    main_logger.info("没有更多等待的用户，程序退出")
+                    break
 
-                    # 向用户发送邮箱更新提醒邮件（提示更新邮箱，不提及被系统 block）
-                    if current_profile:
-                        send_update_email_to_user(current_profile.email, current_profile.full_name)
-
-                    # 更新数据库profile状态为error
-                    if current_db_profile and current_profile:
-                        update_profile_status_to_error(current_db_profile.id, current_profile.full_name)
-
-                    should_get_next_user = True
-                    
-                # 情况2: 预约成功
-                if "预约已完成" in message :
-                    main_logger.info(f"成功！ {message}")
-                    
-                    # 发送邮件通知
-                    if current_profile:
-                        send_appointment_confirmation_email(current_profile.email, current_profile.full_name, appointment_dt, location='SuperC')
-
-                    # 更新数据库profile状态为booked
-                    if current_db_profile and current_profile:
-                        update_profile_status_to_booked(current_db_profile.id, current_profile.full_name, appointment_dt)
-                    
-                    should_get_next_user = True
-                
-                # 统一处理：获取下一个用户
-                if should_get_next_user:
-                    main_logger.info("处理完成！立即检查是否有下一个用户需要处理...")
-                    current_db_profile, current_profile = get_next_user_profile()
-                    
-                    if current_db_profile and current_profile:
-                        main_logger.info("继续查询下一个用户的预约...")
-                        continue
-                    else:
-                        main_logger.info("没有更多等待的用户，程序退出")
-                        break
 
             main_logger.warning(f"出现未预期的消息: {message}")
         except Exception as e:

@@ -1,6 +1,6 @@
 # Aachen Termin Bot
 
-亚琛外管局（Ausländeramt）自动预约机器人，支持SuperC和Infostelle两个地点的RWTH学生预约。  
+亚琛 SuperC 外管局（Ausländeramt）自动预约机器人。  
 https://termine.staedteregion-aachen.de/auslaenderamt/
 
 ## 🏗️ 项目架构
@@ -59,6 +59,9 @@ source .venv/bin/activate  # Linux/Mac
 
 # 使用uv安装依赖
 uv pip install -r requirements.txt
+uv sync
+
+uv add xxx
 ```
 
 ### 2. 配置环境变量
