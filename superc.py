@@ -93,8 +93,8 @@ if __name__ == "__main__":
             break
             
         try:
-            # TODO: appointment_datetime_str 不对，runcheck 里返回的值是 datetime
-            has_appointment, message, appointment_datetime_str = run_check(superc_config, current_profile)
+            # run_check returns a datetime object (not a string)
+            has_appointment, message, appointment_datetime = run_check(superc_config, current_profile)
 
             # 无预约时等待1分钟后重新检查
             if not has_appointment:
@@ -147,6 +147,18 @@ if __name__ == "__main__":
                     # 更新数据库profile状态为booked
                     if current_db_profile:
                         try:
+                            # Convert datetime object to string format: "Weekday, DD.MM.YYYY HH:MM"
+                            # This format matches what parse_appointment_date() expects in db/utils.py
+                            appointment_datetime_str = None
+                            if appointment_datetime:
+                                # Use locale-independent format to match German weekday names
+                                weekday_names = {
+                                    0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag',
+                                    4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'
+                                }
+                                weekday = weekday_names[appointment_datetime.weekday()]
+                                appointment_datetime_str = f"{weekday}, {appointment_datetime.strftime('%d.%m.%Y %H:%M')}"
+                            
                             success = update_appointment_status(current_db_profile.id, 'booked', appointment_datetime_str)  # type: ignore
 
                             # 这里出问题，这里到 else 去了
