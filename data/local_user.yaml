@@ -1,0 +1,12 @@
+# 本地模式用户配置
+# 用于 python superc.py --local 模式，无需连接 Supabase
+
+users:
+  - vorname: "Max"
+    nachname: "Mustermann"
+    email: "max.mustermann@rwth-aachen.de"
+    phone: "+4915112345678"
+    geburtsdatum_day: 15
+    geburtsdatum_month: 6
+    geburtsdatum_year: 1995
+    preferred_locations: "superc"
