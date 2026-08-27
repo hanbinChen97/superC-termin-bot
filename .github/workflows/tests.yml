@@ -34,11 +34,26 @@ jobs:
 
       # ── 第一层：Unit + E2E (respx mock)，完全离线 ──────────────────
       - name: Run unit & E2E tests (offline)
+        env:
+          # db/utils.py 在模块导入时就初始化数据库连接，CI 里需要提供占位变量
+          # 测试本身不会真正连接数据库
+          DB_USER: ci_dummy
+          DB_PASSWORD: ci_dummy
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: ci_dummy
         run: |
           PYTHONPATH=. pytest -m "not integration" -v --tb=short
 
       # ── 第二层：Integration (vcrpy cassette 回放)，也完全离线 ───────
       # cassette 文件已提交到 git，所以不需要真实网络
       - name: Run integration tests (vcrpy cassette replay)
+        env:
+          DB_USER: ci_dummy
+          DB_PASSWORD: ci_dummy
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: ci_dummy
         run: |
           PYTHONPATH=. pytest -m integration -v --tb=short
+
