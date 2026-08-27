@@ -16,9 +16,22 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11"]
 
+    env:
+      # db/utils.py 在模块导入时初始化 SQLAlchemy engine，CI 里提供占位值
+      DB_USER: ci_dummy
+      DB_PASSWORD: ci_dummy
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_NAME: ci_dummy
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q libpq-dev
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -32,46 +45,23 @@ jobs:
           pip install -r requirements.txt
           pip install respx pytest-mock vcrpy pytest-recording
 
-      # ── Debug: 诊断 CI 环境，打印关键信息 ──────────────────────────
       - name: Debug CI environment
-        env:
-          DB_USER: ci_dummy
-          DB_PASSWORD: ci_dummy
-          DB_HOST: localhost
-          DB_PORT: "5432"
-          DB_NAME: ci_dummy
         run: |
           python --version
-          pip list | grep -E "sqlalchemy|psycopg2|respx|pytest|vcrpy"
-          echo "--- test key imports ---"
+          pip show httpx respx pytest sqlalchemy psycopg2-binary vcrpy | grep -E "Name|Version"
+          echo "--- key imports ---"
           PYTHONPATH=. python -c "
-          from db.models import AppointmentProfile
-          print('db.models OK')
-          from superc.profile import Profile
-          print('superc.profile OK')
-          from superc.appointment_checker import run_check
-          print('appointment_checker OK')
-          " || echo "IMPORT FAILED (see traceback above)"
+          from db.models import AppointmentProfile; print('db.models OK')
+          from superc.profile import Profile; print('superc.profile OK')
+          from superc.appointment_checker import run_check; print('appointment_checker OK')
+          " || echo "IMPORT FAILED"
 
       # ── 第一层：Unit + E2E (respx mock)，完全离线 ──────────────────
       - name: Run unit & E2E tests (offline)
-        env:
-          DB_USER: ci_dummy
-          DB_PASSWORD: ci_dummy
-          DB_HOST: localhost
-          DB_PORT: "5432"
-          DB_NAME: ci_dummy
         run: |
           PYTHONPATH=. pytest -m "not integration" -v --tb=long
 
       # ── 第二层：Integration (vcrpy cassette 回放)，也完全离线 ───────
-      # cassette 文件已提交到 git，所以不需要真实网络
       - name: Run integration tests (vcrpy cassette replay)
-        env:
-          DB_USER: ci_dummy
-          DB_PASSWORD: ci_dummy
-          DB_HOST: localhost
-          DB_PORT: "5432"
-          DB_NAME: ci_dummy
         run: |
           PYTHONPATH=. pytest -m integration -v --tb=long
