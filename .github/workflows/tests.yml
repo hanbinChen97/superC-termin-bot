@@ -32,18 +32,37 @@ jobs:
           pip install -r requirements.txt
           pip install respx pytest-mock vcrpy pytest-recording
 
-      # ── 第一层：Unit + E2E (respx mock)，完全离线 ──────────────────
-      - name: Run unit & E2E tests (offline)
+      # ── Debug: 诊断 CI 环境，打印关键信息 ──────────────────────────
+      - name: Debug CI environment
         env:
-          # db/utils.py 在模块导入时就初始化数据库连接，CI 里需要提供占位变量
-          # 测试本身不会真正连接数据库
           DB_USER: ci_dummy
           DB_PASSWORD: ci_dummy
           DB_HOST: localhost
           DB_PORT: "5432"
           DB_NAME: ci_dummy
         run: |
-          PYTHONPATH=. pytest -m "not integration" -v --tb=short
+          python --version
+          pip list | grep -E "sqlalchemy|psycopg2|respx|pytest|vcrpy"
+          echo "--- test key imports ---"
+          PYTHONPATH=. python -c "
+          from db.models import AppointmentProfile
+          print('db.models OK')
+          from superc.profile import Profile
+          print('superc.profile OK')
+          from superc.appointment_checker import run_check
+          print('appointment_checker OK')
+          " || echo "IMPORT FAILED (see traceback above)"
+
+      # ── 第一层：Unit + E2E (respx mock)，完全离线 ──────────────────
+      - name: Run unit & E2E tests (offline)
+        env:
+          DB_USER: ci_dummy
+          DB_PASSWORD: ci_dummy
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: ci_dummy
+        run: |
+          PYTHONPATH=. pytest -m "not integration" -v --tb=long
 
       # ── 第二层：Integration (vcrpy cassette 回放)，也完全离线 ───────
       # cassette 文件已提交到 git，所以不需要真实网络
@@ -55,5 +74,4 @@ jobs:
           DB_PORT: "5432"
           DB_NAME: ci_dummy
         run: |
-          PYTHONPATH=. pytest -m integration -v --tb=short
-
+          PYTHONPATH=. pytest -m integration -v --tb=long
