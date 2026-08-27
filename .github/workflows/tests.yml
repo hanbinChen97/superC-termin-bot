@@ -22,6 +22,8 @@ jobs:
       DB_HOST: localhost
       DB_PORT: "5432"
       DB_NAME: ci_dummy
+      # gpt_call.py 在模块导入时检查此变量，CI 里提供占位值（测试不会真正调用 OpenAI）
+      OPENAI_KEY: ci_dummy_key
 
     steps:
       - name: Checkout code
