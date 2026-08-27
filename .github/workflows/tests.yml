@@ -1,0 +1,44 @@
+name: Tests
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  test:
+    name: Run Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install respx pytest-mock vcrpy pytest-recording
+
+      # ── 第一层：Unit + E2E (respx mock)，完全离线 ──────────────────
+      - name: Run unit & E2E tests (offline)
+        run: |
+          PYTHONPATH=. pytest -m "not integration" -v --tb=short
+
+      # ── 第二层：Integration (vcrpy cassette 回放)，也完全离线 ───────
+      # cassette 文件已提交到 git，所以不需要真实网络
+      - name: Run integration tests (vcrpy cassette replay)
+        run: |
+          PYTHONPATH=. pytest -m integration -v --tb=short
